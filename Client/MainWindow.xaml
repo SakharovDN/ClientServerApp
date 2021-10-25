@@ -1,0 +1,57 @@
+﻿<Window x:Class="Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <Label>Address:</Label>
+            <TextBox x:Name="AddressTextBox" IsEnabled="{Binding Path=IsEditMode}"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="1">
+            <Label>Port:</Label>
+            <TextBox x:Name="PortTextBox"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="2">
+            <Button x:Name="StartButton" Command="{Binding ClickCommand}">Start</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="3">
+            <Button x:Name="StopButton">Stop</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <Label>Login:</Label>
+            <TextBox x:Name="LoginTextBox"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <Button x:Name="LoginButton">Login</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <Label>Message:</Label>
+            <TextBox x:Name="MessageTextBox"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="2">
+            <Button x:Name="SendButton">Send</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="3">
+            <Button x:Name="ClearButton">Clear</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
+            <ListBox x:Name="MessagesListBox"></ListBox>
+        </StackPanel>
+    </Grid>
+</Window>

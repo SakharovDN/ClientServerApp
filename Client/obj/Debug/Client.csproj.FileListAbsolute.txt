@@ -1,0 +1,15 @@
+D:\repos\ClientServerApp\Client\bin\Debug\Client.exe.config
+D:\repos\ClientServerApp\Client\bin\Debug\Client.exe
+D:\repos\ClientServerApp\Client\bin\Debug\Client.pdb
+D:\repos\ClientServerApp\Client\obj\Debug\Client.csproj.AssemblyReference.cache
+D:\repos\ClientServerApp\Client\obj\Debug\MainWindow.g.cs
+D:\repos\ClientServerApp\Client\obj\Debug\App.g.cs
+D:\repos\ClientServerApp\Client\obj\Debug\Client_MarkupCompile.cache
+D:\repos\ClientServerApp\Client\obj\Debug\Client_MarkupCompile.lref
+D:\repos\ClientServerApp\Client\obj\Debug\MainWindow.baml
+D:\repos\ClientServerApp\Client\obj\Debug\Client.g.resources
+D:\repos\ClientServerApp\Client\obj\Debug\Client.Properties.Resources.resources
+D:\repos\ClientServerApp\Client\obj\Debug\Client.csproj.GenerateResource.cache
+D:\repos\ClientServerApp\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+D:\repos\ClientServerApp\Client\obj\Debug\Client.exe
+D:\repos\ClientServerApp\Client\obj\Debug\Client.pdb
