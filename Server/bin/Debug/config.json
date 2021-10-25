@@ -1,6 +1,0 @@
-{
-  "NetworkInterface": "WebSocket",
-  "Port": 65000,
-  "InactivityTimeoutInterval": 120000,
-  "DbConnection": "path"
-}
