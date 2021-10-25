@@ -1,9 +1,0 @@
-D:\repos\ClientServerApp\Common\bin\Debug\Common.dll
-D:\repos\ClientServerApp\Common\bin\Debug\Common.pdb
-D:\repos\ClientServerApp\Common\bin\Debug\websocket-sharp.dll
-D:\repos\ClientServerApp\Common\bin\Debug\websocket-sharp.xml
-D:\repos\ClientServerApp\Common\obj\Debug\Common.csproj.AssemblyReference.cache
-D:\repos\ClientServerApp\Common\obj\Debug\Common.csproj.CoreCompileInputs.cache
-D:\repos\ClientServerApp\Common\obj\Debug\Common.csproj.CopyComplete
-D:\repos\ClientServerApp\Common\obj\Debug\Common.dll
-D:\repos\ClientServerApp\Common\obj\Debug\Common.pdb
