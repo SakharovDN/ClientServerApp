@@ -1,7 +1,6 @@
 ﻿namespace Server
 {
     using System;
-    using Common;
 
     internal class Program
     {

@@ -1,19 +1,12 @@
-﻿namespace Common
+﻿namespace Server
 {
     using System;
-    using System.IO;
     using System.Net;
 
-    using Newtonsoft.Json;
+    using Common;
 
     public class NetworkManager
     {
-        #region Constants
-
-        private const string CONFIG_FILE_PATH = @"config.json";
-
-        #endregion
-
         #region Fields
 
         private readonly WsServer _wsServer;
@@ -26,8 +19,8 @@
 
         public NetworkManager()
         {
-            _configSetting = ConfigSettings.Read(CONFIG_FILE_PATH);
-            _wsServer = new WsServer(new IPEndPoint(IPAddress.Any, 65000));
+            _configSetting = ConfigSettings.Receive();
+            _wsServer = new WsServer(new IPEndPoint(IPAddress.Any, _configSetting.Port));
         }
 
         #endregion
@@ -36,7 +29,7 @@
 
         public void Start()
         {
-            Console.WriteLine($"WebSocketServer: {IPAddress.Any}:{65000}");
+            Console.WriteLine($"WebSocketServer: {IPAddress.Any}:{_configSetting.Port}");
             _wsServer.Start();
         }
 
