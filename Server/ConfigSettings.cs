@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace Server
 {
     using System.IO;
 
@@ -6,6 +6,12 @@
 
     public class ConfigSettings
     {
+        #region Constants
+
+        private const string CONFIG_FILE_PATH = @"config.json";
+
+        #endregion
+
         #region Properties
 
         public string NetworkInterface { get; set; }
@@ -20,9 +26,9 @@
 
         #region Methods
 
-        public static ConfigSettings Read(string path)
+        public static ConfigSettings Receive()
         {
-            using (StreamReader file = File.OpenText(path))
+            using (StreamReader file = File.OpenText(CONFIG_FILE_PATH))
             {
                 var serializer = new JsonSerializer();
 
