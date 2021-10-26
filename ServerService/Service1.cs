@@ -1,32 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-using Common;
-
-namespace ServerService
+﻿namespace ServerService
 {
+    using System.ServiceProcess;
+
+    using Server;
+
     public partial class Service1 : ServiceBase
     {
-        NetworkManager networkManager = new NetworkManager();
+        #region Fields
+
+        private NetworkManager _networkManager;
+
+        #endregion
+
+        #region Constructors
+
         public Service1()
         {
             InitializeComponent();
         }
 
+        #endregion
+
+        #region Methods
+
         protected override void OnStart(string[] args)
         {
-            networkManager.Start();
+            _networkManager = new NetworkManager();
+            _networkManager.Start();
         }
 
         protected override void OnStop()
         {
-            networkManager.Stop();
+            _networkManager?.Stop();
+            _networkManager = null;
         }
+
+        #endregion
     }
 }

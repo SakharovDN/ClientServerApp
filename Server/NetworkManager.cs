@@ -5,6 +5,8 @@
 
     using Common;
 
+    using NLog;
+
     public class NetworkManager
     {
         #region Fields
@@ -12,6 +14,7 @@
         private readonly WsServer _wsServer;
 
         private readonly ConfigSettings _configSetting;
+        private readonly Logger _logger;
 
         #endregion
 
@@ -21,6 +24,7 @@
         {
             _configSetting = ConfigSettings.Receive();
             _wsServer = new WsServer(new IPEndPoint(IPAddress.Any, _configSetting.Port));
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         #endregion
@@ -29,13 +33,28 @@
 
         public void Start()
         {
-            Console.WriteLine($"WebSocketServer: {IPAddress.Any}:{_configSetting.Port}");
-            _wsServer.Start();
+            try
+            {
+                _wsServer.Start();
+                _logger.Info("Server started successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message, ex.Source);
+            }
         }
 
         public void Stop()
         {
-            _wsServer.Stop();
+            try
+            {
+                _wsServer.Stop();
+                _logger.Info("Server stopped successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.Message, ex.Source);
+            }
         }
 
         #endregion
