@@ -4,6 +4,7 @@
     using System.Net;
 
     using Common;
+    using Common._EventArgs_;
 
     using NLog;
 
@@ -12,7 +13,6 @@
         #region Fields
 
         private readonly WsServer _wsServer;
-
         private readonly ConfigSettings _configSetting;
         private readonly Logger _logger;
 
@@ -56,7 +56,6 @@
                 _logger.Error(ex.Message, ex.Source);
             }
         }
-
         #endregion
     }
 }
