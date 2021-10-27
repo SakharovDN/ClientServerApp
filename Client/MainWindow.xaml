@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Client"
+        xmlns:local="clr-namespace:Client" d:DataContext="{d:DesignInstance Type=local:ViewModelBase}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Client" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -21,37 +21,37 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
             <Label>Address:</Label>
-            <TextBox x:Name="AddressTextBox" IsEnabled="{Binding Path=IsEditMode}"></TextBox>
+            <TextBox x:Name="AddressTextBox" Text="{Binding Address}" IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1">
             <Label>Port:</Label>
-            <TextBox x:Name="PortTextBox"></TextBox>
+            <TextBox x:Name="PortTextBox" Text="{Binding Port}" IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="2">
-            <Button x:Name="StartButton" Command="{Binding ClickCommand}">Start</Button>
+            <Button x:Name="StartButton" Command="{Binding StartCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">Start</Button>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="3">
-            <Button x:Name="StopButton">Stop</Button>
+            <Button x:Name="StopButton" Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0">
             <Label>Login:</Label>
-            <TextBox x:Name="LoginTextBox"></TextBox>
+            <TextBox x:Name="ClientNameTextBox" IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <Button x:Name="LoginButton">Login</Button>
+            <Button x:Name="LoginButton" Command="{Binding LoginCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonLoginIsEnabled}">Login</Button>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
             <Label>Message:</Label>
-            <TextBox x:Name="MessageTextBox"></TextBox>
+            <TextBox x:Name="MessageTextBox" IsEnabled="{Binding ControlsEnabledViewModel.MessageIsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="2">
-            <Button x:Name="SendButton">Send</Button>
+            <Button x:Name="SendButton" Command="{Binding SendButton}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonSendIsEnabled}">Send</Button>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="3">
-            <Button x:Name="ClearButton">Clear</Button>
+            <Button x:Name="ClearButton" Command="{Binding ClearButton}">Clear</Button>
         </StackPanel>
         <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
-            <ListBox x:Name="MessagesListBox"></ListBox>
+            <ListBox x:Name="MessagesListBox" Height="219" ItemsSource="{Binding MessagesList}"></ListBox>
         </StackPanel>
     </Grid>
 </Window>
