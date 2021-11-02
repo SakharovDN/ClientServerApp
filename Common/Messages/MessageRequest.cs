@@ -1,18 +1,18 @@
 ﻿namespace Common.Messages
 {
-    public class ConnectionRequest
+    public class MessageRequest
     {
         #region Properties
 
-        public string Login { get; set; }
+        public string Message { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ConnectionRequest(string login)
+        public MessageRequest(string message)
         {
-            Login = login;
+            Message = message;
         }
 
         #endregion
@@ -21,11 +21,12 @@
 
         public MessageContainer GetContainer()
         {
-            return new MessageContainer
+            var container = new MessageContainer
             {
-                Type = MessageTypes.ConnectionRequest,
+                Type = MessageTypes.MessageRequest,
                 Payload = this
             };
+            return container;
         }
 
         #endregion

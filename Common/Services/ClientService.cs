@@ -7,7 +7,7 @@
 
     public static class ClientService
     {
-        #region Properties
+        #region Fields
 
         public static List<WsClient> Clients = new List<WsClient>();
 
@@ -42,6 +42,7 @@
                 Clients.Remove(client);
             }
         }
+
         #endregion
     }
 }

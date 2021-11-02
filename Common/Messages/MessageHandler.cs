@@ -31,7 +31,7 @@
             switch (container.Type)
             {
                 case MessageTypes.ConnectionResponse:
-                    var connectionResponse = ((JObject) container.Payload).ToObject(typeof(ConnectionResponse)) as ConnectionResponse;
+                    var connectionResponse = ((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) as ConnectionResponse;
 
                     if (connectionResponse != null && connectionResponse.Result == ResultCodes.Failure)
                     {
@@ -41,6 +41,11 @@
 
                     ConnectionStateChanged?.Invoke(client, new ConnectionStateChangedEventArgs(client.Login, true));
                     ClientService.Add(client);
+                    break;
+
+                case MessageTypes.MessageBroadcast:
+                    var messageBroadcast = ((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) as MessageBroadcast;
+                    MessageReceived?.Invoke(client, new MessageReceivedEventArgs(client.Login, messageBroadcast.Message));
                     break;
             }
         }
@@ -52,7 +57,7 @@
             switch (container.Type)
             {
                 case MessageTypes.ConnectionRequest:
-                    var connectionRequest = ((JObject) container.Payload).ToObject(typeof(ConnectionRequest)) as ConnectionRequest;
+                    var connectionRequest = ((JObject)container.Payload).ToObject(typeof(ConnectionRequest)) as ConnectionRequest;
                     var connectionResponse = new ConnectionResponse
                     {
                         Result = ResultCodes.Ok
@@ -68,8 +73,14 @@
                     {
                         connection.Login = connectionRequest.Login;
                         connection.Send(connectionResponse.GetContainer());
+                        ConnectionStateChanged?.Invoke(connection, new ConnectionStateChangedEventArgs(connection.Login, true));
                     }
 
+                    break;
+
+                case MessageTypes.MessageRequest:
+                    var messageRequest = ((JObject)container.Payload).ToObject(typeof(MessageRequest)) as MessageRequest;
+                    MessageReceived?.Invoke(connection, new MessageReceivedEventArgs(connection.Login, messageRequest.Message));
                     break;
             }
         }

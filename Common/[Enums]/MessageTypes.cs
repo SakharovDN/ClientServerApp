@@ -3,6 +3,8 @@
     public enum MessageTypes
     {
         ConnectionRequest,
-        ConnectionResponse
+        ConnectionResponse,
+        MessageRequest,
+        MessageBroadcast
     }
 }

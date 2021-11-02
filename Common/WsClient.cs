@@ -81,7 +81,6 @@
             _socket.OnOpen -= OnOpen;
             _socket.OnClose -= OnClose;
             _socket.OnMessage -= OnMessage;
-
             _socket = null;
             Login = string.Empty;
         }
@@ -90,7 +89,6 @@
         {
             Login = login;
             _sendQueue.Enqueue(new ConnectionRequest(Login).GetContainer());
-
             SendImpl();
         }
 
