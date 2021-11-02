@@ -35,14 +35,14 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0">
             <Label>Login:</Label>
-            <TextBox x:Name="ClientNameTextBox" IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}"></TextBox>
+            <TextBox x:Name="ClientNameTextBox" Text="{Binding ClientName}" IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <Button x:Name="LoginButton" Command="{Binding LoginCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonLoginIsEnabled}">Login</Button>
+            <Button x:Name="LoginButton" Command="{Binding SignInCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonSignInIsEnabled}">Sign in</Button>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
             <Label>Message:</Label>
-            <TextBox x:Name="MessageTextBox" IsEnabled="{Binding ControlsEnabledViewModel.MessageIsEnabled}"></TextBox>
+            <TextBox x:Name="MessageTextBox" Text="{Binding Message}" IsEnabled="{Binding ControlsEnabledViewModel.MessageIsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="2">
             <Button x:Name="SendButton" Command="{Binding SendButton}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonSendIsEnabled}">Send</Button>
@@ -51,7 +51,15 @@
             <Button x:Name="ClearButton" Command="{Binding ClearButton}">Clear</Button>
         </StackPanel>
         <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
-            <ListBox x:Name="MessagesListBox" Height="219" ItemsSource="{Binding MessagesList}"></ListBox>
+            <ListBox x:Name="MessagesListBox" Height="219" ItemsSource="{Binding MessagesList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </Grid>
 </Window>

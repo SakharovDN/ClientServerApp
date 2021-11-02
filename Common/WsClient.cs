@@ -85,6 +85,12 @@
             Login = string.Empty;
         }
 
+        public void Send(string message)
+        {
+            _sendQueue.Enqueue(new MessageRequest(message).GetContainer());
+            SendImpl();
+        }
+
         public void SignIn(string login)
         {
             Login = login;
