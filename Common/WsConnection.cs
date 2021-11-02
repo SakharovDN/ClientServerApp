@@ -89,7 +89,6 @@
             {
                 _server.FreeConnection(Id);
                 Context.WebSocket.CloseAsync();
-
                 return;
             }
 

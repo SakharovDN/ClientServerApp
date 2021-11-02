@@ -31,8 +31,7 @@
             using (StreamReader file = File.OpenText(CONFIG_FILE_PATH))
             {
                 var serializer = new JsonSerializer();
-
-                return (ConfigSettings) serializer.Deserialize(file, typeof(ConfigSettings));
+                return (ConfigSettings)serializer.Deserialize(file, typeof(ConfigSettings));
             }
         }
 

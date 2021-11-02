@@ -49,8 +49,10 @@
   <ItemGroup>
     <Compile Include="Messages\ConnectionRequest.cs" />
     <Compile Include="Messages\ConnectionResponse.cs" />
+    <Compile Include="Messages\MessageBroadcast.cs" />
     <Compile Include="Messages\MessageContainer.cs" />
     <Compile Include="Messages\MessageHandler.cs" />
+    <Compile Include="Messages\MessageRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ClientService.cs" />
     <Compile Include="WsClient.cs" />

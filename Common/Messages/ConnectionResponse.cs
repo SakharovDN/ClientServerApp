@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Messages
+﻿namespace Common.Messages
 {
     public class ConnectionResponse
     {
@@ -14,7 +8,7 @@ namespace Common.Messages
 
         public string Reason { get; set; }
 
-        #endregion Properties
+        #endregion
 
         #region Methods
 
@@ -25,10 +19,9 @@ namespace Common.Messages
                 Type = MessageTypes.ConnectionResponse,
                 Payload = this
             };
-
             return container;
         }
 
-        #endregion Methods
+        #endregion
     }
 }

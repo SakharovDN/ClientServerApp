@@ -12,9 +12,7 @@
             {
                 var networkManager = new NetworkManager();
                 networkManager.Start();
-
                 Console.ReadLine();
-
                 networkManager.Stop();
             }
             catch (Exception ex)
