@@ -1,46 +1,53 @@
 ﻿namespace Common.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using WebSocketSharp;
 
-    public static class ClientService
+    public class ClientService
     {
         #region Fields
 
-        public static List<WsClient> Clients = new List<WsClient>();
+        public Dictionary<Guid, WsClient> Clients;
+
+        #endregion
+
+        #region Constructors
+
+        public ClientService()
+        {
+            Clients = new Dictionary<Guid, WsClient>();
+        }
 
         #endregion
 
         #region Methods
 
-        public static List<WsClient> GetClients()
+        public bool ClientExists(string clientName)
         {
-            return Clients;
+            return Clients.Any(client => client.Value.Name == clientName);
         }
 
-        public static bool ClientExists(string login)
+        public void Add(WsClient client)
         {
-            return Clients.Any(client => client.Login == login);
-        }
-
-        public static void Add(WsClient client)
-        {
-            if (ClientExists(client.Login) || client.Login.IsNullOrEmpty())
+            if (ClientExists(client.Name) || client.Name.IsNullOrEmpty())
             {
                 return;
             }
 
-            Clients.Add(client);
+            Clients.Add(client.Id, client);
         }
 
-        public static void Remove(WsClient client)
+        public void Remove(WsClient client)
         {
-            if (ClientExists(client.Login))
+            if (!ClientExists(client.Name))
             {
-                Clients.Remove(client);
+                return;
             }
+
+            Clients.Remove(client.Id);
         }
 
         #endregion

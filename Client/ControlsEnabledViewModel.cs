@@ -93,7 +93,7 @@
             }
         }
 
-        public bool ButtonSignIsIsEnabled
+        public bool ButtonSignInIsEnabled
         {
             get => _buttonSignInIsEnabled;
             set
@@ -140,7 +140,7 @@
             ClientNameIsEnabled = false;
             ButtonStartIsEnabled = true;
             ButtonStopIsEnabled = false;
-            ButtonSignIsIsEnabled = false;
+            ButtonSignInIsEnabled = false;
             ButtonSendIsEnabled = false;
         }
 
@@ -152,11 +152,11 @@
             ClientNameIsEnabled = true;
             ButtonStartIsEnabled = false;
             ButtonStopIsEnabled = true;
-            ButtonSignIsIsEnabled = true;
+            ButtonSignInIsEnabled = true;
             ButtonSendIsEnabled = false;
         }
 
-        public void SetAfterLoginControlsState()
+        public void SetAfterSignInControlsState()
         {
             AddressIsEnabled = false;
             PortIsEnabled = false;
@@ -164,7 +164,7 @@
             ClientNameIsEnabled = false;
             ButtonStartIsEnabled = false;
             ButtonStopIsEnabled = true;
-            ButtonSignIsIsEnabled = false;
+            ButtonSignInIsEnabled = false;
             ButtonSendIsEnabled = true;
         }
 

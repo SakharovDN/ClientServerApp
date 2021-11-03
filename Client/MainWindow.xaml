@@ -50,8 +50,21 @@
         <StackPanel Grid.Row="2" Grid.Column="3">
             <Button x:Name="ClearButton" Command="{Binding ClearButton}">Clear</Button>
         </StackPanel>
-        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+            <Label>Messages:</Label>
             <ListBox x:Name="MessagesListBox" Height="219" ItemsSource="{Binding MessagesList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2">
+            <Label>Clients:</Label>
+            <ListBox x:Name="ClientsListBox" Height="219" ItemsSource="{Binding ClientsList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

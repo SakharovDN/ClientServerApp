@@ -47,8 +47,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\ClientsListRequest.cs" />
+    <Compile Include="Messages\ClientsListResponse.cs" />
     <Compile Include="Messages\ConnectionRequest.cs" />
     <Compile Include="Messages\ConnectionResponse.cs" />
+    <Compile Include="Messages\DisconnectionRequest.cs" />
     <Compile Include="Messages\MessageBroadcast.cs" />
     <Compile Include="Messages\MessageContainer.cs" />
     <Compile Include="Messages\MessageHandler.cs" />
@@ -60,6 +63,9 @@
     <Compile Include="[Enums]\MessageTypes.cs" />
     <Compile Include="[Enums]\ResultCodes.cs" />
     <Compile Include="WsServer.cs" />
+    <Compile Include="[EventArgs]\ClientsListItemsAddedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ClientsListItemsRemovedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ClientsListReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionStateChangedEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageReceivedEventArgs.cs" />
   </ItemGroup>

@@ -25,8 +25,6 @@
 
         public Guid Id { get; }
 
-        public string Login { get; set; }
-
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
 
         #endregion
@@ -80,7 +78,7 @@
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            MessageHandler.HandleMessage(e.Data, this);
+            MessageHandler.HandleMessage(e.Data, _server, this);
         }
 
         private void SendCompleted(bool completed)

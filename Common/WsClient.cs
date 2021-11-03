@@ -7,8 +7,6 @@
 
     using Newtonsoft.Json;
 
-    using Services;
-
     using WebSocketSharp;
 
     public class WsClient
@@ -23,7 +21,9 @@
 
         #region Properties
 
-        public string Login { get; set; }
+        public string Name { get; set; }
+
+        public Guid Id { get; set; }
 
         public bool IsConnected => _socket?.ReadyState == WebSocketState.Open;
 
@@ -33,7 +33,7 @@
 
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<MessageReceivedEventArgs> ClientMessageReceived;
 
         #endregion
 
@@ -46,6 +46,7 @@
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
+            Id = Guid.NewGuid();
         }
 
         #endregion
@@ -75,27 +76,45 @@
 
             if (IsConnected)
             {
-                _socket.CloseAsync();
+                SignOut();
+                _socket.Close();
+                _socket.OnOpen -= OnOpen;
+                _socket.OnClose -= OnClose;
+                _socket.OnMessage -= OnMessage;
+                _socket = null;
+                Name = string.Empty;
             }
-
-            _socket.OnOpen -= OnOpen;
-            _socket.OnClose -= OnClose;
-            _socket.OnMessage -= OnMessage;
-            _socket = null;
-            Login = string.Empty;
         }
 
         public void Send(string message)
         {
-            _sendQueue.Enqueue(new MessageRequest(message).GetContainer());
+            _sendQueue.Enqueue(new MessageRequest(this, message).GetContainer());
             SendImpl();
         }
 
-        public void SignIn(string login)
+        public void SignIn(string clientName)
         {
-            Login = login;
-            _sendQueue.Enqueue(new ConnectionRequest(Login).GetContainer());
+            Name = clientName;
+            _sendQueue.Enqueue(new ConnectionRequest(this).GetContainer());
             SendImpl();
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, true));
+        }
+
+        public void SignOut()
+        {
+            _sendQueue.Enqueue(new DisconnectionRequest(this).GetContainer());
+            SendImpl();
+        }
+
+        public void RequestClientsList()
+        {
+            string serializedMessages = JsonConvert.SerializeObject(new ClientsListRequest().GetContainer(), _settings);
+            _socket.SendAsync(serializedMessages, SendCompleted);
+        }
+
+        public void Receive(string message)
+        {
+            ClientMessageReceived?.Invoke(this, new MessageReceivedEventArgs(Name, message));
         }
 
         private void SendCompleted(bool completed)
@@ -103,8 +122,7 @@
             if (!completed)
             {
                 Disconnect();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(Login, false));
-                ClientService.Remove(this);
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
                 return;
             }
 
@@ -134,14 +152,12 @@
 
         private void OnClose(object sender, CloseEventArgs e)
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(Login, false));
-            ClientService.Remove(this);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
         }
 
         private void OnOpen(object sender, EventArgs e)
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(Login, true));
-            ClientService.Add(this);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, true));
         }
 
         #endregion
