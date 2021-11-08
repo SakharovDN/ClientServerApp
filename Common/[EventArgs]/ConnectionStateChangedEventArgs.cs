@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        public string ClientName { get; }
+        public WsClient Client { get; }
 
         public bool Connected { get; }
 
@@ -12,9 +12,9 @@
 
         #region Constructors
 
-        public ConnectionStateChangedEventArgs(string clientName, bool connected)
+        public ConnectionStateChangedEventArgs(WsClient client, bool connected)
         {
-            ClientName = clientName;
+            Client = client;
             Connected = connected;
         }
 

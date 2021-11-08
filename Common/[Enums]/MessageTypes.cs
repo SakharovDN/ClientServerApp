@@ -5,6 +5,10 @@
         ConnectionRequest,
         ConnectionResponse,
         MessageRequest,
-        MessageBroadcast
+        MessageBroadcast,
+        ClientsListRequest,
+        ClientsListResponse,
+        DisconnectionRequest,
+        DisconnectionResponse
     }
 }

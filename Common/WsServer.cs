@@ -8,15 +8,18 @@
 
     using Messages;
 
+    using Services;
+
     using WebSocketSharp.Server;
 
     public class WsServer
     {
         #region Fields
 
+        public readonly ClientService ClientService;
+
         private readonly IPEndPoint _listenAddress;
         private readonly ConcurrentDictionary<Guid, WsConnection> _connections;
-
         private WebSocketServer _server;
 
         #endregion
@@ -26,7 +29,8 @@
         public WsServer(IPEndPoint listenAddress)
         {
             MessageHandler.MessageReceived += HandleMessageReceived;
-            MessageHandler.ConnectionStateChanged += ConnectionStateChanged;
+            MessageHandler.ConnectionStateChanged += HandleConnectionStateChanged;
+            ClientService = new ClientService();
             _listenAddress = listenAddress;
             _connections = new ConcurrentDictionary<Guid, WsConnection>();
         }
@@ -81,11 +85,32 @@
             _connections.TryRemove(connectionId, out WsConnection _);
         }
 
-        private void ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
         {
             string clientState = e.Connected ? "подключён" : "отключён";
-            string message = $"Клиент {e.ClientName} {clientState}";
+            string message = $"Клиент {e.Client.Name} {clientState}";
+
+            if (e.Connected)
+            {
+                ClientService.Add(e.Client);
+            }
+            else
+            {
+                ClientService.Remove(e.Client);
+            }
+
             Send(message);
+            SendClientList();
+        }
+
+        private void SendClientList()
+        {
+            MessageContainer clientsListResponse = new ClientsListResponse(ClientService.Clients).GetContainer();
+
+            foreach (KeyValuePair<Guid, WsConnection> connection in _connections)
+            {
+                connection.Value.Send(clientsListResponse);
+            }
         }
 
         private void HandleMessageReceived(object sender, MessageReceivedEventArgs e)

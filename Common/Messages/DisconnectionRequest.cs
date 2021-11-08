@@ -1,6 +1,6 @@
 ﻿namespace Common.Messages
 {
-    public class ConnectionRequest
+    public class DisconnectionRequest
     {
         #region Properties
 
@@ -10,7 +10,7 @@
 
         #region Constructors
 
-        public ConnectionRequest(WsClient client)
+        public DisconnectionRequest(WsClient client)
         {
             Client = client;
         }
@@ -23,7 +23,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ConnectionRequest,
+                Type = MessageTypes.DisconnectionRequest,
                 Payload = this
             };
         }

@@ -1,18 +1,21 @@
 ﻿namespace Common.Messages
 {
-    public class ConnectionRequest
+    using System;
+    using System.Collections.Generic;
+
+    public class ClientsListResponse
     {
         #region Properties
 
-        public WsClient Client { get; set; }
+        public Dictionary<Guid, WsClient> Clients { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ConnectionRequest(WsClient client)
+        public ClientsListResponse(Dictionary<Guid, WsClient> clients)
         {
-            Client = client;
+            Clients = clients;
         }
 
         #endregion
@@ -23,7 +26,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ConnectionRequest,
+                Type = MessageTypes.ClientsListResponse,
                 Payload = this
             };
         }

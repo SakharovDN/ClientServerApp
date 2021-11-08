@@ -12,9 +12,10 @@
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new ViewModelBase();
+            var viewModelBase = new ViewModelBase();
+            DataContext = viewModelBase;
+            Closing += viewModelBase.OnWindowClosing;
         }
-
 
         #endregion
     }
