@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace Server.WebSocket
 {
     using System;
     using System.Collections.Concurrent;
@@ -6,7 +6,8 @@
     using System.Linq;
     using System.Net;
 
-    using Messages;
+    using Common;
+    using Common.Messages;
 
     using Services;
 
@@ -28,8 +29,8 @@
 
         public WsServer(IPEndPoint listenAddress)
         {
-            MessageHandler.MessageReceived += HandleMessageReceived;
-            MessageHandler.ConnectionStateChanged += HandleConnectionStateChanged;
+            MessageService.MessageReceived += HandleMessageReceived;
+            MessageService.ConnectionStateChanged += HandleConnectionStateChanged;
             ClientService = new ClientService();
             _listenAddress = listenAddress;
             _connections = new ConcurrentDictionary<Guid, WsConnection>();

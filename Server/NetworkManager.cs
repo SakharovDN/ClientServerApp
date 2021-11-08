@@ -3,9 +3,9 @@
     using System;
     using System.Net;
 
-    using Common;
-
     using NLog;
+
+    using WebSocket;
 
     public class NetworkManager
     {

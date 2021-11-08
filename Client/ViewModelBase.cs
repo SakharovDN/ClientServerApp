@@ -9,7 +9,6 @@
     using System.Windows.Input;
 
     using Common;
-    using Common.Messages;
 
     public class ViewModelBase : INotifyPropertyChanged
     {
@@ -122,7 +121,7 @@
             ClientsList = new ObservableCollection<string>();
             MessagesList = new ObservableCollection<string>();
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
-            MessageHandler.ClientsListReceived += HandleClientsListReceived;
+            ClientMessageHandler.ClientsListReceived += HandleClientsListReceived;
             Address = "127.0.0.1";
             Port = "65000";
         }
