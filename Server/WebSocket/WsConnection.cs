@@ -1,11 +1,13 @@
-﻿namespace Common
+﻿namespace Server.WebSocket
 {
     using System;
     using System.Collections.Concurrent;
 
-    using Messages;
+    using Common.Messages;
 
     using Newtonsoft.Json;
+
+    using Services;
 
     using WebSocketSharp;
     using WebSocketSharp.Server;
@@ -78,7 +80,7 @@
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            MessageHandler.HandleMessage(e.Data, _server, this);
+            MessageService.HandleMessage(e.Data, _server, this);
         }
 
         private void SendCompleted(bool completed)

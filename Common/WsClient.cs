@@ -147,7 +147,7 @@
 
         private void OnMessage(object sender, MessageEventArgs e)
         {
-            MessageHandler.HandleMessage(e.Data, this);
+            ClientMessageHandler.HandleMessage(e.Data, this);
         }
 
         private void OnClose(object sender, CloseEventArgs e)
