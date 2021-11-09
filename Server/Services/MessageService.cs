@@ -1,8 +1,10 @@
 ﻿namespace Server.Services
 {
     using System;
+    using System.Data;
 
     using Common;
+    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
@@ -48,7 +50,24 @@
                 case MessageTypes.ClientsListRequest:
                     HandleClientsListRequest(server, connection);
                     break;
+
+                case MessageTypes.EventLogsRequest:
+                    HandleEventLogsRequest(connection);
+                    break;
             }
+        }
+
+        private static void HandleEventLogsRequest(WsConnection connection)
+        {
+            DataTable eventLogs;
+
+            using (var db = new EventLogContext())
+            {
+                eventLogs = db.EventLogs.ToDataTable();
+            }
+
+            var eventLogsResponse = new EventLogsResponse(eventLogs);
+            connection.Send(eventLogsResponse.GetContainer());
         }
 
         private static void HandleDisconnectionRequest(WsServer server, MessageContainer container)

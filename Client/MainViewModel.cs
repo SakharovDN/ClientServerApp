@@ -10,7 +10,7 @@
 
     using Common;
 
-    public class ViewModelBase : INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged
     {
         #region Fields
 
@@ -19,7 +19,7 @@
         private CommandHandler _stopCommand;
         private CommandHandler _signInCommand;
         private CommandHandler _sendButton;
-        private CommandHandler _clearButton;
+        private CommandHandler _getEventLogsButton;
         private string _address;
         private string _port;
         private string _clientName;
@@ -101,7 +101,7 @@
 
         public ICommand SendButton => _sendButton ?? (_sendButton = new CommandHandler(PerformSendButton));
 
-        public ICommand ClearButton => _clearButton ?? (_clearButton = new CommandHandler(PerformClearButton));
+        public ICommand GetEventLogsButton => _getEventLogsButton ?? (_getEventLogsButton = new CommandHandler(PerformGetEventLogsButton));
 
         #endregion
 
@@ -113,7 +113,7 @@
 
         #region Constructors
 
-        public ViewModelBase()
+        public MainViewModel()
         {
             _client = new WsClient();
             _client.ClientMessageReceived += HandleClientMessageReceived;
@@ -122,6 +122,7 @@
             MessagesList = new ObservableCollection<string>();
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             ClientMessageHandler.ClientsListReceived += HandleClientsListReceived;
+            ClientMessageHandler.EventLogsReceived += HandleEventLogsReceived;
             Address = "127.0.0.1";
             Port = "65000";
         }
@@ -151,6 +152,16 @@
                     {
                         ClientsList.Add(client.Value.Name);
                     }
+                });
+        }
+
+        private static void HandleEventLogsReceived(object sender, EventLogsReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    var eventLogWindow = new EventLogWindow(args.EventLogs);
+                    eventLogWindow.Show();
                 });
         }
 
@@ -189,9 +200,9 @@
             _client?.Send(Message);
         }
 
-        private void PerformClearButton(object commandParameter)
+        private void PerformGetEventLogsButton(object commandParameter)
         {
-            MessagesList.Clear();
+            _client.RequestEventLogs();
         }
 
         private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs args)

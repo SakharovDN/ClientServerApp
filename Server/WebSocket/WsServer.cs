@@ -7,6 +7,7 @@
     using System.Net;
 
     using Common;
+    using Common.EventLog;
     using Common.Messages;
 
     using Services;
@@ -18,7 +19,7 @@
         #region Fields
 
         public readonly ClientService ClientService;
-
+        private readonly EventLogContext _eventLogContext;
         private readonly IPEndPoint _listenAddress;
         private readonly ConcurrentDictionary<Guid, WsConnection> _connections;
         private WebSocketServer _server;
@@ -34,6 +35,7 @@
             ClientService = new ClientService();
             _listenAddress = listenAddress;
             _connections = new ConcurrentDictionary<Guid, WsConnection>();
+            _eventLogContext = new EventLogContext();
         }
 
         #endregion
@@ -102,6 +104,7 @@
 
             Send(message);
             SendClientList();
+            _eventLogContext.ConnectionEventLog(message);
         }
 
         private void SendClientList()

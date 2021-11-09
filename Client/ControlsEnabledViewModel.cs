@@ -17,7 +17,6 @@
         private bool _buttonStopIsEnabled;
         private bool _buttonSendIsEnabled;
         private bool _buttonSignInIsEnabled;
-        private bool _buttonClearIsEnabled;
 
         #endregion
 
@@ -99,16 +98,6 @@
             set
             {
                 _buttonSignInIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ButtonClearIsEnabled
-        {
-            get => _buttonClearIsEnabled;
-            set
-            {
-                _buttonClearIsEnabled = value;
                 OnPropertyChanged();
             }
         }

@@ -8,6 +8,8 @@
         MessageBroadcast,
         ClientsListRequest,
         ClientsListResponse,
-        DisconnectionRequest
+        DisconnectionRequest,
+        EventLogsRequest,
+        EventLogsResponse
     }
 }

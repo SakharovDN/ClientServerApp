@@ -13,6 +13,8 @@
 
         public static event EventHandler<ClientsListReceivedEventArgs> ClientsListReceived;
 
+        public static event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
+
         #endregion
 
         #region Methods
@@ -39,26 +41,41 @@
                 case MessageTypes.ClientsListResponse:
                     HandleClientsListResponse(container);
                     break;
+
+                case MessageTypes.EventLogsResponse:
+                    HandleEventLogsResponse(container);
+                    break;
+            }
+        }
+
+        private static void HandleEventLogsResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(EventLogsResponse)) is EventLogsResponse eventLogsResponse)
+            {
+                EventLogsReceived?.Invoke(null, new EventLogsReceivedEventArgs(eventLogsResponse.EventLogs));
             }
         }
 
         private static void HandleClientsListResponse(MessageContainer container)
         {
-            var clientsListResponse = ((JObject)container.Payload).ToObject(typeof(ClientsListResponse)) as ClientsListResponse;
-            ClientsListReceived?.Invoke(null, new ClientsListReceivedEventArgs(clientsListResponse.Clients));
+            if (((JObject)container.Payload).ToObject(typeof(ClientsListResponse)) is ClientsListResponse clientsListResponse)
+            {
+                ClientsListReceived?.Invoke(null, new ClientsListReceivedEventArgs(clientsListResponse.Clients));
+            }
         }
 
         private static void HandleMessageBroadcast(WsClient client, MessageContainer container)
         {
-            var messageBroadcast = ((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) as MessageBroadcast;
-            client.Receive(messageBroadcast?.Message);
+            if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
+            {
+                client.Receive(messageBroadcast.Message);
+            }
         }
 
         private static void HandleConnectionResponse(WsClient client, MessageContainer container)
         {
-            var connectionResponse = ((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) as ConnectionResponse;
-
-            if (connectionResponse == null || connectionResponse.Result != ResultCodes.Failure)
+            if (!(((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
+                || connectionResponse.Result != ResultCodes.Failure)
             {
                 return;
             }
