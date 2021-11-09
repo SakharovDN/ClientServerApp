@@ -117,6 +117,12 @@
             ClientMessageReceived?.Invoke(this, new MessageReceivedEventArgs(Name, message));
         }
 
+        public void RequestEventLogs()
+        {
+            string serializedMessages = JsonConvert.SerializeObject(new EventLogsRequest().GetContainer(), _settings);
+            _socket.SendAsync(serializedMessages, SendCompleted);
+        }
+
         private void SendCompleted(bool completed)
         {
             if (!completed)
