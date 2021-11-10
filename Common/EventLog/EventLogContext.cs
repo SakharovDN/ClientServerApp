@@ -4,6 +4,7 @@
     using System.ComponentModel;
     using System.Data;
     using System.Data.Entity;
+    using System.Linq;
 
     public class EventLogContext : DbContext
     {
@@ -54,7 +55,7 @@
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
             var table = new DataTable();
 
-            foreach (PropertyDescriptor prop in properties)
+            foreach (PropertyDescriptor prop in properties.Cast<PropertyDescriptor>().Where(prop => prop.Name != "Id"))
             {
                 table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
             }
@@ -63,7 +64,7 @@
             {
                 DataRow row = table.NewRow();
 
-                foreach (PropertyDescriptor prop in properties)
+                foreach (PropertyDescriptor prop in properties.Cast<PropertyDescriptor>().Where(prop => prop.Name != "Id"))
                 {
                     row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
                 }
