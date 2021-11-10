@@ -64,7 +64,13 @@
             _socket.OnOpen += OnOpen;
             _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
+            _socket.OnError += OnError;
             _socket.ConnectAsync();
+        }
+
+        private void OnError(object sender, ErrorEventArgs e)
+        {
+
         }
 
         public void Disconnect()
@@ -74,16 +80,17 @@
                 return;
             }
 
-            if (IsConnected)
+            if (!IsConnected)
             {
-                SignOut();
-                _socket.Close();
-                _socket.OnOpen -= OnOpen;
-                _socket.OnClose -= OnClose;
-                _socket.OnMessage -= OnMessage;
-                _socket = null;
-                Name = string.Empty;
+                return;
             }
+
+            _socket.Close();
+            _socket.OnOpen -= OnOpen;
+            _socket.OnClose -= OnClose;
+            _socket.OnMessage -= OnMessage;
+            _socket = null;
+            Name = string.Empty;
         }
 
         public void Send(string message)
@@ -97,7 +104,6 @@
             Name = clientName;
             _sendQueue.Enqueue(new ConnectionRequest(this).GetContainer());
             SendImpl();
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, true));
         }
 
         public void SignOut()

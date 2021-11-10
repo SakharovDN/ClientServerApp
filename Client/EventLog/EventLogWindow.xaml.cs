@@ -1,4 +1,4 @@
-﻿namespace Client
+﻿namespace Client.EventLog
 {
     using System.Data;
     using System.Windows;

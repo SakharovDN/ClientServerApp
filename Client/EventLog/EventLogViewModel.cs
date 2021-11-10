@@ -1,4 +1,4 @@
-﻿namespace Client
+﻿namespace Client.EventLog
 {
     using System;
     using System.ComponentModel;
@@ -26,7 +26,7 @@
             set
             {
                 _selectedDateFrom = value;
-                OnPropertyChanged(nameof(SelectedDateFrom));
+                OnPropertyChanged();
             }
         }
 
@@ -36,7 +36,7 @@
             set
             {
                 _selectedDateTo = value;
-                OnPropertyChanged(nameof(SelectedDateTo));
+                OnPropertyChanged();
             }
         }
 
@@ -46,7 +46,7 @@
             set
             {
                 _eventLogs = value;
-                OnPropertyChanged(nameof(EventLogs));
+                OnPropertyChanged();
             }
         }
 
