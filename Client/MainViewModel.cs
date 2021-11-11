@@ -1,6 +1,7 @@
 ﻿namespace Client
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Windows;
@@ -25,6 +26,7 @@
         private string _address;
         private string _port;
         private string _clientName;
+        private ObservableCollection<string> _messagesList;
 
         #endregion
 
@@ -62,6 +64,16 @@
             }
         }
 
+        public ObservableCollection<string> MessagesList
+        {
+            get => _messagesList;
+            set
+            {
+                _messagesList = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand StartCommand => _startCommand ?? (_startCommand = new CommandHandler(PerformStartButton));
 
         public ICommand StopCommand => _stopCommand ?? (_stopCommand = new CommandHandler(PerformStopButton));
@@ -83,8 +95,11 @@
         public MainViewModel()
         {
             _client = new WsClient();
+            _client.ConnectionStateChanged += HandleConnectionStateChanged;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             ClientMessageHandler.EventLogsReceived += HandleEventLogsReceived;
+            ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            MessagesList = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
         }
@@ -103,14 +118,10 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private static void HandleEventLogsReceived(object sender, EventLogsReceivedEventArgs args)
+        private void OpenMessenger()
         {
-            Application.Current.Dispatcher.Invoke(
-                delegate
-                {
-                    var eventLogWindow = new EventLogWindow(args.EventLogs);
-                    eventLogWindow.Show();
-                });
+            var messenger = new MessengerWindow(_client);
+            messenger.Show();
         }
 
         private void PerformStartButton(object commandParameter)
@@ -122,15 +133,9 @@
             }
             catch (Exception ex)
             {
-                //MessagesList.Add(ex.Message);
+                MessagesList.Add(ex.Message);
                 ControlsEnabledViewModel.SetDefaultControlsState();
             }
-        }
-
-        private void OpenMessenger()
-        {
-            var messenger = new MessengerWindow(_client);
-            messenger.Show();
         }
 
         private void PerformStopButton(object commandParameter)
@@ -141,13 +146,69 @@
 
         private void PerformSignInButton(object commandParameter)
         {
-            _client?.SignIn(ClientName);
-            OpenMessenger();
+            try
+            {
+                _client?.SignIn(ClientName);
+            }
+            catch (Exception ex)
+            {
+                MessagesList.Add(ex.Message);
+            }
         }
 
         private void PerformGetEventLogsButton(object commandParameter)
         {
             _client.RequestEventLogs();
+        }
+
+        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    if (!args.Connected)
+                    {
+                        return;
+                    }
+
+                    if (string.IsNullOrEmpty(args.Client.Name))
+                    {
+                        MessagesList.Add("Клиент подключен к серверу.");
+                        MessagesList.Add("Авторизируйтесь, чтобы отправлять сообщения.");
+                    }
+                    else
+                    {
+                        MessagesList.Add("Авторизация прошла успешно");
+                    }
+                });
+        }
+
+        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    if (e.ConnectionResponse.Result == ResultCodes.Failure)
+                    {
+                        MessagesList.Add(e.ConnectionResponse.Reason);
+                    }
+                    else
+                    {
+                        Application.Current.MainWindow?.Hide();
+                        OpenMessenger();
+                    }
+                });
+            
+        }
+
+        private static void HandleEventLogsReceived(object sender, EventLogsReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    var eventLogWindow = new EventLogWindow(args.EventLogs);
+                    eventLogWindow.ShowDialog();
+                });
         }
 
         #endregion

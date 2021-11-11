@@ -25,7 +25,11 @@
             get => _selectedDateFrom;
             set
             {
-                _selectedDateFrom = value;
+                if (value <= SelectedDateTo)
+                {
+                    _selectedDateFrom = value;
+                }
+
                 OnPropertyChanged();
             }
         }
@@ -35,7 +39,11 @@
             get => _selectedDateTo;
             set
             {
-                _selectedDateTo = value;
+                if (value >= SelectedDateFrom)
+                {
+                    _selectedDateTo = value;
+                }
+
                 OnPropertyChanged();
             }
         }
@@ -64,8 +72,8 @@
         {
             _eventLogsGlobal = eventLogs.Copy();
             EventLogs = eventLogs.Copy();
-            SelectedDateFrom = _eventLogsGlobal.Rows[_eventLogsGlobal.Rows.Count - 1].Field<DateTime>("Timestamp").Date;
             SelectedDateTo = _eventLogsGlobal.Rows[0].Field<DateTime>("Timestamp").Date;
+            SelectedDateFrom = _eventLogsGlobal.Rows[_eventLogsGlobal.Rows.Count - 1].Field<DateTime>("Timestamp").Date;
             PropertyChanged += HandlePropertyChanged;
         }
 
@@ -91,7 +99,15 @@
         {
             string filter = $"Timestamp >= '{SelectedDateFrom}' AND Timestamp < '{SelectedDateTo + TimeSpan.FromDays(1)}'";
             string sort = "Timestamp desc";
-            EventLogs = _eventLogsGlobal.Select(filter, sort).CopyToDataTable();
+
+            try
+            {
+                EventLogs = _eventLogsGlobal.Select(filter, sort).CopyToDataTable();
+            }
+            catch
+            {
+                EventLogs = null;
+            }
         }
 
         #endregion

@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="Server connection" Height="263" Width="400" ResizeMode="CanMinimize">
+        Title="Server connection" Height="344" Width="400" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="44"/>
             <RowDefinition Height="44"/>
-            <RowDefinition Height="44"/>
+            <RowDefinition Height="127"/>
             <RowDefinition Height="44"/>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
@@ -30,6 +30,9 @@
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.Column="1">
             <Button Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
+        </DockPanel>
+        <DockPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <ListBox ItemsSource="{Binding MessagesList}"></ListBox>
         </DockPanel>
         <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <Label>Login:</Label>
