@@ -65,9 +65,8 @@
             {
                 eventLogs = db.EventLogs.ToDataTable();
             }
-
-            var eventLogsResponse = new EventLogsResponse(eventLogs);
-            connection.Send(eventLogsResponse.GetContainer());
+            
+            connection.Send(new EventLogsResponse(eventLogs).GetContainer());
         }
 
         private static void HandleDisconnectionRequest(WsServer server, MessageContainer container)

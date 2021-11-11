@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Input;
 
@@ -25,6 +27,8 @@
         #endregion
 
         #region Properties
+
+        public string MessagesListSelectedItem { get; set; }
 
         public ICommand SendButton => _sendButton ?? (_sendButton = new CommandHandler(PerformSendButton));
 
@@ -71,8 +75,7 @@
         public MessengerViewModel(WsClient client)
         {
             _client = client;
-            _client.ClientMessageReceived += HandleClientMessageReceived;
-            _client.ConnectionStateChanged += HandleConnectionStateChanged;
+            ClientMessageHandler.MessageReceived += HandleMessageReceived;
             ClientMessageHandler.ClientsListReceived += HandleClientsListReceived;
             _client.RequestClientsList();
             ClientsList = new ObservableCollection<string>();
@@ -86,6 +89,7 @@
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
             _client?.SignOut();
+            Application.Current.MainWindow?.Show();
         }
 
         [NotifyPropertyChangedInvocator]
@@ -110,34 +114,18 @@
 
         private void PerformSendButton(object commandParameter)
         {
+            if (string.IsNullOrEmpty(Message))
+            {
+                return;
+            }
+
+            var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
+            Message = regex.Replace(Message, @" ").Trim();
             _client?.Send(Message);
             Message = string.Empty;
         }
 
-        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs args)
-        {
-            Application.Current.Dispatcher.Invoke(
-                delegate
-                {
-                    if (!args.Connected)
-                    {
-                        return;
-                    }
-
-                    if (string.IsNullOrEmpty(args.Client.Name))
-                    {
-                        MessagesList.Add("Клиент подключен к серверу.");
-                        MessagesList.Add("Авторизируйтесь, чтобы отправлять сообщения.");
-                    }
-                    else
-                    {
-                        MessagesList.Add("Авторизация прошла успешно");
-                        //ControlsEnabledViewModel.SetAfterSignInControlsState();
-                    }
-                });
-        }
-
-        private void HandleClientMessageReceived(object sender, MessageReceivedEventArgs args)
+        private void HandleMessageReceived(object sender, MessageReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate

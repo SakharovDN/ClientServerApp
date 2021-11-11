@@ -15,6 +15,9 @@
 
         public static event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
 
+        public static event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
+
+        public static event EventHandler<MessageReceivedEventArgs> MessageReceived;
         #endregion
 
         #region Methods
@@ -68,20 +71,16 @@
         {
             if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
             {
-                client.Receive(messageBroadcast.Message);
+                MessageReceived?.Invoke(null, new MessageReceivedEventArgs(client.Name, messageBroadcast.Message));
             }
         }
 
         private static void HandleConnectionResponse(WsClient client, MessageContainer container)
         {
-            if (!(((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
-                || connectionResponse.Result != ResultCodes.Failure)
+            if (((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
             {
-                return;
+                ConnectionResponseReceived?.Invoke(null, new ConnectionResponseReceivedEventArgs(connectionResponse));
             }
-
-            client.Name = string.Empty;
-            client.Receive(connectionResponse.Reason);
         }
 
         #endregion

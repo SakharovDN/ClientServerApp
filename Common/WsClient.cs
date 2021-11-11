@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Text.RegularExpressions;
 
     using Messages;
 
@@ -16,12 +17,31 @@
         private readonly JsonSerializerSettings _settings;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private WebSocket _socket;
+        private string _name;
 
         #endregion
 
         #region Properties
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (value.IsNullOrEmpty())
+                {
+                    throw new Exception("Введите имя, чтобы авторизироваться");
+                }
+
+                if (value.Length > 10)
+                {
+                    throw new Exception("Имя может содержать максимум 10 символов");
+                }
+
+                var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
+                _name = regex.Replace(value, @" ").Trim();
+            }
+        }
 
         public Guid Id { get; set; }
 
@@ -32,8 +52,6 @@
         #region Events
 
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
-
-        public event EventHandler<MessageReceivedEventArgs> ClientMessageReceived;
 
         #endregion
 
@@ -68,11 +86,6 @@
             _socket.ConnectAsync();
         }
 
-        private void OnError(object sender, ErrorEventArgs e)
-        {
-
-        }
-
         public void Disconnect()
         {
             if (_socket == null)
@@ -90,13 +103,6 @@
             _socket.OnClose -= OnClose;
             _socket.OnMessage -= OnMessage;
             _socket = null;
-            Name = string.Empty;
-        }
-
-        public void Send(string message)
-        {
-            _sendQueue.Enqueue(new MessageRequest(this, message).GetContainer());
-            SendImpl();
         }
 
         public void SignIn(string clientName)
@@ -118,15 +124,16 @@
             _socket.SendAsync(serializedMessages, SendCompleted);
         }
 
-        public void Receive(string message)
-        {
-            ClientMessageReceived?.Invoke(this, new MessageReceivedEventArgs(Name, message));
-        }
-
         public void RequestEventLogs()
         {
             string serializedMessages = JsonConvert.SerializeObject(new EventLogsRequest().GetContainer(), _settings);
             _socket.SendAsync(serializedMessages, SendCompleted);
+        }
+
+        public void Send(string message)
+        {
+            _sendQueue.Enqueue(new MessageRequest(this, message).GetContainer());
+            SendImpl();
         }
 
         private void SendCompleted(bool completed)
@@ -155,6 +162,11 @@
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
             _socket.SendAsync(serializedMessages, SendCompleted);
+        }
+
+        private static void OnError(object sender, ErrorEventArgs e)
+        {
+            throw e.Exception;
         }
 
         private void OnMessage(object sender, MessageEventArgs e)

@@ -90,6 +90,7 @@
     <Compile Include="[Enums]\MessageTypes.cs" />
     <Compile Include="[Enums]\ResultCodes.cs" />
     <Compile Include="[EventArgs]\ClientsListReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ConnectionResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionStateChangedEventArgs.cs" />
     <Compile Include="[EventArgs]\EventLogsReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageReceivedEventArgs.cs" />

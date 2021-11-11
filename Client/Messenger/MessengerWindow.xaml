@@ -24,7 +24,10 @@
             <ListBox ItemsSource="{Binding ClientsList}"></ListBox>
         </DockPanel>
         <DockPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
-            <ListBox ItemsSource="{Binding MessagesList}"></ListBox>
+            <ListBox Name="MessagesListBox"
+                     ItemsSource="{Binding MessagesList}"
+                     SelectedItem="{Binding MessagesListSelectedItem}">
+            </ListBox>
         </DockPanel>
         <DockPanel Grid.Column="1" Grid.Row="2">
             <TextBox Width="500" Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}">
