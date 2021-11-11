@@ -1,0 +1,38 @@
+﻿<Window x:Class="Client.Messenger.MessengerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.Messenger" d:DataContext="{d:DesignInstance Type=local:MessengerViewModel}"
+        mc:Ignorable="d"
+        Title="Messenger" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="0" Grid.Row="0">
+            <Button Width="50">Navbar</Button>
+            <TextBox></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+            <ListBox ItemsSource="{Binding ClientsList}"></ListBox>
+        </DockPanel>
+        <DockPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+            <ListBox ItemsSource="{Binding MessagesList}"></ListBox>
+        </DockPanel>
+        <DockPanel Grid.Column="1" Grid.Row="2">
+            <TextBox Width="500" Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding SendButton}" Key="Enter"></KeyBinding>
+                </TextBox.InputBindings>
+            </TextBox>
+            <Button Width="30" Command="{Binding SendButton}">Send</Button>
+        </DockPanel>
+    </Grid>
+</Window>

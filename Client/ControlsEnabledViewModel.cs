@@ -12,15 +12,24 @@
         private bool _addressIsEnabled;
         private bool _portIsEnabled;
         private bool _clientNameIsEnabled;
-        private bool _messageIsEnabled;
         private bool _buttonStartIsEnabled;
         private bool _buttonStopIsEnabled;
-        private bool _buttonSendIsEnabled;
         private bool _buttonSignInIsEnabled;
+        private bool _buttonGetEventLogsIsEnabled;
 
         #endregion
 
         #region Properties
+
+        public bool ButtonGetEventLogsIsEnabled
+        {
+            get => _buttonGetEventLogsIsEnabled;
+            set
+            {
+                _buttonGetEventLogsIsEnabled = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool AddressIsEnabled
         {
@@ -52,16 +61,6 @@
             }
         }
 
-        public bool MessageIsEnabled
-        {
-            get => _messageIsEnabled;
-            set
-            {
-                _messageIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
         public bool ButtonStartIsEnabled
         {
             get => _buttonStartIsEnabled;
@@ -78,16 +77,6 @@
             set
             {
                 _buttonStopIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ButtonSendIsEnabled
-        {
-            get => _buttonSendIsEnabled;
-            set
-            {
-                _buttonSendIsEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -125,36 +114,22 @@
         {
             AddressIsEnabled = true;
             PortIsEnabled = true;
-            MessageIsEnabled = false;
             ClientNameIsEnabled = false;
             ButtonStartIsEnabled = true;
             ButtonStopIsEnabled = false;
             ButtonSignInIsEnabled = false;
-            ButtonSendIsEnabled = false;
+            ButtonGetEventLogsIsEnabled = false;
         }
 
         public void SetAfterStartControlsState()
         {
             AddressIsEnabled = false;
             PortIsEnabled = false;
-            MessageIsEnabled = false;
             ClientNameIsEnabled = true;
             ButtonStartIsEnabled = false;
             ButtonStopIsEnabled = true;
             ButtonSignInIsEnabled = true;
-            ButtonSendIsEnabled = false;
-        }
-
-        public void SetAfterSignInControlsState()
-        {
-            AddressIsEnabled = false;
-            PortIsEnabled = false;
-            MessageIsEnabled = true;
-            ClientNameIsEnabled = false;
-            ButtonStartIsEnabled = false;
-            ButtonStopIsEnabled = true;
-            ButtonSignInIsEnabled = false;
-            ButtonSendIsEnabled = true;
+            ButtonGetEventLogsIsEnabled = true;
         }
 
         [NotifyPropertyChangedInvocator]

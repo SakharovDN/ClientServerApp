@@ -1,11 +1,11 @@
-﻿<Window x:Class="Client.EventLogWindow"
+﻿<Window x:Class="Client.EventLog.EventLogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Client" d:DataContext="{d:DesignInstance Type=local:EventLogViewModel}"
+        xmlns:local="clr-namespace:Client.EventLog" d:DataContext="{d:DesignInstance Type=local:EventLogViewModel}"
         mc:Ignorable="d"
-        Title="Журнал событий" Height="450" Width="800">
+        Title="Event log" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
