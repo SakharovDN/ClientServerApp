@@ -128,32 +128,20 @@
 
         public void RequestClientsList()
         {
-            string serializedMessages = JsonConvert.SerializeObject(new ClientsListRequest().GetContainer(), _settings);
-            _socket.SendAsync(serializedMessages, SendCompleted);
+            _sendQueue.Enqueue(new ClientsListRequest().GetContainer());
+            SendImpl();
         }
 
         public void RequestEventLogs()
         {
-            string serializedMessages = JsonConvert.SerializeObject(new EventLogsRequest().GetContainer(), _settings);
-            _socket.SendAsync(serializedMessages, SendCompleted);
+            _sendQueue.Enqueue(new EventLogsRequest().GetContainer());
+            SendImpl();
         }
 
         public void Send(string message)
         {
             string serializedMessages = JsonConvert.SerializeObject(new MessageRequest(this, message).GetContainer(), _settings);
-            _chatSocket.SendAsync(serializedMessages, SendCompleted);
-        }
-
-        private void SendCompleted(bool completed)
-        {
-            if (!completed)
-            {
-                Disconnect();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
-                return;
-            }
-
-            SendImpl();
+            _chatSocket.Send(serializedMessages);
         }
 
         private void SendImpl()
@@ -170,6 +158,18 @@
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
             _socket.SendAsync(serializedMessages, SendCompleted);
+        }
+
+        private void SendCompleted(bool completed)
+        {
+            if (!completed)
+            {
+                Disconnect();
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
+                return;
+            }
+
+            SendImpl();
         }
 
         private static void OnError(object sender, ErrorEventArgs e)

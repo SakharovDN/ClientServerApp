@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Concurrent;
 
+    using Common;
+    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
@@ -19,8 +21,7 @@
         private readonly JsonSerializerSettings _settings;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private readonly MessageService _messageService;
-
-        private WsServer _server;
+        private readonly EventLogContext _eventLogContext;
 
         #endregion
 
@@ -43,16 +44,13 @@
                 NullValueHandling = NullValueHandling.Ignore
             };
             _messageService = new MessageService();
+            _messageService.ConnectionStateChanged += HandleConnectionStateChanged;
+            _eventLogContext = new EventLogContext();
         }
 
         #endregion
 
         #region Methods
-
-        public void AddServer(WsServer server)
-        {
-            _server = server;
-        }
 
         public void Send(MessageContainer container)
         {
@@ -70,31 +68,9 @@
             Context.WebSocket.Close();
         }
 
-        protected override void OnOpen()
-        {
-            _server.AddConnection(this);
-        }
-
-        protected override void OnClose(CloseEventArgs e)
-        {
-            _server.FreeConnection(Id);
-        }
-
         protected override void OnMessage(MessageEventArgs e)
         {
-            _messageService.HandleMessage(e.Data, _server, this);
-        }
-
-        private void SendCompleted(bool completed)
-        {
-            if (!completed)
-            {
-                _server.FreeConnection(Id);
-                Context.WebSocket.CloseAsync();
-                return;
-            }
-
-            SendImpl();
+            _messageService.HandleMessage(e.Data, this);
         }
 
         private void SendImpl()
@@ -111,6 +87,48 @@
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
             SendAsync(serializedMessages, SendCompleted);
+        }
+
+        private void SendCompleted(bool completed)
+        {
+            if (!completed)
+            {
+                Context.WebSocket.CloseAsync();
+                return;
+            }
+
+            SendImpl();
+        }
+
+        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        {
+            string clientState = e.Connected ? "подключён" : "отключён";
+            string message = $"Клиент {e.Client.Name} {clientState}";
+
+            if (e.Connected)
+            {
+                ClientService.Add(e.Client);
+            }
+            else
+            {
+                ClientService.Remove(e.Client);
+            }
+
+            SendBroadcastMessage(message);
+            SendBroadcastClientsList();
+            _eventLogContext.ConnectionEventLog(message);
+        }
+
+        private void SendBroadcastMessage(string message)
+        {
+            string serializedMessages = JsonConvert.SerializeObject(new MessageBroadcast(message).GetContainer(), _settings);
+            Sessions.Broadcast(serializedMessages);
+        }
+
+        private void SendBroadcastClientsList()
+        {
+            string serializedMessages = JsonConvert.SerializeObject(new ClientsListResponse(ClientService.Clients).GetContainer(), _settings);
+            Sessions.Broadcast(serializedMessages);
         }
 
         #endregion

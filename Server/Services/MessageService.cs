@@ -16,7 +16,7 @@
     {
         #region Events
 
-        public static event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
         public event EventHandler<MessageRequestHandledEventArgs> MessageRequestHandled;
 
@@ -36,7 +36,7 @@
             HandleMessageRequest(container);
         }
 
-        public void HandleMessage(string message, WsServer server, WsConnection connection)
+        public void HandleMessage(string message, WsConnection connection)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(message);
 
@@ -48,15 +48,15 @@
             switch (container.Type)
             {
                 case MessageTypes.ConnectionRequest:
-                    HandleConnectionRequest(server, connection, container);
+                    HandleConnectionRequest(connection, container);
                     break;
 
                 case MessageTypes.DisconnectionRequest:
-                    HandleDisconnectionRequest(server, container);
+                    HandleDisconnectionRequest(container);
                     break;
 
                 case MessageTypes.ClientsListRequest:
-                    HandleClientsListRequest(server, connection);
+                    HandleClientsListRequest(connection);
                     break;
 
                 case MessageTypes.EventLogsRequest:
@@ -84,23 +84,23 @@
             connection.Send(new EventLogsResponse(eventLogs).GetContainer());
         }
 
-        private static void HandleDisconnectionRequest(WsServer server, MessageContainer container)
+        private void HandleDisconnectionRequest(MessageContainer container)
         {
             var disconnectionRequest = ((JObject)container.Payload).ToObject(typeof(DisconnectionRequest)) as DisconnectionRequest;
 
-            if (server.ClientService.ClientExists(disconnectionRequest?.Client.Name))
+            if (ClientService.ClientExists(disconnectionRequest?.Client.Name))
             {
                 ConnectionStateChanged?.Invoke(null, new ConnectionStateChangedEventArgs(disconnectionRequest?.Client, false));
             }
         }
 
-        private static void HandleClientsListRequest(WsServer server, WsConnection connection)
+        private static void HandleClientsListRequest(WsConnection connection)
         {
-            var clientsListResponse = new ClientsListResponse(server.ClientService.Clients);
+            var clientsListResponse = new ClientsListResponse(ClientService.Clients);
             connection.Send(clientsListResponse.GetContainer());
         }
 
-        private static void HandleConnectionRequest(WsServer server, WsConnection connection, MessageContainer container)
+        private void HandleConnectionRequest(WsConnection connection, MessageContainer container)
         {
             var connectionRequest = ((JObject)container.Payload).ToObject(typeof(ConnectionRequest)) as ConnectionRequest;
             var connectionResponse = new ConnectionResponse
@@ -108,7 +108,7 @@
                 Result = ResultCodes.Ok
             };
 
-            if (server.ClientService.ClientExists(connectionRequest?.Client.Name))
+            if (ClientService.ClientExists(connectionRequest?.Client.Name))
             {
                 connectionResponse.Result = ResultCodes.Failure;
                 connectionResponse.Reason = $"Клиент с именем '{connectionRequest?.Client.Name}' уже подключен.";
