@@ -17,6 +17,7 @@
         private readonly JsonSerializerSettings _settings;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private WebSocket _socket;
+        private WebSocket _chatSocket;
         private string _name;
 
         #endregion
@@ -78,12 +79,16 @@
                 Disconnect();
             }
 
-            _socket = new WebSocket($"ws://{address}:{port}");
+            _socket = new WebSocket($"ws://{address}:{port}/Connection");
             _socket.OnOpen += OnOpen;
             _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
             _socket.OnError += OnError;
             _socket.ConnectAsync();
+            _chatSocket = new WebSocket($"ws://{address}:{port}/CommonChat");
+            _chatSocket.OnMessage += OnMessage;
+            _chatSocket.OnError += OnError;
+            _chatSocket.ConnectAsync();
         }
 
         public void Disconnect()
@@ -103,6 +108,9 @@
             _socket.OnClose -= OnClose;
             _socket.OnMessage -= OnMessage;
             _socket = null;
+            _chatSocket.Close();
+            _chatSocket.OnMessage -= OnMessage;
+            _chatSocket = null;
         }
 
         public void SignIn(string clientName)
@@ -132,8 +140,8 @@
 
         public void Send(string message)
         {
-            _sendQueue.Enqueue(new MessageRequest(this, message).GetContainer());
-            SendImpl();
+            string serializedMessages = JsonConvert.SerializeObject(new MessageRequest(this, message).GetContainer(), _settings);
+            _chatSocket.SendAsync(serializedMessages, SendCompleted);
         }
 
         private void SendCompleted(bool completed)

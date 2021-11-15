@@ -94,6 +94,7 @@
     <Compile Include="[EventArgs]\ConnectionStateChangedEventArgs.cs" />
     <Compile Include="[EventArgs]\EventLogsReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\MessageRequestHandledEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
