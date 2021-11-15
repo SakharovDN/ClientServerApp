@@ -30,7 +30,6 @@
 
         public WsServer(IPEndPoint listenAddress)
         {
-            MessageService.MessageReceived += HandleMessageReceived;
             MessageService.ConnectionStateChanged += HandleConnectionStateChanged;
             ClientService = new ClientService();
             _listenAddress = listenAddress;
@@ -46,11 +45,12 @@
         {
             _server = new WebSocketServer(_listenAddress.Address, _listenAddress.Port, false);
             _server.AddWebSocketService<WsConnection>(
-                "/",
+                "/Connection",
                 connection =>
                 {
                     connection.AddServer(this);
                 });
+            _server.AddWebSocketService<WsChat>("/CommonChat");
             _server.Start();
         }
 
@@ -115,12 +115,6 @@
             {
                 connection.Value.Send(clientsListResponse);
             }
-        }
-
-        private void HandleMessageReceived(object sender, MessageReceivedEventArgs e)
-        {
-            string message = $"{e.ClientName}: {e.Message}";
-            Send(message);
         }
 
         #endregion

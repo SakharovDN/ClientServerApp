@@ -12,19 +12,31 @@
 
     using WebSocket;
 
-    public static class MessageService
+    public class MessageService
     {
         #region Events
 
         public static event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
-        public static event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<MessageRequestHandledEventArgs> MessageRequestHandled;
 
         #endregion
 
         #region Methods
 
-        public static void HandleMessage(string message, WsServer server, WsConnection connection)
+        public void HandleMessage(string message, WsChat chat)
+        {
+            var container = JsonConvert.DeserializeObject<MessageContainer>(message);
+
+            if (container == null)
+            {
+                return;
+            }
+
+            HandleMessageRequest(container);
+        }
+
+        public void HandleMessage(string message, WsServer server, WsConnection connection)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(message);
 
@@ -43,10 +55,6 @@
                     HandleDisconnectionRequest(server, container);
                     break;
 
-                case MessageTypes.MessageRequest:
-                    HandleMessageRequest(container);
-                    break;
-
                 case MessageTypes.ClientsListRequest:
                     HandleClientsListRequest(server, connection);
                     break;
@@ -57,6 +65,13 @@
             }
         }
 
+        public void HandleMessageRequest(MessageContainer container)
+        {
+            var messageRequest = ((JObject)container.Payload).ToObject(typeof(MessageRequest)) as MessageRequest;
+            string message = $"{messageRequest?.Client.Name}: {messageRequest?.Message}";
+            MessageRequestHandled?.Invoke(null, new MessageRequestHandledEventArgs(new MessageBroadcast(message).GetContainer()));
+        }
+
         private static void HandleEventLogsRequest(WsConnection connection)
         {
             DataTable eventLogs;
@@ -65,7 +80,7 @@
             {
                 eventLogs = db.EventLogs.ToDataTable();
             }
-            
+
             connection.Send(new EventLogsResponse(eventLogs).GetContainer());
         }
 
@@ -83,12 +98,6 @@
         {
             var clientsListResponse = new ClientsListResponse(server.ClientService.Clients);
             connection.Send(clientsListResponse.GetContainer());
-        }
-
-        private static void HandleMessageRequest(MessageContainer container)
-        {
-            var messageRequest = ((JObject)container.Payload).ToObject(typeof(MessageRequest)) as MessageRequest;
-            MessageReceived?.Invoke(null, new MessageReceivedEventArgs(messageRequest?.Client.Name, messageRequest?.Message));
         }
 
         private static void HandleConnectionRequest(WsServer server, WsConnection connection, MessageContainer container)

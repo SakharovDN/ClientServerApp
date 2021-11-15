@@ -18,6 +18,7 @@
         public static event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
 
         public static event EventHandler<MessageReceivedEventArgs> MessageReceived;
+
         #endregion
 
         #region Methods

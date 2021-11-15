@@ -18,6 +18,7 @@
 
         private readonly JsonSerializerSettings _settings;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
+        private readonly MessageService _messageService;
 
         private WsServer _server;
 
@@ -41,6 +42,7 @@
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
+            _messageService = new MessageService();
         }
 
         #endregion
@@ -80,7 +82,7 @@
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            MessageService.HandleMessage(e.Data, _server, this);
+            _messageService.HandleMessage(e.Data, _server, this);
         }
 
         private void SendCompleted(bool completed)
