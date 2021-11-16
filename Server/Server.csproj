@@ -68,6 +68,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigSettings.cs" />
+    <Compile Include="Storage\EventLog\EventLog.cs" />
+    <Compile Include="Storage\EventLog\EventLogContext.cs" />
+    <Compile Include="Storage\Chat\Chat.cs" />
+    <Compile Include="Storage\Chat\ChatContext.cs" />
+    <Compile Include="Storage\Client\Client.cs" />
+    <Compile Include="Storage\Client\ClientContext.cs" />
+    <Compile Include="Storage\Message\Message.cs" />
+    <Compile Include="Storage\Message\MessageContext.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Program.cs" />

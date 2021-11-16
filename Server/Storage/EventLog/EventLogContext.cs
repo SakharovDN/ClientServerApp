@@ -1,4 +1,4 @@
-﻿namespace Common.EventLog
+﻿namespace Server.Storage.EventLog
 {
     using System;
     using System.ComponentModel;

@@ -5,7 +5,6 @@
     using System.Net;
 
     using Common;
-    using Common.EventLog;
 
     using Services;
 
@@ -14,7 +13,7 @@
     public class WsServer
     {
         #region Fields
-        
+
         private readonly IPEndPoint _listenAddress;
         private WebSocketServer _server;
 

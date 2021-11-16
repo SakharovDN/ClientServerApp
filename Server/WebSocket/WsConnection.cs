@@ -4,12 +4,13 @@
     using System.Collections.Concurrent;
 
     using Common;
-    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
 
     using Services;
+
+    using Storage.EventLog;
 
     using WebSocketSharp;
     using WebSocketSharp.Server;

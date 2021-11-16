@@ -4,11 +4,12 @@
     using System.Data;
 
     using Common;
-    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+
+    using Storage.EventLog;
 
     using WebSocket;
 
