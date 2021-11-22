@@ -12,7 +12,6 @@
         #region Fields
 
         private readonly WsServer _wsServer;
-
         private readonly ConfigSettings _configSetting;
         private readonly Logger _logger;
 
@@ -23,7 +22,7 @@
         public NetworkManager()
         {
             _configSetting = ConfigSettings.Receive();
-            _wsServer = new WsServer(new IPEndPoint(IPAddress.Any, _configSetting.Port));
+            _wsServer = new WsServer(_configSetting);
             _logger = LogManager.GetCurrentClassLogger();
         }
 
