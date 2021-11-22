@@ -64,13 +64,7 @@
     <Compile Include="EventLog\EventLogWindow.xaml.cs">
       <DependentUpon>EventLogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Messenger\MessengerViewModel.cs" />
-    <Compile Include="Messenger\MessengerWindow.xaml.cs">
-      <DependentUpon>MessengerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NavBarPage.xaml.cs">
-      <DependentUpon>NavBarPage.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Messenger.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="MainViewModel.cs" />
     <Page Include="EventLog\EventLogWindow.xaml">
@@ -89,14 +83,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Messenger\MessengerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NavBarPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
