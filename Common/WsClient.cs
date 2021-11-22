@@ -84,6 +84,7 @@
             _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
             _socket.OnError += OnError;
+            _socket.EmitOnPing = true;
             _socket.ConnectAsync();
             _chatSocket = new WebSocket($"ws://{address}:{port}/CommonChat");
             _chatSocket.OnMessage += OnMessage;
@@ -179,6 +180,10 @@
 
         private void OnMessage(object sender, MessageEventArgs e)
         {
+            if (e.IsPing)
+            {
+                _socket.Ping();
+            }
             ClientMessageHandler.HandleMessage(e.Data, this);
         }
 
