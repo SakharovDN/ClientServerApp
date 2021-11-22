@@ -12,9 +12,9 @@
         private bool _addressIsEnabled;
         private bool _portIsEnabled;
         private bool _clientNameIsEnabled;
+        private bool _messageIsEnabled;
         private bool _buttonStartIsEnabled;
         private bool _buttonStopIsEnabled;
-        private bool _buttonSignInIsEnabled;
         private bool _buttonGetEventLogsIsEnabled;
 
         #endregion
@@ -71,22 +71,22 @@
             }
         }
 
+        public bool MessageIsEnabled
+        {
+            get => _messageIsEnabled;
+            set
+            {
+                _messageIsEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool ButtonStopIsEnabled
         {
             get => _buttonStopIsEnabled;
             set
             {
                 _buttonStopIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ButtonSignInIsEnabled
-        {
-            get => _buttonSignInIsEnabled;
-            set
-            {
-                _buttonSignInIsEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -114,10 +114,10 @@
         {
             AddressIsEnabled = true;
             PortIsEnabled = true;
-            ClientNameIsEnabled = false;
+            ClientNameIsEnabled = true;
+            MessageIsEnabled = false;
             ButtonStartIsEnabled = true;
             ButtonStopIsEnabled = false;
-            ButtonSignInIsEnabled = false;
             ButtonGetEventLogsIsEnabled = false;
         }
 
@@ -125,10 +125,10 @@
         {
             AddressIsEnabled = false;
             PortIsEnabled = false;
-            ClientNameIsEnabled = true;
+            ClientNameIsEnabled = false;
+            MessageIsEnabled = true;
             ButtonStartIsEnabled = false;
             ButtonStopIsEnabled = true;
-            ButtonSignInIsEnabled = true;
             ButtonGetEventLogsIsEnabled = true;
         }
 

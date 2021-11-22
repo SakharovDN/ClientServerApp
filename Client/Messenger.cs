@@ -1,10 +1,9 @@
-﻿namespace Client.Messenger
+﻿namespace Client
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Windows;
@@ -14,7 +13,7 @@
 
     using Common;
 
-    public class MessengerViewModel : INotifyPropertyChanged
+    public class Messenger : INotifyPropertyChanged
     {
         #region Fields
 
@@ -27,8 +26,6 @@
         #endregion
 
         #region Properties
-
-        public string MessagesListSelectedItem { get; set; }
 
         public ICommand SendButton => _sendButton ?? (_sendButton = new CommandHandler(PerformSendButton));
 
@@ -72,7 +69,7 @@
 
         #region Constructors
 
-        public MessengerViewModel(WsClient client)
+        public Messenger(WsClient client)
         {
             _client = client;
             ClientMessageHandler.MessageReceived += HandleMessageReceived;

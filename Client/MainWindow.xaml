@@ -5,45 +5,151 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="Server connection" Height="344" Width="400" ResizeMode="CanMinimize">
+        Title="ClientServerApp" Height="450" Width="800">
     <Grid>
+        <Grid.Resources>
+            <Style x:Key="AddressTextBox" TargetType="{x:Type TextBox}"
+                   xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <Style.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Address..." Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Style.Resources>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="Text" Value="{x:Null}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="PortTextBox" TargetType="{x:Type TextBox}" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <Style.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Port..." Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Style.Resources>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="Text" Value="{x:Null}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="ClientNameTextBox" TargetType="{x:Type TextBox}"
+                   xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <Style.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Name..." Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Style.Resources>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="Text" Value="{x:Null}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="MessageTextBox" TargetType="{x:Type TextBox}"
+                   xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <Style.Resources>
+                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                        <VisualBrush.Visual>
+                            <Label Content="Type a message..." Foreground="Gray" />
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Style.Resources>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="Text" Value="{x:Null}">
+                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter Property="Background" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="44"/>
-            <RowDefinition Height="44"/>
-            <RowDefinition Height="127"/>
-            <RowDefinition Height="44"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
+            <RowDefinition />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="20" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="150" />
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Row="0" Grid.Column="0">
-            <TextBox Text="{Binding Address}" IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}" FontSize="24" TextAlignment="Center"/>
+            <TextBox Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.Column="0">
-            <TextBox Text="{Binding Port}" IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}" FontSize="24" TextAlignment="Center"></TextBox>
+            <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}" />
         </DockPanel>
-        <DockPanel Grid.Row="0" Grid.Column="1">
-            <Button Command="{Binding StartCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">Start</Button>
+        <DockPanel Grid.Row="4" Grid.Column="0">
+            <Button Command="{Binding StartCommand}"
+                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">
+                Start
+            </Button>
         </DockPanel>
-        <DockPanel Grid.Row="1" Grid.Column="1">
+        <DockPanel Grid.Row="5" Grid.Column="0">
             <Button Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
         </DockPanel>
-        <DockPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-            <ListBox ItemsSource="{Binding MessagesList}"></ListBox>
+        <DockPanel Grid.Row="2" Grid.Column="0">
+            <ListBox ItemsSource="{Binding MessagesList}" />
         </DockPanel>
-        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+        <StackPanel Grid.Row="3" Grid.Column="0">
             <Label>Login:</Label>
-            <TextBox Text="{Binding ClientName}" IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}"></TextBox>
+            <TextBox Style="{StaticResource ClientNameTextBox}" Text="{Binding ClientName}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}" />
         </StackPanel>
-        <DockPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
-            <Button Command="{Binding SignInCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonSignInIsEnabled}">Sign in</Button>
-        </DockPanel>
-        <DockPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-            <Button Command="{Binding GetEventLogsButton}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}">GetEventLogs
+        <DockPanel Grid.Row="5" Grid.Column="2">
+            <Button Command="{Binding GetEventLogsButton}"
+                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}">
+                GetEventLogs
             </Button>
+        </DockPanel>
+        <DockPanel Grid.Row="0" Grid.RowSpan="5" Grid.Column="1">
+            <ListBox Name="MessagesListBox" ItemsSource="{Binding Messenger.MessagesList}" />
+        </DockPanel>
+        <DockPanel Grid.Column="1" Grid.Row="5">
+            <TextBox Style="{StaticResource MessageTextBox}"
+                     Text="{Binding Messenger.Message, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.MessageIsEnabled}">
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding Messenger.SendButton}" Key="Enter" />
+                </TextBox.InputBindings>
+            </TextBox>
+        </DockPanel>
+        <DockPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="5">
+            <ListBox ItemsSource="{Binding Messenger.ClientsList}" />
         </DockPanel>
     </Grid>
 </Window>

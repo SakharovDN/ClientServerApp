@@ -11,8 +11,6 @@
 
     using EventLog;
 
-    using Messenger;
-
     public class MainViewModel : INotifyPropertyChanged
     {
         #region Fields
@@ -20,8 +18,6 @@
         private readonly WsClient _client;
         private CommandHandler _startCommand;
         private CommandHandler _stopCommand;
-        private CommandHandler _signInCommand;
-
         private CommandHandler _getEventLogsButton;
         private string _address;
         private string _port;
@@ -31,6 +27,8 @@
         #endregion
 
         #region Properties
+
+        public Messenger Messenger { get; set; }
 
         public ControlsEnabledViewModel ControlsEnabledViewModel { get; set; }
 
@@ -78,8 +76,6 @@
 
         public ICommand StopCommand => _stopCommand ?? (_stopCommand = new CommandHandler(PerformStopButton));
 
-        public ICommand SignInCommand => _signInCommand ?? (_signInCommand = new CommandHandler(PerformSignInButton));
-
         public ICommand GetEventLogsButton => _getEventLogsButton ?? (_getEventLogsButton = new CommandHandler(PerformGetEventLogsButton));
 
         #endregion
@@ -97,6 +93,7 @@
             _client = new WsClient();
             _client.ConnectionStateChanged += HandleConnectionStateChanged;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
+            Messenger = new Messenger(_client);
             ClientMessageHandler.EventLogsReceived += HandleEventLogsReceived;
             ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             MessagesList = new ObservableCollection<string>();
@@ -118,21 +115,17 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void OpenMessenger()
-        {
-            var messenger = new MessengerWindow(_client);
-            messenger.Show();
-        }
-
         private void PerformStartButton(object commandParameter)
         {
             try
             {
                 _client.Connect(Address, Port);
+                _client?.SignIn(ClientName);
                 ControlsEnabledViewModel.SetAfterStartControlsState();
             }
             catch (Exception ex)
             {
+                _client.Disconnect();
                 MessagesList.Add(ex.Message);
                 ControlsEnabledViewModel.SetDefaultControlsState();
             }
@@ -142,18 +135,6 @@
         {
             _client?.Disconnect();
             ControlsEnabledViewModel.SetDefaultControlsState();
-        }
-
-        private void PerformSignInButton(object commandParameter)
-        {
-            try
-            {
-                _client?.SignIn(ClientName);
-            }
-            catch (Exception ex)
-            {
-                MessagesList.Add(ex.Message);
-            }
         }
 
         private void PerformGetEventLogsButton(object commandParameter)
@@ -171,14 +152,9 @@
                         return;
                     }
 
-                    if (string.IsNullOrEmpty(args.Client.Name))
+                    if (!string.IsNullOrEmpty(args.Client.Name))
                     {
-                        MessagesList.Add("Клиент подключен к серверу.");
-                        MessagesList.Add("Авторизируйтесь, чтобы отправлять сообщения.");
-                    }
-                    else
-                    {
-                        MessagesList.Add("Авторизация прошла успешно");
+                        MessagesList.Add("Authorization was successful");
                     }
                 });
         }
@@ -192,13 +168,7 @@
                     {
                         MessagesList.Add(e.ConnectionResponse.Reason);
                     }
-                    else
-                    {
-                        Application.Current.MainWindow?.Hide();
-                        OpenMessenger();
-                    }
                 });
-            
         }
 
         private static void HandleEventLogsReceived(object sender, EventLogsReceivedEventArgs args)
