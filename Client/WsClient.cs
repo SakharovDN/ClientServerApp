@@ -182,7 +182,7 @@
                 return;
             }
 
-            ClientMessageHandler.HandleMessage(e.Data, this);
+            ClientMessageHandler.HandleMessage(e.Data);
         }
 
         #endregion
