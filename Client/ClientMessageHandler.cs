@@ -1,8 +1,9 @@
-﻿namespace Common
+﻿namespace Client
 {
     using System;
 
-    using Messages;
+    using Common;
+    using Common.Messages;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -17,7 +18,11 @@
 
         public static event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
 
+        public static event EventHandler<DisconnectionResponseReceivedEventArgs> DisconnectionResponseReceived;
+
         public static event EventHandler<MessageReceivedEventArgs> MessageReceived;
+
+        public static event EventHandler<ConnectionStateChangedEchoReceivedEventArgs> ConnectionStateChangedEchoReceived;
 
         #endregion
 
@@ -35,7 +40,11 @@
             switch (container.Type)
             {
                 case MessageTypes.ConnectionResponse:
-                    HandleConnectionResponse(client, container);
+                    HandleConnectionResponse(container);
+                    break;
+
+                case MessageTypes.DisconnectionResponse:
+                    HandleDisconnectionResponse(container);
                     break;
 
                 case MessageTypes.MessageBroadcast:
@@ -49,6 +58,28 @@
                 case MessageTypes.EventLogsResponse:
                     HandleEventLogsResponse(container);
                     break;
+
+                case MessageTypes.ConnectionStateChangedEcho:
+                    HandleConnectionStateChangedEcho(container);
+                    break;
+            }
+        }
+
+        private static void HandleDisconnectionResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(DisconnectionResponse)) is DisconnectionResponse disconnectionResponse)
+            {
+                DisconnectionResponseReceived?.Invoke(null, new DisconnectionResponseReceivedEventArgs());
+            }
+        }
+
+        private static void HandleConnectionStateChangedEcho(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(ConnectionStateChangedEcho)) is ConnectionStateChangedEcho connectionStateChangedEcho)
+            {
+                ConnectionStateChangedEchoReceived?.Invoke(
+                    null,
+                    new ConnectionStateChangedEchoReceivedEventArgs(connectionStateChangedEcho.ClientName, connectionStateChangedEcho.IsConnected));
             }
         }
 
@@ -76,7 +107,7 @@
             }
         }
 
-        private static void HandleConnectionResponse(WsClient client, MessageContainer container)
+        private static void HandleConnectionResponse(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
             {

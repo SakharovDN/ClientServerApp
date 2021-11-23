@@ -2,22 +2,22 @@
 {
     using System;
 
-    public class MessageReceivedEventArgs : EventArgs
+    public class ConnectionStateChangedEchoReceivedEventArgs : EventArgs
     {
         #region Properties
 
         public string ClientName { get; }
 
-        public string Message { get; }
+        public bool IsConnected { get; }
 
         #endregion
 
         #region Constructors
 
-        public MessageReceivedEventArgs(string clientName, string message)
+        public ConnectionStateChangedEchoReceivedEventArgs(string clientName, bool isConnected)
         {
             ClientName = clientName;
-            Message = message;
+            IsConnected = isConnected;
         }
 
         #endregion

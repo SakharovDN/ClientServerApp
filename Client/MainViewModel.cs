@@ -91,11 +91,11 @@
         public MainViewModel()
         {
             _client = new WsClient();
-            _client.ConnectionStateChanged += HandleConnectionStateChanged;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             Messenger = new Messenger(_client);
             ClientMessageHandler.EventLogsReceived += HandleEventLogsReceived;
             ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            ClientMessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             MessagesList = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
@@ -107,7 +107,10 @@
 
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            _client?.Disconnect();
+            if (_client.IsConnected)
+            {
+                _client.LogOut();
+            }
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -120,7 +123,7 @@
             try
             {
                 _client.Connect(Address, Port);
-                _client?.SignIn(ClientName);
+                _client?.LogIn(ClientName);
                 ControlsEnabledViewModel.SetAfterStartControlsState();
             }
             catch (Exception ex)
@@ -133,7 +136,7 @@
 
         private void PerformStopButton(object commandParameter)
         {
-            _client?.Disconnect();
+            _client.LogOut();
             ControlsEnabledViewModel.SetDefaultControlsState();
         }
 
@@ -142,20 +145,14 @@
             _client.RequestEventLogs();
         }
 
-        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs args)
+        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedEchoReceivedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (!args.Connected)
-                    {
-                        return;
-                    }
-
-                    if (!string.IsNullOrEmpty(args.Client.Name))
-                    {
-                        MessagesList.Add("Authorization was successful");
-                    }
+                    string clientState = e.IsConnected ? "is connected" : "is disconnected";
+                    string message = $"Client {e.ClientName} {clientState}";
+                    MessagesList.Add(message);
                 });
         }
 
@@ -164,9 +161,15 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (e.ConnectionResponse.Result == ResultCodes.Failure)
+                    if (e.ConnectionResponse.Result == ResultCodes.Ok)
                     {
+                        _client.RequestClientsList();
+                    }
+                    else
+                    {
+                        _client.Disconnect();
                         MessagesList.Add(e.ConnectionResponse.Reason);
+                        ControlsEnabledViewModel.SetDefaultControlsState();
                     }
                 });
         }

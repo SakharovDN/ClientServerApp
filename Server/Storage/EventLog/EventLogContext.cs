@@ -1,4 +1,4 @@
-﻿namespace Common.EventLog
+﻿namespace Server.Storage.EventLog
 {
     using System;
     using System.ComponentModel;
@@ -16,8 +16,8 @@
 
         #region Constructors
 
-        public EventLogContext()
-            : base("DbConnection")
+        public EventLogContext(string dbConnection)
+            : base(dbConnection)
         {
         }
 
@@ -25,7 +25,7 @@
 
         #region Methods
 
-        public void ConnectionEventLog(string message)
+        public void AddEventLogToDt(string message)
         {
             var eventLog = new EventLog
             {

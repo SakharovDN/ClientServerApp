@@ -28,11 +28,8 @@
 
         public static ConfigSettings Receive()
         {
-            using (StreamReader file = File.OpenText(CONFIG_FILE_PATH))
-            {
-                var serializer = new JsonSerializer();
-                return (ConfigSettings)serializer.Deserialize(file, typeof(ConfigSettings));
-            }
+            string jsonString = File.ReadAllText(CONFIG_FILE_PATH);
+            return JsonConvert.DeserializeObject<ConfigSettings>(jsonString);
         }
 
         #endregion

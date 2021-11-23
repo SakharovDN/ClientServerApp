@@ -1,10 +1,6 @@
 ﻿namespace Server.WebSocket
 {
-    using System;
-    using System.Collections.Generic;
     using System.Net;
-
-    using Common;
 
     using Services;
 
@@ -17,6 +13,8 @@
         private readonly IPEndPoint _listenAddress;
         private WebSocketServer _server;
         private readonly int _inactivityTimeoutInterval;
+        private ClientService _clientService;
+        private EventLogService _eventLogService;
 
         #endregion
 
@@ -24,9 +22,10 @@
 
         public WsServer(ConfigSettings configSettings)
         {
-            ClientService.Clients = new Dictionary<Guid, WsClient>();
             _listenAddress = new IPEndPoint(IPAddress.Any, configSettings.Port);
             _inactivityTimeoutInterval = configSettings.InactivityTimeoutInterval;
+            _clientService = new ClientService();
+            _eventLogService = new EventLogService(configSettings.DbConnection);
         }
 
         #endregion

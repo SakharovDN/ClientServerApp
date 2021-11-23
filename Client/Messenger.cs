@@ -1,7 +1,5 @@
 ﻿namespace Client
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -74,7 +72,7 @@
             _client = client;
             ClientMessageHandler.MessageReceived += HandleMessageReceived;
             ClientMessageHandler.ClientsListReceived += HandleClientsListReceived;
-            _client.RequestClientsList();
+            ClientMessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             ClientsList = new ObservableCollection<string>();
             MessagesList = new ObservableCollection<string>();
         }
@@ -82,12 +80,6 @@
         #endregion
 
         #region Methods
-
-        public void OnWindowClosing(object sender, CancelEventArgs e)
-        {
-            _client?.SignOut();
-            Application.Current.MainWindow?.Show();
-        }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -102,9 +94,9 @@
                 {
                     ClientsList.Clear();
 
-                    foreach (KeyValuePair<Guid, WsClient> client in e.Clients)
+                    foreach (string client in e.Clients)
                     {
-                        ClientsList.Add(client.Value.Name);
+                        ClientsList.Add(client);
                     }
                 });
         }
@@ -128,6 +120,22 @@
                 delegate
                 {
                     MessagesList.Add(args.Message);
+                });
+        }
+
+        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedEchoReceivedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    if (e.IsConnected)
+                    {
+                        ClientsList.Add(e.ClientName);
+                    }
+                    else
+                    {
+                        ClientsList.Remove(e.ClientName);
+                    }
                 });
         }
 

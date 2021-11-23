@@ -1,10 +1,11 @@
-﻿namespace Common
+﻿namespace Client
 {
     using System;
     using System.Collections.Concurrent;
     using System.Text.RegularExpressions;
 
-    using Messages;
+    using Common;
+    using Common.Messages;
 
     using Newtonsoft.Json;
 
@@ -31,12 +32,12 @@
             {
                 if (value.IsNullOrEmpty())
                 {
-                    throw new Exception("Введите имя, чтобы авторизироваться");
+                    throw new Exception("Enter your name to log in");
                 }
 
                 if (value.Length > 10)
                 {
-                    throw new Exception("Имя может содержать максимум 10 символов");
+                    throw new Exception("The name can contain a maximum of 10 characters");
                 }
 
                 var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
@@ -50,16 +51,11 @@
 
         #endregion
 
-        #region Events
-
-        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
-
-        #endregion
-
         #region Constructors
 
         public WsClient()
         {
+            ClientMessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
             _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
@@ -80,16 +76,14 @@
             }
 
             _socket = new WebSocket($"ws://{address}:{port}/Connection");
-            _socket.OnOpen += OnOpen;
-            _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
             _socket.OnError += OnError;
             _socket.EmitOnPing = true;
-            _socket.ConnectAsync();
+            _socket.Connect();
             _chatSocket = new WebSocket($"ws://{address}:{port}/CommonChat");
             _chatSocket.OnMessage += OnMessage;
             _chatSocket.OnError += OnError;
-            _chatSocket.ConnectAsync();
+            _chatSocket.Connect();
         }
 
         public void Disconnect()
@@ -105,8 +99,6 @@
             }
 
             _socket.Close();
-            _socket.OnOpen -= OnOpen;
-            _socket.OnClose -= OnClose;
             _socket.OnMessage -= OnMessage;
             _socket = null;
             _chatSocket.Close();
@@ -114,16 +106,16 @@
             _chatSocket = null;
         }
 
-        public void SignIn(string clientName)
+        public void LogIn(string clientName)
         {
             Name = clientName;
-            _sendQueue.Enqueue(new ConnectionRequest(this).GetContainer());
+            _sendQueue.Enqueue(new ConnectionRequest(Name).GetContainer());
             SendImpl();
         }
 
-        public void SignOut()
+        public void LogOut()
         {
-            _sendQueue.Enqueue(new DisconnectionRequest(this).GetContainer());
+            _sendQueue.Enqueue(new DisconnectionRequest(Name).GetContainer());
             SendImpl();
         }
 
@@ -141,8 +133,13 @@
 
         public void Send(string message)
         {
-            string serializedMessages = JsonConvert.SerializeObject(new MessageRequest(this, message).GetContainer(), _settings);
+            string serializedMessages = JsonConvert.SerializeObject(new MessageRequest(Name, message).GetContainer(), _settings);
             _chatSocket.Send(serializedMessages);
+        }
+
+        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
+        {
+            Disconnect();
         }
 
         private void SendImpl()
@@ -158,7 +155,7 @@
             }
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
-            _socket.SendAsync(serializedMessages, SendCompleted);
+            _socket.Send(serializedMessages);
         }
 
         private void SendCompleted(bool completed)
@@ -166,7 +163,6 @@
             if (!completed)
             {
                 Disconnect();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
                 return;
             }
 
@@ -183,18 +179,10 @@
             if (e.IsPing)
             {
                 _socket.Ping();
+                return;
             }
+
             ClientMessageHandler.HandleMessage(e.Data, this);
-        }
-
-        private void OnClose(object sender, CloseEventArgs e)
-        {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, false));
-        }
-
-        private void OnOpen(object sender, EventArgs e)
-        {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(this, true));
         }
 
         #endregion
