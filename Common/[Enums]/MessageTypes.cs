@@ -9,7 +9,9 @@
         ClientsListRequest,
         ClientsListResponse,
         DisconnectionRequest,
+        DisconnectionResponse,
         EventLogsRequest,
-        EventLogsResponse
+        EventLogsResponse,
+        ConnectionStateChangedEcho
     }
 }

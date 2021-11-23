@@ -4,15 +4,15 @@
     {
         #region Properties
 
-        public WsClient Client { get; set; }
+        public string ClientName { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public DisconnectionRequest(WsClient client)
+        public DisconnectionRequest(string clientName)
         {
-            Client = client;
+            ClientName = clientName;
         }
 
         #endregion

@@ -3,17 +3,17 @@
     using System;
     using System.Collections.Generic;
 
-    public class ClientsListReceivedEventArgs
+    public class ClientsListReceivedEventArgs : EventArgs
     {
         #region Properties
 
-        public Dictionary<Guid, WsClient> Clients { get; }
+        public List<string> Clients { get; }
 
         #endregion
 
         #region Constructors
 
-        public ClientsListReceivedEventArgs(Dictionary<Guid, WsClient> clients)
+        public ClientsListReceivedEventArgs(List<string> clients)
         {
             Clients = clients;
         }

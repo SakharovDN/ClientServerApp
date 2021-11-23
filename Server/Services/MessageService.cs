@@ -1,10 +1,8 @@
 ﻿namespace Server.Services
 {
-    using System;
     using System.Data;
 
     using Common;
-    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
@@ -14,17 +12,9 @@
 
     public class MessageService
     {
-        #region Events
-
-        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
-
-        public event EventHandler<MessageRequestHandledEventArgs> MessageRequestHandled;
-
-        #endregion
-
         #region Methods
 
-        public void HandleMessage(string message, WsChat chat)
+        public static void HandleMessage(string message, WsChat chat)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(message);
 
@@ -33,10 +23,10 @@
                 return;
             }
 
-            HandleMessageRequest(container);
+            HandleMessageRequest(chat, container);
         }
 
-        public void HandleMessage(string message, WsConnection connection)
+        public static void HandleMessage(string message, WsConnection connection)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(message);
 
@@ -52,7 +42,7 @@
                     break;
 
                 case MessageTypes.DisconnectionRequest:
-                    HandleDisconnectionRequest(container);
+                    HandleDisconnectionRequest(connection, container);
                     break;
 
                 case MessageTypes.ClientsListRequest:
@@ -65,33 +55,36 @@
             }
         }
 
-        public void HandleMessageRequest(MessageContainer container)
+        public static void HandleMessageRequest(WsChat chat, MessageContainer container)
         {
             var messageRequest = ((JObject)container.Payload).ToObject(typeof(MessageRequest)) as MessageRequest;
-            string message = $"{messageRequest?.Client.Name}: {messageRequest?.Message}";
-            MessageRequestHandled?.Invoke(null, new MessageRequestHandledEventArgs(new MessageBroadcast(message).GetContainer()));
+            string message = $"{messageRequest?.SenderName}: {messageRequest?.Message}";
+            string messageBroadcast = JsonConvert.SerializeObject(new MessageBroadcast(message).GetContainer());
+            chat.BroadcastMessage(messageBroadcast);
         }
 
         private static void HandleEventLogsRequest(WsConnection connection)
         {
-            DataTable eventLogs;
-
-            using (var db = new EventLogContext())
-            {
-                eventLogs = db.EventLogs.ToDataTable();
-            }
-
+            DataTable eventLogs = EventLogService.GetEventLogs();
             connection.Send(new EventLogsResponse(eventLogs).GetContainer());
         }
 
-        private void HandleDisconnectionRequest(MessageContainer container)
+        private static void HandleDisconnectionRequest(WsConnection connection, MessageContainer container)
         {
-            var disconnectionRequest = ((JObject)container.Payload).ToObject(typeof(DisconnectionRequest)) as DisconnectionRequest;
-
-            if (ClientService.ClientExists(disconnectionRequest?.Client.Name))
+            if (!(((JObject)container.Payload).ToObject(typeof(DisconnectionRequest)) is DisconnectionRequest disconnectionRequest))
             {
-                ConnectionStateChanged?.Invoke(null, new ConnectionStateChangedEventArgs(disconnectionRequest?.Client, false));
+                return;
             }
+
+            if (!ClientService.ClientExists(disconnectionRequest.ClientName))
+            {
+                return;
+            }
+
+            ClientService.Remove(disconnectionRequest.ClientName);
+            EventLogService.AddEventLog($"Client {disconnectionRequest.ClientName} is disconnected");
+            connection.Broadcast(new ConnectionStateChangedEcho(disconnectionRequest.ClientName, false).GetContainer());
+            connection.Send(new DisconnectionResponse().GetContainer());
         }
 
         private static void HandleClientsListRequest(WsConnection connection)
@@ -100,22 +93,29 @@
             connection.Send(clientsListResponse.GetContainer());
         }
 
-        private void HandleConnectionRequest(WsConnection connection, MessageContainer container)
+        private static void HandleConnectionRequest(WsConnection connection, MessageContainer container)
         {
-            var connectionRequest = ((JObject)container.Payload).ToObject(typeof(ConnectionRequest)) as ConnectionRequest;
+            if (!(((JObject)container.Payload).ToObject(typeof(ConnectionRequest)) is ConnectionRequest connectionRequest))
+            {
+                return;
+            }
+
             var connectionResponse = new ConnectionResponse
             {
                 Result = ResultCodes.Ok
             };
 
-            if (ClientService.ClientExists(connectionRequest?.Client.Name))
+            if (ClientService.ClientExists(connectionRequest.ClientName))
             {
                 connectionResponse.Result = ResultCodes.Failure;
-                connectionResponse.Reason = $"Клиент с именем '{connectionRequest?.Client.Name}' уже подключен.";
+                connectionResponse.Reason = $"Client named '{connectionRequest.ClientName}' is already connected.";
             }
-            else
+
+            if (connectionResponse.Result == ResultCodes.Ok)
             {
-                ConnectionStateChanged?.Invoke(null, new ConnectionStateChangedEventArgs(connectionRequest?.Client, true));
+                ClientService.Add(connectionRequest.ClientName);
+                EventLogService.AddEventLog($"Client {connectionRequest.ClientName} is connected");
+                connection.Broadcast(new ConnectionStateChangedEcho(connectionRequest.ClientName, true).GetContainer());
             }
 
             connection.Send(connectionResponse.GetContainer());

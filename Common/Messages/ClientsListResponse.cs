@@ -1,19 +1,18 @@
 ﻿namespace Common.Messages
 {
-    using System;
     using System.Collections.Generic;
 
     public class ClientsListResponse
     {
         #region Properties
 
-        public Dictionary<Guid, WsClient> Clients { get; set; }
+        public List<string> Clients { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ClientsListResponse(Dictionary<Guid, WsClient> clients)
+        public ClientsListResponse(List<string> clients)
         {
             Clients = clients;
         }

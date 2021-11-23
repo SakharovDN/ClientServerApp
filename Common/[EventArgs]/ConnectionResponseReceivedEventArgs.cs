@@ -1,8 +1,10 @@
 ﻿namespace Common
 {
+    using System;
+
     using Messages;
 
-    public class ConnectionResponseReceivedEventArgs
+    public class ConnectionResponseReceivedEventArgs : EventArgs
     {
         #region Properties
 

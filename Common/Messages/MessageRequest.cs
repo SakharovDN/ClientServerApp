@@ -6,16 +6,16 @@
 
         public string Message { get; set; }
 
-        public WsClient Client { get; set; }
+        public string SenderName { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public MessageRequest(WsClient client, string message)
+        public MessageRequest(string senderName, string message)
         {
-            Client = client;
             Message = message;
+            SenderName = senderName;
         }
 
         #endregion

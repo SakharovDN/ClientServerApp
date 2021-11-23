@@ -1,8 +1,9 @@
 ﻿namespace Common
 {
+    using System;
     using System.Data;
 
-    public class EventLogsReceivedEventArgs
+    public class EventLogsReceivedEventArgs : EventArgs
     {
         #region Properties
 

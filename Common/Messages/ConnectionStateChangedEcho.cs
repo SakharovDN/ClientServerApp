@@ -1,18 +1,21 @@
 ﻿namespace Common.Messages
 {
-    public class ConnectionRequest
+    public class ConnectionStateChangedEcho
     {
         #region Properties
 
         public string ClientName { get; set; }
 
+        public bool IsConnected { get; set; }
+
         #endregion
 
         #region Constructors
 
-        public ConnectionRequest(string clientName)
+        public ConnectionStateChangedEcho(string clientName, bool isConnected)
         {
             ClientName = clientName;
+            IsConnected = isConnected;
         }
 
         #endregion
@@ -23,7 +26,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ConnectionRequest,
+                Type = MessageTypes.ConnectionStateChangedEcho,
                 Payload = this
             };
         }

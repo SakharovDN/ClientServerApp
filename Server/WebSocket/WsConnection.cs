@@ -1,12 +1,9 @@
 ﻿namespace Server.WebSocket
 {
-    using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Timers;
 
-    using Common;
-    using Common.EventLog;
     using Common.Messages;
 
     using Newtonsoft.Json;
@@ -23,8 +20,6 @@
         private readonly JsonSerializerSettings _settings;
         private int _inactivityTimeoutInterval;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
-        private readonly MessageService _messageService;
-        private readonly EventLogContext _eventLogContext;
         private readonly Stopwatch _pingStopwatch;
         private readonly Timer _pingTimer;
         private readonly Timer _checkConnectionTimer;
@@ -32,8 +27,6 @@
         #endregion
 
         #region Properties
-
-        public Guid Id { get; }
 
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
 
@@ -48,14 +41,10 @@
             _pingTimer = new Timer();
             _checkConnectionTimer = new Timer();
             _sendQueue = new ConcurrentQueue<MessageContainer>();
-            Id = Guid.NewGuid();
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
-            _messageService = new MessageService();
-            _messageService.ConnectionStateChanged += HandleConnectionStateChanged;
-            _eventLogContext = new EventLogContext();
         }
 
         #endregion
@@ -78,6 +67,17 @@
             SendImpl();
         }
 
+        public void Broadcast(MessageContainer container)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            string serializedMessages = JsonConvert.SerializeObject(container, _settings);
+            Sessions.Broadcast(serializedMessages);
+        }
+
         protected override void OnMessage(MessageEventArgs e)
         {
             if (e.IsPing)
@@ -86,7 +86,7 @@
                 return;
             }
 
-            _messageService.HandleMessage(e.Data, this);
+            MessageService.HandleMessage(e.Data, this);
         }
 
         protected override void OnOpen()
@@ -133,49 +133,18 @@
             }
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
-            SendAsync(serializedMessages, SendCompleted);
+            Send(serializedMessages);
         }
 
         private void SendCompleted(bool completed)
         {
             if (!completed)
             {
-                Context.WebSocket.CloseAsync();
+                Context.WebSocket.Close();
                 return;
             }
 
             SendImpl();
-        }
-
-        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
-        {
-            string clientState = e.Connected ? "подключён" : "отключён";
-            string message = $"Клиент {e.Client.Name} {clientState}";
-
-            if (e.Connected)
-            {
-                ClientService.Add(e.Client);
-            }
-            else
-            {
-                ClientService.Remove(e.Client);
-            }
-
-            SendBroadcastMessage(message);
-            SendBroadcastClientsList();
-            _eventLogContext.ConnectionEventLog(message);
-        }
-
-        private void SendBroadcastMessage(string message)
-        {
-            string serializedMessages = JsonConvert.SerializeObject(new MessageBroadcast(message).GetContainer(), _settings);
-            Sessions.Broadcast(serializedMessages);
-        }
-
-        private void SendBroadcastClientsList()
-        {
-            string serializedMessages = JsonConvert.SerializeObject(new ClientsListResponse(ClientService.Clients).GetContainer(), _settings);
-            Sessions.Broadcast(serializedMessages);
         }
 
         #endregion
