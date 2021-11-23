@@ -28,7 +28,7 @@
 
         #region Methods
 
-        public static void HandleMessage(string message, WsClient client)
+        public static void HandleMessage(string message)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(message);
 
@@ -48,7 +48,7 @@
                     break;
 
                 case MessageTypes.MessageBroadcast:
-                    HandleMessageBroadcast(client, container);
+                    HandleMessageBroadcast(container);
                     break;
 
                 case MessageTypes.ClientsListResponse:
@@ -99,11 +99,11 @@
             }
         }
 
-        private static void HandleMessageBroadcast(WsClient client, MessageContainer container)
+        private static void HandleMessageBroadcast(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
             {
-                MessageReceived?.Invoke(null, new MessageReceivedEventArgs(client.Name, messageBroadcast.Message));
+                MessageReceived?.Invoke(null, new MessageReceivedEventArgs(messageBroadcast.SenderName, messageBroadcast.Message));
             }
         }
 

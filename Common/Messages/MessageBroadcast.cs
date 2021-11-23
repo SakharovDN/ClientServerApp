@@ -6,13 +6,16 @@
 
         public string Message { get; set; }
 
+        public string SenderName { get; set; }
+
         #endregion
 
         #region Constructors
 
-        public MessageBroadcast(string message)
+        public MessageBroadcast(string message, string senderName)
         {
             Message = message;
+            SenderName = senderName;
         }
 
         #endregion

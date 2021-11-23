@@ -119,7 +119,7 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    MessagesList.Add(args.Message);
+                    MessagesList.Add($"{args.ClientName}: {args.Message}");
                 });
         }
 

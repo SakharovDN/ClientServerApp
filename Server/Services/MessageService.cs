@@ -57,9 +57,13 @@
 
         public static void HandleMessageRequest(WsChat chat, MessageContainer container)
         {
-            var messageRequest = ((JObject)container.Payload).ToObject(typeof(MessageRequest)) as MessageRequest;
-            string message = $"{messageRequest?.SenderName}: {messageRequest?.Message}";
-            string messageBroadcast = JsonConvert.SerializeObject(new MessageBroadcast(message).GetContainer());
+            if (!(((JObject)container.Payload).ToObject(typeof(MessageRequest)) is MessageRequest messageRequest))
+            {
+                return;
+            }
+
+            string messageBroadcast =
+                JsonConvert.SerializeObject(new MessageBroadcast(messageRequest.Message, messageRequest.SenderName).GetContainer());
             chat.BroadcastMessage(messageBroadcast);
         }
 
