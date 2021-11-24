@@ -29,6 +29,11 @@
             return Clients.Any(client => client == clientName);
         }
 
+        public static List<string> GetConnectedClients()
+        {
+            return Clients.ToList();
+        }
+
         public static void Add(string client)
         {
             if (ClientExists(client) || client.IsNullOrEmpty())

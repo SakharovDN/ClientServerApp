@@ -136,17 +136,6 @@
             Send(serializedMessages);
         }
 
-        private void SendCompleted(bool completed)
-        {
-            if (!completed)
-            {
-                Context.WebSocket.Close();
-                return;
-            }
-
-            SendImpl();
-        }
-
         #endregion
     }
 }

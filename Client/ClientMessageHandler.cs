@@ -12,8 +12,6 @@
     {
         #region Events
 
-        public static event EventHandler<ClientsListReceivedEventArgs> ClientsListReceived;
-
         public static event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
 
         public static event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
@@ -49,10 +47,6 @@
 
                 case MessageTypes.MessageBroadcast:
                     HandleMessageBroadcast(container);
-                    break;
-
-                case MessageTypes.ClientsListResponse:
-                    HandleClientsListResponse(container);
                     break;
 
                 case MessageTypes.EventLogsResponse:
@@ -91,14 +85,6 @@
             }
         }
 
-        private static void HandleClientsListResponse(MessageContainer container)
-        {
-            if (((JObject)container.Payload).ToObject(typeof(ClientsListResponse)) is ClientsListResponse clientsListResponse)
-            {
-                ClientsListReceived?.Invoke(null, new ClientsListReceivedEventArgs(clientsListResponse.Clients));
-            }
-        }
-
         private static void HandleMessageBroadcast(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
@@ -111,7 +97,12 @@
         {
             if (((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
             {
-                ConnectionResponseReceived?.Invoke(null, new ConnectionResponseReceivedEventArgs(connectionResponse));
+                ConnectionResponseReceived?.Invoke(
+                    null,
+                    new ConnectionResponseReceivedEventArgs(
+                        connectionResponse.Result,
+                        connectionResponse.Reason,
+                        connectionResponse.ConnectedClients));
             }
         }
 

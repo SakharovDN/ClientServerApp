@@ -161,16 +161,14 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (e.ConnectionResponse.Result == ResultCodes.Ok)
+                    if (e.Result == ResultCodes.Ok)
                     {
-                        _client.RequestClientsList();
+                        return;
                     }
-                    else
-                    {
-                        _client.Disconnect();
-                        MessagesList.Add(e.ConnectionResponse.Reason);
-                        ControlsEnabledViewModel.SetDefaultControlsState();
-                    }
+
+                    _client.Disconnect();
+                    MessagesList.Add(e.Reason);
+                    ControlsEnabledViewModel.SetDefaultControlsState();
                 });
         }
 

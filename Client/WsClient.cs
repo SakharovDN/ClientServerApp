@@ -119,12 +119,6 @@
             SendImpl();
         }
 
-        public void RequestClientsList()
-        {
-            _sendQueue.Enqueue(new ClientsListRequest().GetContainer());
-            SendImpl();
-        }
-
         public void RequestEventLogs()
         {
             _sendQueue.Enqueue(new EventLogsRequest().GetContainer());
@@ -156,17 +150,6 @@
 
             string serializedMessages = JsonConvert.SerializeObject(message, _settings);
             _socket.Send(serializedMessages);
-        }
-
-        private void SendCompleted(bool completed)
-        {
-            if (!completed)
-            {
-                Disconnect();
-                return;
-            }
-
-            SendImpl();
         }
 
         private static void OnError(object sender, ErrorEventArgs e)

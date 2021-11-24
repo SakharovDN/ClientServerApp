@@ -45,10 +45,6 @@
                     HandleDisconnectionRequest(connection, container);
                     break;
 
-                case MessageTypes.ClientsListRequest:
-                    HandleClientsListRequest(connection);
-                    break;
-
                 case MessageTypes.EventLogsRequest:
                     HandleEventLogsRequest(connection);
                     break;
@@ -91,12 +87,6 @@
             connection.Send(new DisconnectionResponse().GetContainer());
         }
 
-        private static void HandleClientsListRequest(WsConnection connection)
-        {
-            var clientsListResponse = new ClientsListResponse(ClientService.Clients);
-            connection.Send(clientsListResponse.GetContainer());
-        }
-
         private static void HandleConnectionRequest(WsConnection connection, MessageContainer container)
         {
             if (!(((JObject)container.Payload).ToObject(typeof(ConnectionRequest)) is ConnectionRequest connectionRequest))
@@ -113,10 +103,12 @@
             {
                 connectionResponse.Result = ResultCodes.Failure;
                 connectionResponse.Reason = $"Client named '{connectionRequest.ClientName}' is already connected.";
+                connectionResponse.ConnectedClients = null;
             }
 
             if (connectionResponse.Result == ResultCodes.Ok)
             {
+                connectionResponse.ConnectedClients = ClientService.GetConnectedClients();
                 ClientService.Add(connectionRequest.ClientName);
                 EventLogService.AddEventLog($"Client {connectionRequest.ClientName} is connected");
                 connection.Broadcast(new ConnectionStateChangedEcho(connectionRequest.ClientName, true).GetContainer());
