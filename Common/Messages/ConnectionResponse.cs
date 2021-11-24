@@ -1,5 +1,7 @@
 ﻿namespace Common.Messages
 {
+    using System.Collections.Generic;
+
     public class ConnectionResponse
     {
         #region Properties
@@ -7,6 +9,8 @@
         public ResultCodes Result { get; set; }
 
         public string Reason { get; set; }
+
+        public List<string> ConnectedClients { get; set; }
 
         #endregion
 

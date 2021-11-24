@@ -71,7 +71,7 @@
         {
             _client = client;
             ClientMessageHandler.MessageReceived += HandleMessageReceived;
-            ClientMessageHandler.ClientsListReceived += HandleClientsListReceived;
+            ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             ClientMessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             ClientsList = new ObservableCollection<string>();
             MessagesList = new ObservableCollection<string>();
@@ -87,14 +87,19 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void HandleClientsListReceived(object sender, ClientsListReceivedEventArgs e)
+        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
+                    if (e.Result == ResultCodes.Failure || e.ConnectedClients == null)
+                    {
+                        return;
+                    }
+
                     ClientsList.Clear();
 
-                    foreach (string client in e.Clients)
+                    foreach (string client in e.ConnectedClients)
                     {
                         ClientsList.Add(client);
                     }

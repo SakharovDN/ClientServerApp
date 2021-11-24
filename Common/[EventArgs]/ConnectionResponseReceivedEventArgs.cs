@@ -1,22 +1,27 @@
 ﻿namespace Common
 {
     using System;
-
-    using Messages;
+    using System.Collections.Generic;
 
     public class ConnectionResponseReceivedEventArgs : EventArgs
     {
         #region Properties
 
-        public ConnectionResponse ConnectionResponse { get; set; }
+        public ResultCodes Result { get; }
+
+        public string Reason { get; }
+
+        public List<string> ConnectedClients { get; }
 
         #endregion
 
         #region Constructors
 
-        public ConnectionResponseReceivedEventArgs(ConnectionResponse connectionResponse)
+        public ConnectionResponseReceivedEventArgs(ResultCodes result, string reason, List<string> connectedClients)
         {
-            ConnectionResponse = connectionResponse;
+            Result = result;
+            Reason = reason;
+            ConnectedClients = connectedClients;
         }
 
         #endregion

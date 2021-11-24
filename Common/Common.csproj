@@ -72,8 +72,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages\ClientsListRequest.cs" />
-    <Compile Include="Messages\ClientsListResponse.cs" />
     <Compile Include="Messages\ConnectionRequest.cs" />
     <Compile Include="Messages\ConnectionResponse.cs" />
     <Compile Include="Messages\ConnectionStateChangedEcho.cs" />
