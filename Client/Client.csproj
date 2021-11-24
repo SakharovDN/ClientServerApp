@@ -64,7 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ClientMessageHandler.cs" />
+    <Compile Include="MessageHandler.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="ControlsEnabledViewModel.cs" />
     <Compile Include="EventLog\EventLogViewModel.cs" />

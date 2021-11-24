@@ -8,27 +8,43 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public static class ClientMessageHandler
+    public class MessageHandler
     {
+        #region Fields
+
+        private readonly WsClient _client;
+
+        #endregion
+
         #region Events
 
-        public static event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
+        public event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
 
-        public static event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
+        public event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
 
-        public static event EventHandler<DisconnectionResponseReceivedEventArgs> DisconnectionResponseReceived;
+        public event EventHandler<DisconnectionResponseReceivedEventArgs> DisconnectionResponseReceived;
 
-        public static event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public static event EventHandler<ConnectionStateChangedEchoReceivedEventArgs> ConnectionStateChangedEchoReceived;
+        public event EventHandler<ConnectionStateChangedEchoReceivedEventArgs> ConnectionStateChangedEchoReceived;
+
+        #endregion
+
+        #region Constructors
+
+        public MessageHandler(WsClient client)
+        {
+            _client = client;
+            _client.MessageContainerReceived += HandleMessageContainer;
+        }
 
         #endregion
 
         #region Methods
 
-        public static void HandleMessage(string message)
+        private void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
         {
-            var container = JsonConvert.DeserializeObject<MessageContainer>(message);
+            var container = JsonConvert.DeserializeObject<MessageContainer>(e.MessageContainer);
 
             if (container == null)
             {
@@ -59,7 +75,7 @@
             }
         }
 
-        private static void HandleDisconnectionResponse(MessageContainer container)
+        private void HandleDisconnectionResponse(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(DisconnectionResponse)) is DisconnectionResponse disconnectionResponse)
             {
@@ -67,7 +83,7 @@
             }
         }
 
-        private static void HandleConnectionStateChangedEcho(MessageContainer container)
+        private void HandleConnectionStateChangedEcho(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(ConnectionStateChangedEcho)) is ConnectionStateChangedEcho connectionStateChangedEcho)
             {
@@ -77,7 +93,7 @@
             }
         }
 
-        private static void HandleEventLogsResponse(MessageContainer container)
+        private void HandleEventLogsResponse(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(EventLogsResponse)) is EventLogsResponse eventLogsResponse)
             {
@@ -85,7 +101,7 @@
             }
         }
 
-        private static void HandleMessageBroadcast(MessageContainer container)
+        private void HandleMessageBroadcast(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
             {
@@ -93,7 +109,7 @@
             }
         }
 
-        private static void HandleConnectionResponse(MessageContainer container)
+        private void HandleConnectionResponse(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(ConnectionResponse)) is ConnectionResponse connectionResponse)
             {

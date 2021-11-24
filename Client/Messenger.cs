@@ -70,9 +70,9 @@
         public Messenger(WsClient client)
         {
             _client = client;
-            ClientMessageHandler.MessageReceived += HandleMessageReceived;
-            ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            ClientMessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
+            _client.MessageHandler.MessageReceived += HandleMessageReceived;
+            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             ClientsList = new ObservableCollection<string>();
             MessagesList = new ObservableCollection<string>();
         }

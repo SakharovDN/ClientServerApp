@@ -37,6 +37,11 @@
             SaveChanges();
         }
 
+        public DataTable GetEventLogs()
+        {
+            return EventLogs.ToDataTable();
+        }
+
         public void ClearEventLogsDt()
         {
             Database.ExecuteSqlCommand("TRUNCATE TABLE [EventLogs]");
