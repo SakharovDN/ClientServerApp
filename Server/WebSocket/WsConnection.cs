@@ -1,7 +1,6 @@
 ﻿namespace Server.WebSocket
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Timers;
 
@@ -19,7 +18,6 @@
 
         private readonly JsonSerializerSettings _settings;
         private int _inactivityTimeoutInterval;
-        private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private readonly Stopwatch _pingStopwatch;
         private readonly Timer _pingTimer;
         private readonly Timer _checkConnectionTimer;
@@ -38,6 +36,8 @@
 
         public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
 
+        public event EventHandler<EventArgs> ConnectionClosed;
+
         #endregion
 
         #region Constructors
@@ -48,7 +48,6 @@
             _pingStopwatch = new Stopwatch();
             _pingTimer = new Timer();
             _checkConnectionTimer = new Timer();
-            _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -59,15 +58,15 @@
 
         #region Methods
 
-        public void Send(MessageContainer container)
+        public void Send(MessageContainer messageContainer)
         {
             if (!IsConnected)
             {
                 return;
             }
 
-            _sendQueue.Enqueue(container);
-            SendImpl();
+            string serializedMessages = JsonConvert.SerializeObject(messageContainer, _settings);
+            Send(serializedMessages);
         }
 
         public void Broadcast(MessageContainer container)
@@ -115,6 +114,7 @@
             _pingTimer.Stop();
             _checkConnectionTimer.Stop();
             _pingStopwatch.Reset();
+            ConnectionClosed?.Invoke(this, EventArgs.Empty);
         }
 
         private void Ping(object sender, ElapsedEventArgs e)
@@ -128,22 +128,6 @@
             {
                 Context.WebSocket.Close();
             }
-        }
-
-        private void SendImpl()
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            if (!_sendQueue.TryDequeue(out MessageContainer message))
-            {
-                return;
-            }
-
-            string serializedMessages = JsonConvert.SerializeObject(message, _settings);
-            Send(serializedMessages);
         }
 
         #endregion

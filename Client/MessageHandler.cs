@@ -1,6 +1,8 @@
 ﻿namespace Client
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Timers;
 
     using Common;
     using Common.Messages;
@@ -13,6 +15,9 @@
         #region Fields
 
         private readonly WsClient _client;
+        private readonly ConcurrentQueue<MessageContainer> _handlingQueue;
+        private readonly Timer _handlingTimer;
+        private bool _messageIsHandling;
 
         #endregion
 
@@ -35,14 +40,20 @@
         public MessageHandler(WsClient client)
         {
             _client = client;
-            _client.MessageContainerReceived += HandleMessageContainer;
+            _client.ClientClosed += StopHandlingTimer;
+            _client.MessageContainerReceived += EnqueueMessageContainer;
+            _handlingQueue = new ConcurrentQueue<MessageContainer>();
+            _messageIsHandling = false;
+            _handlingTimer = new Timer(100);
+            _handlingTimer.Elapsed += HandleMessageContainer;
+            _handlingTimer.Start();
         }
 
         #endregion
 
         #region Methods
 
-        private void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
+        private void EnqueueMessageContainer(object sender, MessageContainerReceivedEventArgs e)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(e.MessageContainer);
 
@@ -50,6 +61,18 @@
             {
                 return;
             }
+
+            _handlingQueue.Enqueue(container);
+        }
+
+        private void HandleMessageContainer(object sender, ElapsedEventArgs e)
+        {
+            if (!_handlingQueue.TryDequeue(out MessageContainer container) || _messageIsHandling)
+            {
+                return;
+            }
+
+            _messageIsHandling = true;
 
             switch (container.Type)
             {
@@ -73,6 +96,13 @@
                     HandleConnectionStateChangedEcho(container);
                     break;
             }
+
+            _messageIsHandling = false;
+        }
+
+        private void StopHandlingTimer(object sender, EventArgs e)
+        {
+            _handlingTimer.Stop();
         }
 
         private void HandleDisconnectionResponse(MessageContainer container)

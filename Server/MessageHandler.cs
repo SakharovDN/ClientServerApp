@@ -1,6 +1,9 @@
 ﻿namespace Server
 {
+    using System;
+    using System.Collections.Concurrent;
     using System.Data;
+    using System.Timers;
 
     using Common;
     using Common.Messages;
@@ -20,6 +23,9 @@
         private readonly ClientContext _clientContext;
         private readonly EventLogContext _eventLogContext;
         private readonly WsConnection _connection;
+        private readonly ConcurrentQueue<MessageContainer> _handlingQueue;
+        private readonly Timer _handlingTimer;
+        private bool _messageIsHandling;
 
         #endregion
 
@@ -30,14 +36,25 @@
             _clientContext = new ClientContext(dbConnection);
             _eventLogContext = new EventLogContext(dbConnection);
             _connection = connection;
-            _connection.MessageContainerReceived += HandleMessageContainer;
+            _connection.ConnectionClosed += StopHandlingTimer;
+            _connection.MessageContainerReceived += EnqueueMessageContainer;
+            _handlingQueue = new ConcurrentQueue<MessageContainer>();
+            _messageIsHandling = false;
+            _handlingTimer = new Timer(100);
+            _handlingTimer.Elapsed += HandleMessageContainer;
+            _handlingTimer.Start();
         }
 
         #endregion
 
         #region Methods
 
-        private void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
+        private void StopHandlingTimer(object sender, EventArgs e)
+        {
+            _handlingTimer.Stop();
+        }
+
+        private void EnqueueMessageContainer(object sender, MessageContainerReceivedEventArgs e)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(e.MessageContainer);
 
@@ -45,6 +62,18 @@
             {
                 return;
             }
+
+            _handlingQueue.Enqueue(container);
+        }
+
+        private void HandleMessageContainer(object sender, ElapsedEventArgs e)
+        {
+            if (!_handlingQueue.TryDequeue(out MessageContainer container) || _messageIsHandling)
+            {
+                return;
+            }
+
+            _messageIsHandling = true;
 
             switch (container.Type)
             {
@@ -64,6 +93,8 @@
                     HandleEventLogsRequest();
                     break;
             }
+
+            _messageIsHandling = false;
         }
 
         private void HandleMessageRequest(MessageContainer container)

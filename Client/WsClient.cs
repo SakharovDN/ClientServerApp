@@ -1,7 +1,6 @@
 ﻿namespace Client
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Text.RegularExpressions;
 
     using Common;
@@ -18,7 +17,6 @@
         public MessageHandler MessageHandler;
 
         private readonly JsonSerializerSettings _settings;
-        private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private WebSocket _socket;
         private string _name;
 
@@ -56,6 +54,8 @@
 
         public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
 
+        public event EventHandler<EventArgs> ClientClosed;
+
         #endregion
 
         #region Constructors
@@ -64,12 +64,10 @@
         {
             MessageHandler = new MessageHandler(this);
             MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
-            _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
-            Id = Guid.NewGuid();
         }
 
         #endregion
@@ -85,6 +83,7 @@
 
             _socket = new WebSocket($"ws://{address}:{port}/Connection");
             _socket.OnMessage += OnMessage;
+            _socket.OnClose += OnClose;
             _socket.OnError += OnError;
             _socket.EmitOnPing = true;
             _socket.Connect();
@@ -110,26 +109,22 @@
         public void LogIn(string clientName)
         {
             Name = clientName;
-            _sendQueue.Enqueue(new ConnectionRequest(Name).GetContainer());
-            SendImpl();
+            Send(new ConnectionRequest(Name).GetContainer());
         }
 
         public void LogOut()
         {
-            _sendQueue.Enqueue(new DisconnectionRequest(Name).GetContainer());
-            SendImpl();
+            Send(new DisconnectionRequest(Name).GetContainer());
         }
 
         public void RequestEventLogs()
         {
-            _sendQueue.Enqueue(new EventLogsRequest().GetContainer());
-            SendImpl();
+            Send(new EventLogsRequest().GetContainer());
         }
 
         public void Send(string message)
         {
-            _sendQueue.Enqueue(new MessageRequest(Name, message).GetContainer());
-            SendImpl();
+            Send(new MessageRequest(Name, message).GetContainer());
         }
 
         private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
@@ -137,20 +132,20 @@
             Disconnect();
         }
 
-        private void SendImpl()
+        private void Send(MessageContainer messageContainer)
         {
             if (!IsConnected)
             {
                 return;
             }
 
-            if (!_sendQueue.TryDequeue(out MessageContainer message))
-            {
-                return;
-            }
-
-            string serializedMessages = JsonConvert.SerializeObject(message, _settings);
+            string serializedMessages = JsonConvert.SerializeObject(messageContainer, _settings);
             _socket.Send(serializedMessages);
+        }
+
+        private void OnClose(object sender, CloseEventArgs e)
+        {
+            ClientClosed?.Invoke(this, EventArgs.Empty);
         }
 
         private static void OnError(object sender, ErrorEventArgs e)
