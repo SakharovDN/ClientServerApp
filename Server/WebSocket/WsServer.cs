@@ -2,6 +2,8 @@
 {
     using System.Net;
 
+    using Services;
+
     using WebSocketSharp.Server;
 
     public class WsServer
@@ -11,6 +13,9 @@
         private readonly IPEndPoint _listenAddress;
         private WebSocketServer _server;
         private readonly ConfigSettings _configSettings;
+        private readonly MessageService _messageService;
+        private readonly ClientService _clientService;
+        private readonly EventLogService _eventLogService;
 
         #endregion
 
@@ -20,6 +25,9 @@
         {
             _configSettings = configSettings;
             _listenAddress = new IPEndPoint(IPAddress.Any, _configSettings.Port);
+            _messageService = new MessageService();
+            _clientService = new ClientService(configSettings.DbConnection);
+            _eventLogService = new EventLogService(configSettings.DbConnection);
         }
 
         #endregion
@@ -33,7 +41,7 @@
                 "/Connection",
                 connection =>
                 {
-                    connection.SetConfigSettings(_configSettings);
+                    connection.SetSettings(_configSettings.InactivityTimeoutInterval, _messageService, _clientService, _eventLogService);
                 });
             _server.Start();
         }
@@ -41,6 +49,9 @@
         public void Stop()
         {
             _server?.Stop();
+            _messageService.Stop();
+            _clientService.Stop();
+            _eventLogService.Stop();
             _server = null;
         }
 

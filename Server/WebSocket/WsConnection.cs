@@ -10,6 +10,8 @@
 
     using Newtonsoft.Json;
 
+    using Services;
+
     using WebSocketSharp;
     using WebSocketSharp.Server;
 
@@ -24,7 +26,6 @@
         private readonly Timer _pingTimer;
         private readonly Timer _checkConnectionTimer;
         private MessageHandler _messageHandler;
-        private string _dbConnection;
 
         #endregion
 
@@ -81,11 +82,14 @@
             Sessions.Broadcast(serializedMessages);
         }
 
-        public void SetConfigSettings(ConfigSettings configSettings)
+        public void SetSettings(
+            int inactivityTimeoutInterval,
+            MessageService messageService,
+            ClientService clientService,
+            EventLogService eventLogService)
         {
-            _inactivityTimeoutInterval = configSettings.InactivityTimeoutInterval;
-            _dbConnection = configSettings.DbConnection;
-            _messageHandler = new MessageHandler(this, _dbConnection);
+            _inactivityTimeoutInterval = inactivityTimeoutInterval;
+            _messageHandler = new MessageHandler(this, messageService, clientService, eventLogService);
         }
 
         protected override void OnMessage(MessageEventArgs e)

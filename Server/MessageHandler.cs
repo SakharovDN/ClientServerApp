@@ -1,15 +1,12 @@
 ﻿namespace Server
 {
-    using System.Data;
-
     using Common;
     using Common.Messages;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    using Storage.Client;
-    using Storage.EventLog;
+    using Services;
 
     using WebSocket;
 
@@ -17,25 +14,37 @@
     {
         #region Fields
 
-        private readonly ClientContext _clientContext;
-        private readonly EventLogContext _eventLogContext;
         private readonly WsConnection _connection;
+        private readonly MessageService _messageService;
+        private readonly ClientService _clientService;
+        private readonly EventLogService _eventLogService;
 
         #endregion
 
         #region Constructors
 
-        public MessageHandler(WsConnection connection, string dbConnection)
+        public MessageHandler(WsConnection connection, MessageService messageService, ClientService clientService, EventLogService eventLogService)
         {
-            _clientContext = new ClientContext(dbConnection);
-            _eventLogContext = new EventLogContext(dbConnection);
             _connection = connection;
             _connection.MessageContainerReceived += HandleMessageContainer;
+            _messageService = messageService;
+            _clientService = clientService;
+            _eventLogService = eventLogService;
         }
 
         #endregion
 
         #region Methods
+
+        public void Send(MessageContainer container)
+        {
+            _connection.Send(container);
+        }
+
+        public void SendBroadcast(MessageContainer container)
+        {
+            _connection.Broadcast(container);
+        }
 
         private void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
         {
@@ -66,23 +75,6 @@
             }
         }
 
-        private void HandleMessageRequest(MessageContainer container)
-        {
-            if (!(((JObject)container.Payload).ToObject(typeof(MessageRequest)) is MessageRequest messageRequest))
-            {
-                return;
-            }
-
-            MessageContainer messageBroadcast = new MessageBroadcast(messageRequest.Message, messageRequest.SenderName).GetContainer();
-            _connection.Broadcast(messageBroadcast);
-        }
-
-        private void HandleEventLogsRequest()
-        {
-            DataTable eventLogs = _eventLogContext.GetEventLogs();
-            _connection.Send(new EventLogsResponse(eventLogs).GetContainer());
-        }
-
         private void HandleDisconnectionRequest(MessageContainer container)
         {
             if (!(((JObject)container.Payload).ToObject(typeof(DisconnectionRequest)) is DisconnectionRequest disconnectionRequest))
@@ -90,15 +82,7 @@
                 return;
             }
 
-            if (!_clientContext.ClientIsConnected(disconnectionRequest.ClientName))
-            {
-                return;
-            }
-
-            _clientContext.ChangeConnectionStatus(disconnectionRequest.ClientName);
-            _eventLogContext.AddEventLogToDt($"Client {disconnectionRequest.ClientName} is disconnected");
-            _connection.Broadcast(new ConnectionStateChangedEcho(disconnectionRequest.ClientName, false).GetContainer());
-            _connection.Send(new DisconnectionResponse().GetContainer());
+            _clientService.EnqueueDisconnectionRequest(new Request(disconnectionRequest, this));
         }
 
         private void HandleConnectionRequest(MessageContainer container)
@@ -108,36 +92,22 @@
                 return;
             }
 
-            var connectionResponse = new ConnectionResponse
-            {
-                Result = ResultCodes.Ok
-            };
+            _clientService.EnqueueConnectionRequest(new Request(connectionRequest, this));
+        }
 
-            if (_clientContext.ClientIsConnected(connectionRequest.ClientName))
+        private void HandleMessageRequest(MessageContainer container)
+        {
+            if (!(((JObject)container.Payload).ToObject(typeof(MessageRequest)) is MessageRequest messageRequest))
             {
-                connectionResponse.Result = ResultCodes.Failure;
-                connectionResponse.Reason = $"Client named '{connectionRequest.ClientName}' is already connected.";
-                connectionResponse.ConnectedClients = null;
+                return;
             }
 
-            if (connectionResponse.Result == ResultCodes.Ok)
-            {
-                connectionResponse.ConnectedClients = _clientContext.GetConnectedClients();
+            _messageService.EnqueueMessageRequest(new Request(messageRequest, this));
+        }
 
-                if (!_clientContext.ClientExists(connectionRequest.ClientName))
-                {
-                    _clientContext.AddNewClientToDt(connectionRequest.ClientName);
-                }
-                else
-                {
-                    _clientContext.ChangeConnectionStatus(connectionRequest.ClientName);
-                }
-
-                _eventLogContext.AddEventLogToDt($"Client {connectionRequest.ClientName} is connected");
-                _connection.Broadcast(new ConnectionStateChangedEcho(connectionRequest.ClientName, true).GetContainer());
-            }
-
-            _connection.Send(connectionResponse.GetContainer());
+        private void HandleEventLogsRequest()
+        {
+            _eventLogService.ConstructEventLogsResponse();
         }
 
         #endregion
