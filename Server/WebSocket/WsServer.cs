@@ -2,8 +2,6 @@
 {
     using System.Net;
 
-    using Services;
-
     using WebSocketSharp.Server;
 
     public class WsServer
@@ -12,9 +10,7 @@
 
         private readonly IPEndPoint _listenAddress;
         private WebSocketServer _server;
-        private readonly int _inactivityTimeoutInterval;
-        private ClientService _clientService;
-        private EventLogService _eventLogService;
+        private readonly ConfigSettings _configSettings;
 
         #endregion
 
@@ -22,10 +18,8 @@
 
         public WsServer(ConfigSettings configSettings)
         {
-            _listenAddress = new IPEndPoint(IPAddress.Any, configSettings.Port);
-            _inactivityTimeoutInterval = configSettings.InactivityTimeoutInterval;
-            _clientService = new ClientService();
-            _eventLogService = new EventLogService(configSettings.DbConnection);
+            _configSettings = configSettings;
+            _listenAddress = new IPEndPoint(IPAddress.Any, _configSettings.Port);
         }
 
         #endregion
@@ -39,9 +33,8 @@
                 "/Connection",
                 connection =>
                 {
-                    connection.SetInactivityTimeoutInterval(_inactivityTimeoutInterval);
+                    connection.SetConfigSettings(_configSettings);
                 });
-            _server.AddWebSocketService<WsChat>("/CommonChat");
             _server.Start();
         }
 

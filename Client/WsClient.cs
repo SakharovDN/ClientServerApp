@@ -15,10 +15,11 @@
     {
         #region Fields
 
+        public MessageHandler MessageHandler;
+
         private readonly JsonSerializerSettings _settings;
         private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private WebSocket _socket;
-        private WebSocket _chatSocket;
         private string _name;
 
         #endregion
@@ -51,11 +52,18 @@
 
         #endregion
 
+        #region Events
+
+        public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
+
+        #endregion
+
         #region Constructors
 
         public WsClient()
         {
-            ClientMessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
+            MessageHandler = new MessageHandler(this);
+            MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
             _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
@@ -80,10 +88,6 @@
             _socket.OnError += OnError;
             _socket.EmitOnPing = true;
             _socket.Connect();
-            _chatSocket = new WebSocket($"ws://{address}:{port}/CommonChat");
-            _chatSocket.OnMessage += OnMessage;
-            _chatSocket.OnError += OnError;
-            _chatSocket.Connect();
         }
 
         public void Disconnect()
@@ -101,9 +105,6 @@
             _socket.Close();
             _socket.OnMessage -= OnMessage;
             _socket = null;
-            _chatSocket.Close();
-            _chatSocket.OnMessage -= OnMessage;
-            _chatSocket = null;
         }
 
         public void LogIn(string clientName)
@@ -127,8 +128,8 @@
 
         public void Send(string message)
         {
-            string serializedMessages = JsonConvert.SerializeObject(new MessageRequest(Name, message).GetContainer(), _settings);
-            _chatSocket.Send(serializedMessages);
+            _sendQueue.Enqueue(new MessageRequest(Name, message).GetContainer());
+            SendImpl();
         }
 
         private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
@@ -165,7 +166,7 @@
                 return;
             }
 
-            ClientMessageHandler.HandleMessage(e.Data);
+            MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(e.Data));
         }
 
         #endregion

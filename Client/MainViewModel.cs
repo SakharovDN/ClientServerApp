@@ -93,9 +93,9 @@
             _client = new WsClient();
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             Messenger = new Messenger(_client);
-            ClientMessageHandler.EventLogsReceived += HandleEventLogsReceived;
-            ClientMessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            ClientMessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
+            _client.MessageHandler.EventLogsReceived += HandleEventLogsReceived;
+            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             MessagesList = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";

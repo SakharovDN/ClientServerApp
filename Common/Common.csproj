@@ -90,6 +90,7 @@
     <Compile Include="[EventArgs]\ConnectionStateChangedEchoReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\DisconnectionResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\EventLogsReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\MessageContainerReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageReceivedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

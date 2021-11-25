@@ -1,14 +1,14 @@
 ﻿namespace Server.WebSocket
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Timers;
 
+    using Common;
     using Common.Messages;
 
     using Newtonsoft.Json;
-
-    using Services;
 
     using WebSocketSharp;
     using WebSocketSharp.Server;
@@ -23,12 +23,20 @@
         private readonly Stopwatch _pingStopwatch;
         private readonly Timer _pingTimer;
         private readonly Timer _checkConnectionTimer;
+        private MessageHandler _messageHandler;
+        private string _dbConnection;
 
         #endregion
 
         #region Properties
 
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
 
         #endregion
 
@@ -50,11 +58,6 @@
         #endregion
 
         #region Methods
-
-        public void SetInactivityTimeoutInterval(int inactivityTimeoutInterval)
-        {
-            _inactivityTimeoutInterval = inactivityTimeoutInterval;
-        }
 
         public void Send(MessageContainer container)
         {
@@ -78,6 +81,13 @@
             Sessions.Broadcast(serializedMessages);
         }
 
+        public void SetConfigSettings(ConfigSettings configSettings)
+        {
+            _inactivityTimeoutInterval = configSettings.InactivityTimeoutInterval;
+            _dbConnection = configSettings.DbConnection;
+            _messageHandler = new MessageHandler(this, _dbConnection);
+        }
+
         protected override void OnMessage(MessageEventArgs e)
         {
             if (e.IsPing)
@@ -86,7 +96,7 @@
                 return;
             }
 
-            MessageService.HandleMessage(e.Data, this);
+            MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(e.Data));
         }
 
         protected override void OnOpen()
