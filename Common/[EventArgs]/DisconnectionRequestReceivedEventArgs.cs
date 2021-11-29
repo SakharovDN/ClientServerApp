@@ -10,15 +10,21 @@
 
         public string ClientName { get; }
 
+        public Action<object, MessageContainer> Send { get; }
+
         public Action<object, MessageContainer> SendBroadcast { get; }
 
         #endregion
 
         #region Constructors
 
-        public DisconnectionRequestReceivedEventArgs(string clientName, Action<object, MessageContainer> sendBroadcast)
+        public DisconnectionRequestReceivedEventArgs(
+            string clientName,
+            Action<object, MessageContainer> send,
+            Action<object, MessageContainer> sendBroadcast)
         {
             ClientName = clientName;
+            Send = send;
             SendBroadcast = sendBroadcast;
         }
 

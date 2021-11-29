@@ -56,13 +56,16 @@
 
         public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
 
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+
         #endregion
 
         #region Constructors
 
         public WsClient()
         {
-            MessageHandler = new MessageHandler(this);
+            MessageHandler = new MessageHandler();
+            MessageContainerReceived += MessageHandler.HandleMessageContainer;
             MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
             _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
@@ -84,6 +87,8 @@
             }
 
             _socket = new WebSocket($"ws://{address}:{port}/Connection");
+            _socket.OnOpen += OnOpen;
+            _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
             _socket.OnError += OnError;
             _socket.EmitOnPing = true;
@@ -103,7 +108,10 @@
             }
 
             _socket.Close();
+            _socket.OnOpen -= OnOpen;
+            _socket.OnClose -= OnClose;
             _socket.OnMessage -= OnMessage;
+            _socket.OnError -= OnError;
             _socket = null;
         }
 
@@ -167,6 +175,16 @@
             }
 
             MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(e.Data));
+        }
+
+        private void OnOpen(object sender, EventArgs e)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(true));
+        }
+
+        private void OnClose(object sender, CloseEventArgs e)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(false));
         }
 
         #endregion

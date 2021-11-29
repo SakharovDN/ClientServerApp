@@ -91,11 +91,12 @@
         public MainViewModel()
         {
             _client = new WsClient();
-            ControlsEnabledViewModel = new ControlsEnabledViewModel();
-            Messenger = new Messenger(_client);
+            _client.ConnectionStateChanged += HandleConnectionStateChanged;
             _client.MessageHandler.EventLogsReceived += HandleEventLogsReceived;
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
+            ControlsEnabledViewModel = new ControlsEnabledViewModel();
+            Messenger = new Messenger(_client);
             MessagesList = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
@@ -105,11 +106,19 @@
 
         #region Methods
 
-        public void OnWindowClosing(object sender, CancelEventArgs e)
+        public void OnWindowClosing(object sender, CancelEventArgs args)
         {
             if (_client.IsConnected)
             {
                 _client.LogOut();
+            }
+        }
+
+        public void OnWindowClosed(object sender, EventArgs args)
+        {
+            if (_client.IsConnected)
+            {
+                _client.Disconnect();
             }
         }
 
@@ -145,29 +154,38 @@
             _client.RequestEventLogs();
         }
 
-        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedEchoReceivedEventArgs e)
+        private void HandleConnectionStateChanged(object sender, ConnectionStateChangedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    string clientState = e.IsConnected ? "is connected" : "is disconnected";
-                    string message = $"Client {e.ClientName} {clientState}";
+                    MessagesList.Add(args.IsConnected ? "Connection established" : "Connection lost");
+                });
+        }
+
+        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedEchoReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    string clientState = args.IsConnected ? "is connected" : "is disconnected";
+                    string message = $"Client {args.ClientName} {clientState}";
                     MessagesList.Add(message);
                 });
         }
 
-        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs e)
+        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (e.Result == ResultCodes.Ok)
+                    if (args.Result == ResultCodes.Ok)
                     {
                         return;
                     }
 
                     _client.Disconnect();
-                    MessagesList.Add(e.Reason);
+                    MessagesList.Add(args.Reason);
                     ControlsEnabledViewModel.SetDefaultControlsState();
                 });
         }

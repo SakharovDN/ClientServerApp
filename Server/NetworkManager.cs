@@ -105,6 +105,7 @@
             }
 
             _clientService.RemoveClient(args.ClientName);
+            args.Send(sender, new DisconnectionResponse().GetContainer());
             args.SendBroadcast(sender, new ConnectionStateChangedEcho(args.ClientName, false).GetContainer());
         }
 
