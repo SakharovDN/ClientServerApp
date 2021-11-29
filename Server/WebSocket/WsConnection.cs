@@ -1,7 +1,6 @@
 ﻿namespace Server.WebSocket
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Timers;
 
@@ -17,14 +16,12 @@
     {
         #region Fields
 
+        private WsServer _server;
         private readonly JsonSerializerSettings _settings;
+        private Stopwatch _pingStopwatch;
+        private Timer _pingTimer;
+        private Timer _checkConnectionTimer;
         private int _inactivityTimeoutInterval;
-        private readonly ConcurrentQueue<MessageContainer> _sendQueue;
-        private readonly Stopwatch _pingStopwatch;
-        private readonly Timer _pingTimer;
-        private readonly Timer _checkConnectionTimer;
-        private MessageHandler _messageHandler;
-        private string _dbConnection;
 
         #endregion
 
@@ -36,7 +33,7 @@
 
         #region Events
 
-        public event EventHandler<MessageContainerReceivedEventArgs> MessageContainerReceived;
+        public event EventHandler<RequestReceivedEventArgs> RequestReceived;
 
         #endregion
 
@@ -45,10 +42,6 @@
         public WsConnection()
         {
             EmitOnPing = true;
-            _pingStopwatch = new Stopwatch();
-            _pingTimer = new Timer();
-            _checkConnectionTimer = new Timer();
-            _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -59,6 +52,11 @@
 
         #region Methods
 
+        public void AddServer(WsServer server)
+        {
+            _server = server;
+        }
+
         public void Send(MessageContainer container)
         {
             if (!IsConnected)
@@ -66,8 +64,8 @@
                 return;
             }
 
-            _sendQueue.Enqueue(container);
-            SendImpl();
+            string serializedMessages = JsonConvert.SerializeObject(container, _settings);
+            SendAsync(serializedMessages, SendCompleted);
         }
 
         public void Broadcast(MessageContainer container)
@@ -78,33 +76,39 @@
             }
 
             string serializedMessages = JsonConvert.SerializeObject(container, _settings);
-            Sessions.Broadcast(serializedMessages);
+            Sessions.BroadcastAsync(serializedMessages, null);
         }
 
-        public void SetConfigSettings(ConfigSettings configSettings)
+        public void SetInactivityTimeout(int inactivityTimeoutInterval)
         {
-            _inactivityTimeoutInterval = configSettings.InactivityTimeoutInterval;
-            _dbConnection = configSettings.DbConnection;
-            _messageHandler = new MessageHandler(this, _dbConnection);
+            _inactivityTimeoutInterval = inactivityTimeoutInterval;
+        }
+
+        public void Close()
+        {
+            Context.WebSocket.Close();
         }
 
         protected override void OnMessage(MessageEventArgs e)
         {
+            _pingStopwatch.Restart();
+
             if (e.IsPing)
             {
-                _pingStopwatch.Restart();
                 return;
             }
 
-            MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(e.Data));
+            RequestReceived?.Invoke(this, new RequestReceivedEventArgs(ID, e.Data));
         }
 
         protected override void OnOpen()
         {
-            _pingTimer.Interval = _inactivityTimeoutInterval / 2;
+            _server.AddConnection(this);
+            _pingTimer = new Timer(_inactivityTimeoutInterval / 2);
             _pingTimer.Elapsed += Ping;
-            _checkConnectionTimer.Interval = _inactivityTimeoutInterval;
+            _checkConnectionTimer = new Timer(_inactivityTimeoutInterval);
             _checkConnectionTimer.Elapsed += CheckConnection;
+            _pingStopwatch = new Stopwatch();
             _pingTimer.Start();
             _checkConnectionTimer.Start();
             _pingStopwatch.Start();
@@ -112,38 +116,41 @@
 
         protected override void OnClose(CloseEventArgs closeEventArgs)
         {
+            _server.FreeConnection(ID);
             _pingTimer.Stop();
             _checkConnectionTimer.Stop();
             _pingStopwatch.Reset();
         }
 
+        private void SendCompleted(bool completed)
+        {
+            if (completed)
+            {
+                return;
+            }
+
+            _server.FreeConnection(ID);
+            Close();
+        }
+
         private void Ping(object sender, ElapsedEventArgs e)
         {
-            Sessions.PingTo(ID);
+            try
+            {
+                Sessions.PingTo(ID);
+            }
+            catch
+            {
+                Close();
+            }
         }
 
         private void CheckConnection(object sender, ElapsedEventArgs e)
         {
-            if (_pingStopwatch.Elapsed.Milliseconds > _inactivityTimeoutInterval)
+            if (_pingStopwatch.Elapsed.Milliseconds > 3 * _inactivityTimeoutInterval)
             {
-                Context.WebSocket.Close();
+                Close();
             }
-        }
-
-        private void SendImpl()
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            if (!_sendQueue.TryDequeue(out MessageContainer message))
-            {
-                return;
-            }
-
-            string serializedMessages = JsonConvert.SerializeObject(message, _settings);
-            Send(serializedMessages);
         }
 
         #endregion
