@@ -10,12 +10,6 @@
 
     public class MessageHandler
     {
-        #region Fields
-
-        private readonly WsClient _client;
-
-        #endregion
-
         #region Events
 
         public event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
@@ -30,19 +24,9 @@
 
         #endregion
 
-        #region Constructors
-
-        public MessageHandler(WsClient client)
-        {
-            _client = client;
-            _client.MessageContainerReceived += HandleMessageContainer;
-        }
-
-        #endregion
-
         #region Methods
 
-        private void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
+        public void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(e.MessageContainer);
 

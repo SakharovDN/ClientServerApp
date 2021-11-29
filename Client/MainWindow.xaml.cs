@@ -15,6 +15,7 @@
             var viewModelBase = new MainViewModel();
             DataContext = viewModelBase;
             Closing += viewModelBase.OnWindowClosing;
+            Closed += viewModelBase.OnWindowClosed;
             ((INotifyCollectionChanged)MessagesListBox.Items).CollectionChanged += MessagesListBox_CollectionChanged;
         }
 

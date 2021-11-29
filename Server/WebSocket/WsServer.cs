@@ -125,7 +125,7 @@
 
                     DisconnectionRequestReceived?.Invoke(
                         sender,
-                        new DisconnectionRequestReceivedEventArgs(disconnectionRequest.ClientName, SendBroadcast));
+                        new DisconnectionRequestReceivedEventArgs(disconnectionRequest.ClientName, Send, SendBroadcast));
                     break;
 
                 case MessageTypes.MessageRequest:
