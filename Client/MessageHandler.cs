@@ -22,6 +22,8 @@
 
         public event EventHandler<ConnectionStateChangedEchoReceivedEventArgs> ConnectionStateChangedEchoReceived;
 
+        public event EventHandler<ChatHistoryReceivedEventArgs> ChatHistoryReceived;
+
         #endregion
 
         #region Methods
@@ -56,6 +58,10 @@
                 case MessageTypes.ConnectionStateChangedEcho:
                     HandleConnectionStateChangedEcho(container);
                     break;
+
+                case MessageTypes.ChatHistoryResponse:
+                    HandleChatHistoryResponse(container);
+                    break;
             }
         }
 
@@ -89,7 +95,7 @@
         {
             if (((JObject)container.Payload).ToObject(typeof(MessageBroadcast)) is MessageBroadcast messageBroadcast)
             {
-                MessageReceived?.Invoke(null, new MessageReceivedEventArgs(messageBroadcast.SenderName, messageBroadcast.Message));
+                MessageReceived?.Invoke(null, new MessageReceivedEventArgs(messageBroadcast.Message));
             }
         }
 
@@ -103,6 +109,14 @@
                         connectionResponse.Result,
                         connectionResponse.Reason,
                         connectionResponse.ConnectedClients));
+            }
+        }
+
+        private void HandleChatHistoryResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(ChatHistoryResponse)) is ChatHistoryResponse chatHistoryResponse)
+            {
+                ChatHistoryReceived?.Invoke(null, new ChatHistoryReceivedEventArgs(chatHistoryResponse.ChatHistory));
             }
         }
 

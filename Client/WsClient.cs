@@ -1,7 +1,7 @@
 ﻿namespace Client
 {
     using System;
-    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
     using Common;
@@ -18,7 +18,6 @@
         public MessageHandler MessageHandler;
 
         private readonly JsonSerializerSettings _settings;
-        private readonly ConcurrentQueue<MessageContainer> _sendQueue;
         private WebSocket _socket;
         private string _name;
 
@@ -67,7 +66,6 @@
             MessageHandler = new MessageHandler();
             MessageContainerReceived += MessageHandler.HandleMessageContainer;
             MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
-            _sendQueue = new ConcurrentQueue<MessageContainer>();
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -118,47 +116,48 @@
         public void LogIn(string clientName)
         {
             Name = clientName;
-            _sendQueue.Enqueue(new ConnectionRequest(Name).GetContainer());
-            SendImpl();
+            Send(new ConnectionRequest(Name).GetContainer());
         }
 
         public void LogOut()
         {
-            _sendQueue.Enqueue(new DisconnectionRequest(Name).GetContainer());
-            SendImpl();
+            Send(new DisconnectionRequest(Name).GetContainer());
         }
 
         public void RequestEventLogs()
         {
-            _sendQueue.Enqueue(new EventLogsRequest().GetContainer());
-            SendImpl();
+            Send(new EventLogsRequest().GetContainer());
         }
 
-        public void Send(string message)
+        public void SendMessage(string message, string target)
         {
-            _sendQueue.Enqueue(new MessageRequest(Name, message).GetContainer());
-            SendImpl();
+            Send(new MessageRequest(message, Name, target).GetContainer());
         }
 
-        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
+        public void RequestChatHistory(string targetName)
         {
-            Disconnect();
+            var participants = new List<string>
+            {
+                Name,
+                targetName
+            };
+            Send(new ChatHistoryRequest(participants).GetContainer());
         }
 
-        private void SendImpl()
+        private void Send(MessageContainer container)
         {
             if (!IsConnected)
             {
                 return;
             }
 
-            if (!_sendQueue.TryDequeue(out MessageContainer message))
-            {
-                return;
-            }
-
-            string serializedMessages = JsonConvert.SerializeObject(message, _settings);
+            string serializedMessages = JsonConvert.SerializeObject(container, _settings);
             _socket.Send(serializedMessages);
+        }
+
+        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
+        {
+            Disconnect();
         }
 
         private static void OnError(object sender, ErrorEventArgs e)

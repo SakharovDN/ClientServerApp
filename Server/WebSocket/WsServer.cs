@@ -34,6 +34,8 @@
 
         public event EventHandler<EventLogsRequestReceivedEventArgs> EventLogsRequestReceived;
 
+        public event EventHandler<ChatHistoryRequestReceivedEventArgs> ChatHistoryRequestReceived;
+
         #endregion
 
         #region Constructors
@@ -136,11 +138,26 @@
 
                     MessageRequestReceived?.Invoke(
                         sender,
-                        new MessageRequestReceivedEventArgs(messageRequest.SenderName, messageRequest.Message, SendBroadcast));
+                        new MessageRequestReceivedEventArgs(
+                            messageRequest.Body,
+                            messageRequest.Source,
+                            messageRequest.Target,
+                            Send,
+                            SendTo,
+                            SendBroadcast));
                     break;
 
                 case MessageTypes.EventLogsRequest:
                     EventLogsRequestReceived?.Invoke(sender, new EventLogsRequestReceivedEventArgs(Send));
+                    break;
+
+                case MessageTypes.ChatHistoryRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(ChatHistoryRequest)) is ChatHistoryRequest chatHistoryRequest))
+                    {
+                        return;
+                    }
+
+                    ChatHistoryRequestReceived?.Invoke(sender, new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.Participants, Send));
                     break;
             }
         }
@@ -149,6 +166,14 @@
         {
             var connection = sender as WsConnection;
             connection?.Send(container);
+        }
+
+        private void SendTo(object sender, MessageContainer container, string target)
+        {
+            var connection = sender as WsConnection;
+            string targetId = (from connectionItem in _connections.Values where connectionItem.ClientName == target select connectionItem.ID)
+               .FirstOrDefault();
+            connection?.SendTo(container, targetId);
         }
 
         private void SendBroadcast(object sender, MessageContainer container)
