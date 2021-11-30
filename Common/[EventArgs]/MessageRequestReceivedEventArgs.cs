@@ -8,9 +8,15 @@
     {
         #region Properties
 
-        public string SenderName { get; }
+        public string Body { get; }
 
-        public string Message { get; }
+        public string Source { get; }
+
+        public string Target { get; }
+
+        public Action<object, MessageContainer> Send { get; }
+
+        public Action<object, MessageContainer, string> SendTo { get; }
 
         public Action<object, MessageContainer> SendBroadcast { get; }
 
@@ -18,10 +24,19 @@
 
         #region Constructors
 
-        public MessageRequestReceivedEventArgs(string senderName, string message, Action<object, MessageContainer> sendBroadcast)
+        public MessageRequestReceivedEventArgs(
+            string body,
+            string source,
+            string target,
+            Action<object, MessageContainer> send,
+            Action<object, MessageContainer, string> sendTo,
+            Action<object, MessageContainer> sendBroadcast)
         {
-            SenderName = senderName;
-            Message = message;
+            Body = body;
+            Source = source;
+            Target = target;
+            Send = send;
+            SendTo = sendTo;
             SendBroadcast = sendBroadcast;
         }
 

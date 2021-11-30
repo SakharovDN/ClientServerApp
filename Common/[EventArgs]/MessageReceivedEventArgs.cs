@@ -6,17 +6,14 @@
     {
         #region Properties
 
-        public string ClientName { get; }
-
-        public string Message { get; }
+        public Message Message { get; }
 
         #endregion
 
         #region Constructors
 
-        public MessageReceivedEventArgs(string clientName, string message)
+        public MessageReceivedEventArgs(Message message)
         {
-            ClientName = clientName;
             Message = message;
         }
 

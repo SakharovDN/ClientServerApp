@@ -8,6 +8,8 @@
 
     using EventLog;
 
+    using Message;
+
     using NLog;
 
     public class InternalStorage
@@ -26,6 +28,8 @@
 
         public EventLogContext EventLogContext { get; set; }
 
+        public MessageContext MessageContext { get; set; }
+
         #endregion
 
         #region Constructors
@@ -38,6 +42,7 @@
             //todo: check connection
             ClientContext = new ClientContext(dbConnection);
             EventLogContext = new EventLogContext(dbConnection);
+            MessageContext = new MessageContext(dbConnection);
         }
 
         #endregion

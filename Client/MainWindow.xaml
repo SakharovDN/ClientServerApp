@@ -137,19 +137,33 @@
             </Button>
         </DockPanel>
         <DockPanel Grid.Row="0" Grid.RowSpan="5" Grid.Column="1">
-            <ListBox Name="MessagesListBox" ItemsSource="{Binding Messenger.MessagesList}" />
+            <ListBox Name="MessagesListBox" ItemsSource="{Binding Messenger.MessagesList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="16" Foreground="DodgerBlue" Text="{Binding Path=Source}" />
+                                <TextBlock Margin="10,0,0,0" FontSize="10" Foreground="Gray"
+                                           Text="{Binding Path=Timestamp}" />
+                            </StackPanel>
+                            <TextBlock FontSize="14" Text="{Binding Path=Body}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </DockPanel>
         <DockPanel Grid.Column="1" Grid.Row="5">
             <TextBox Style="{StaticResource MessageTextBox}"
                      Text="{Binding Messenger.Message, UpdateSourceTrigger=PropertyChanged}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.MessageIsEnabled}">
+                     Visibility="{Binding Messenger.MessageVisibility}">
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding Messenger.SendButton}" Key="Enter" />
                 </TextBox.InputBindings>
             </TextBox>
         </DockPanel>
         <DockPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="5">
-            <ListBox ItemsSource="{Binding Messenger.ClientsList}" />
+            <ListBox ItemsSource="{Binding Messenger.ClientsList}"
+                     SelectedItem="{Binding Messenger.ClientsListSelectedItem, Mode=TwoWay}" />
         </DockPanel>
     </Grid>
 </Window>

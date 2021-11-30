@@ -4,18 +4,21 @@
     {
         #region Properties
 
-        public string Message { get; set; }
+        public string Body { get; set; }
 
-        public string SenderName { get; set; }
+        public string Source { get; set; }
+
+        public string Target { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public MessageRequest(string senderName, string message)
+        public MessageRequest(string body, string source, string target)
         {
-            Message = message;
-            SenderName = senderName;
+            Body = body;
+            Source = source;
+            Target = target;
         }
 
         #endregion

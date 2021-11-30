@@ -27,6 +27,8 @@
 
         #region Properties
 
+        public string ClientName { get; set; }
+
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
 
         #endregion
@@ -66,6 +68,17 @@
 
             string serializedMessages = JsonConvert.SerializeObject(container, _settings);
             SendAsync(serializedMessages, SendCompleted);
+        }
+
+        public void SendTo(MessageContainer container, string targetId)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            string serializedMessages = JsonConvert.SerializeObject(container, _settings);
+            Sessions.SendToAsync(serializedMessages, targetId, SendCompleted);
         }
 
         public void Broadcast(MessageContainer container)

@@ -1,18 +1,20 @@
 ﻿namespace Common.Messages
 {
-    public class MessageBroadcast
+    using System.Collections.Generic;
+
+    public class ChatHistoryResponse
     {
         #region Properties
 
-        public Message Message { get; set; }
+        public List<Message> ChatHistory { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public MessageBroadcast(Message message)
+        public ChatHistoryResponse(List<Message> chatHistory)
         {
-            Message = message;
+            ChatHistory = chatHistory;
         }
 
         #endregion
@@ -21,12 +23,11 @@
 
         public MessageContainer GetContainer()
         {
-            var container = new MessageContainer
+            return new MessageContainer
             {
-                Type = MessageTypes.MessageBroadcast,
+                Type = MessageTypes.ChatHistoryResponse,
                 Payload = this
             };
-            return container;
         }
 
         #endregion
