@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.EventLog
+﻿namespace Server.Storage
 {
     using System;
 
@@ -6,7 +6,7 @@
     {
         #region Properties
 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public DateTime Timestamp { get; set; }
 

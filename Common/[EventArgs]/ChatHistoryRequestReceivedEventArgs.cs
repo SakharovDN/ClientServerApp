@@ -5,7 +5,7 @@
 
     using Messages;
 
-    public class ChatHistoryRequestReceivedEventArgs
+    public class ChatHistoryRequestReceivedEventArgs : EventArgs
     {
         #region Properties
 

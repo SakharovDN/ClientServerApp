@@ -3,7 +3,6 @@
     using Common;
 
     using Storage;
-    using Storage.Message;
 
     public class MessageService
     {

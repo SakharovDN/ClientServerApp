@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.EventLog
+﻿namespace Server.Storage
 {
     public class AddEventLogItem : QueueItem
     {

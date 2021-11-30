@@ -1,6 +1,5 @@
-﻿namespace Server.Storage.Client
+﻿namespace Server.Storage
 {
-    using System;
     using System.Data.Entity;
     using System.Linq;
 
@@ -27,7 +26,6 @@
         {
             var client = new Client
             {
-                Id = Guid.NewGuid(),
                 Name = name
             };
             Clients.Add(client);
@@ -37,6 +35,11 @@
         public bool ClientExists(string name)
         {
             return Enumerable.Any(Clients, client => client.Name == name);
+        }
+
+        public int GetClientId(string clientName)
+        {
+            return Enumerable.FirstOrDefault(from client in Clients where client.Name == clientName select client.Id);
         }
 
         #endregion

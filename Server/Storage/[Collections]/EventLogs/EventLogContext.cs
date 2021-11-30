@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.EventLog
+﻿namespace Server.Storage
 {
     using System;
     using System.ComponentModel;
@@ -29,7 +29,6 @@
         {
             var eventLog = new EventLog
             {
-                Id = Guid.NewGuid(),
                 Timestamp = DateTime.Now,
                 Message = message
             };
@@ -40,11 +39,6 @@
         public DataTable GetEventLogs()
         {
             return EventLogs.ToDataTable();
-        }
-
-        public void ClearEventLogsDt()
-        {
-            Database.ExecuteSqlCommand("TRUNCATE TABLE [EventLogs]");
         }
 
         #endregion

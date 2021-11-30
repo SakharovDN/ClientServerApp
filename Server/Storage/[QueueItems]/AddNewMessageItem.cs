@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.Message
+﻿namespace Server.Storage
 {
     using Common;
 

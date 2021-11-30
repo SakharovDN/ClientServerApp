@@ -16,7 +16,7 @@
 
         public Action<object, MessageContainer> Send { get; }
 
-        public Action<object, MessageContainer, string> SendTo { get; }
+        public Action<object, MessageContainer, int> SendTo { get; }
 
         public Action<object, MessageContainer> SendBroadcast { get; }
 
@@ -29,7 +29,7 @@
             string source,
             string target,
             Action<object, MessageContainer> send,
-            Action<object, MessageContainer, string> sendTo,
+            Action<object, MessageContainer, int> sendTo,
             Action<object, MessageContainer> sendBroadcast)
         {
             Body = body;

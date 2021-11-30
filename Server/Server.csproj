@@ -73,16 +73,16 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\MessageService.cs" />
-    <Compile Include="Storage\Client\Client.cs" />
-    <Compile Include="Storage\Client\ClientContext.cs" />
-    <Compile Include="Storage\Client\AddNewClientItem.cs" />
-    <Compile Include="Storage\EventLog\EventLog.cs" />
-    <Compile Include="Storage\EventLog\EventLogContext.cs" />
-    <Compile Include="Storage\EventLog\AddEventLogItem.cs" />
+    <Compile Include="Storage\[Collections]\Clients\Client.cs" />
+    <Compile Include="Storage\[Collections]\Clients\ClientContext.cs" />
+    <Compile Include="Storage\[QueueItems]\AddNewClientItem.cs" />
+    <Compile Include="Storage\[Collections]\EventLogs\EventLog.cs" />
+    <Compile Include="Storage\[Collections]\EventLogs\EventLogContext.cs" />
+    <Compile Include="Storage\[QueueItems]\AddEventLogItem.cs" />
     <Compile Include="Storage\InternalStorage.cs" />
-    <Compile Include="Storage\Message\AddNewMessageItem.cs" />
-    <Compile Include="Storage\Message\MessageContext.cs" />
-    <Compile Include="Storage\QueueItem.cs" />
+    <Compile Include="Storage\[QueueItems]\AddNewMessageItem.cs" />
+    <Compile Include="Storage\[Collections]\Messages\MessageContext.cs" />
+    <Compile Include="Storage\[QueueItems]\QueueItem.cs" />
     <Compile Include="WebSocket\WsConnection.cs" />
     <Compile Include="WebSocket\WsServer.cs" />
   </ItemGroup>

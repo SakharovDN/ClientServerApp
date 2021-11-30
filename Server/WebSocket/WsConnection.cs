@@ -27,7 +27,7 @@
 
         #region Properties
 
-        public string ClientName { get; set; }
+        public int ClientId { get; set; }
 
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
 

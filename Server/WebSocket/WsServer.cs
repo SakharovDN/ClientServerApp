@@ -168,12 +168,12 @@
             connection?.Send(container);
         }
 
-        private void SendTo(object sender, MessageContainer container, string target)
+        private void SendTo(object sender, MessageContainer container, int targetId)
         {
             var connection = sender as WsConnection;
-            string targetId = (from connectionItem in _connections.Values where connectionItem.ClientName == target select connectionItem.ID)
-               .FirstOrDefault();
-            connection?.SendTo(container, targetId);
+            string targetConnectionId =
+                (from connectionItem in _connections.Values where connectionItem.ClientId == targetId select connectionItem.ID).FirstOrDefault();
+            connection?.SendTo(container, targetConnectionId);
         }
 
         private void SendBroadcast(object sender, MessageContainer container)
