@@ -45,7 +45,7 @@
             }
         }
 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public bool IsConnected => _socket?.ReadyState == WebSocketState.Open;
 
@@ -70,7 +70,6 @@
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
-            Id = Guid.NewGuid();
         }
 
         #endregion

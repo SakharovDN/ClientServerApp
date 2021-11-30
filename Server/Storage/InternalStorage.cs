@@ -4,12 +4,6 @@
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
 
-    using Client;
-
-    using EventLog;
-
-    using Message;
-
     using NLog;
 
     public class InternalStorage

@@ -22,7 +22,7 @@
         private string _address;
         private string _port;
         private string _clientName;
-        private ObservableCollection<string> _messagesList;
+        private ObservableCollection<string> _eventsCollection;
 
         #endregion
 
@@ -62,12 +62,12 @@
             }
         }
 
-        public ObservableCollection<string> MessagesList
+        public ObservableCollection<string> EventsCollection
         {
-            get => _messagesList;
+            get => _eventsCollection;
             set
             {
-                _messagesList = value;
+                _eventsCollection = value;
                 OnPropertyChanged();
             }
         }
@@ -97,7 +97,7 @@
             _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             Messenger = new Messenger(_client);
-            MessagesList = new ObservableCollection<string>();
+            EventsCollection = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
         }
@@ -133,13 +133,11 @@
             {
                 _client.Connect(Address, Port);
                 _client?.LogIn(ClientName);
-                ControlsEnabledViewModel.SetAfterStartControlsState();
             }
             catch (Exception ex)
             {
                 _client.Disconnect();
-                MessagesList.Add(ex.Message);
-                ControlsEnabledViewModel.SetDefaultControlsState();
+                EventsCollection.Add(ex.Message);
             }
         }
 
@@ -159,7 +157,18 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    MessagesList.Add(args.IsConnected ? "Connection established" : "Connection lost");
+                    if (args.IsConnected)
+                    {
+                        EventsCollection.Add("Connection established");
+                    }
+                    else
+                    {
+                        EventsCollection.Clear();
+                        Messenger.ClientsCollection.Clear();
+                        Messenger.MessagesCollection.Clear();
+                        ControlsEnabledViewModel.SetDefaultControlsState();
+                        EventsCollection.Add("Connection lost");
+                    }
                 });
         }
 
@@ -170,7 +179,7 @@
                 {
                     string clientState = args.IsConnected ? "is connected" : "is disconnected";
                     string message = $"Client {args.ClientName} {clientState}";
-                    MessagesList.Add(message);
+                    EventsCollection.Add(message);
                 });
         }
 
@@ -181,12 +190,14 @@
                 {
                     if (args.Result == ResultCodes.Ok)
                     {
-                        return;
+                        ControlsEnabledViewModel.SetAfterStartControlsState();
                     }
-
-                    _client.Disconnect();
-                    MessagesList.Add(args.Reason);
-                    ControlsEnabledViewModel.SetDefaultControlsState();
+                    else
+                    {
+                        _client.Disconnect();
+                        EventsCollection.Add(args.Reason);
+                        ControlsEnabledViewModel.SetDefaultControlsState();
+                    }
                 });
         }
 

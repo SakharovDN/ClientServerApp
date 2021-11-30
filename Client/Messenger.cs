@@ -17,9 +17,9 @@
 
         private readonly WsClient _client;
         private string _message;
-        private ObservableCollection<Message> _messagesList;
-        private ObservableCollection<string> _clientsList;
-        private string _clientsListSelectedItem;
+        private ObservableCollection<Message> _messagesCollection;
+        private ObservableCollection<string> _clientsCollection;
+        private string _clientsCollectionSelectedItem;
         private CommandHandler _sendButton;
         private Visibility _messageVisibility;
 
@@ -49,32 +49,32 @@
             }
         }
 
-        public ObservableCollection<Message> MessagesList
+        public ObservableCollection<Message> MessagesCollection
         {
-            get => _messagesList;
+            get => _messagesCollection;
             set
             {
-                _messagesList = value;
+                _messagesCollection = value;
                 OnPropertyChanged();
             }
         }
 
-        public ObservableCollection<string> ClientsList
+        public ObservableCollection<string> ClientsCollection
         {
-            get => _clientsList;
+            get => _clientsCollection;
             set
             {
-                _clientsList = value;
+                _clientsCollection = value;
                 OnPropertyChanged();
             }
         }
 
-        public string ClientsListSelectedItem
+        public string ClientsCollectionSelectedItem
         {
-            get => _clientsListSelectedItem;
+            get => _clientsCollectionSelectedItem;
             set
             {
-                _clientsListSelectedItem = value;
+                _clientsCollectionSelectedItem = value;
                 OnPropertyChanged();
             }
         }
@@ -96,8 +96,8 @@
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
             _client.MessageHandler.ChatHistoryReceived += HandleChatHistoryReceived;
-            ClientsList = new ObservableCollection<string>();
-            MessagesList = new ObservableCollection<Message>();
+            ClientsCollection = new ObservableCollection<string>();
+            MessagesCollection = new ObservableCollection<Message>();
             MessageVisibility = Visibility.Hidden;
             PropertyChanged += HandlePropertyChanged;
         }
@@ -122,12 +122,12 @@
                         return;
                     }
 
-                    ClientsList.Clear();
-                    ClientsList.Add("Common");
+                    ClientsCollection.Clear();
+                    ClientsCollection.Add("Common");
 
                     foreach (string client in args.ConnectedClients)
                     {
-                        ClientsList.Add(client);
+                        ClientsCollection.Add(client);
                     }
                 });
         }
@@ -141,7 +141,7 @@
 
             var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
             Message = regex.Replace(Message, @" ").Trim();
-            _client.SendMessage(Message, ClientsListSelectedItem);
+            _client.SendMessage(Message, ClientsCollectionSelectedItem);
             Message = string.Empty;
         }
 
@@ -152,16 +152,16 @@
                 {
                     if (args.Message.Target == "Common")
                     {
-                        if (ClientsListSelectedItem == "Common")
+                        if (ClientsCollectionSelectedItem == "Common")
                         {
-                            MessagesList.Add(args.Message);
+                            MessagesCollection.Add(args.Message);
                         }
                     }
                     else
                     {
-                        if (args.Message.Target == ClientsListSelectedItem || args.Message.Source == ClientsListSelectedItem)
+                        if (args.Message.Target == ClientsCollectionSelectedItem || args.Message.Source == ClientsCollectionSelectedItem)
                         {
-                            MessagesList.Add(args.Message);
+                            MessagesCollection.Add(args.Message);
                         }
                     }
                 });
@@ -179,11 +179,11 @@
 
                     if (args.IsConnected)
                     {
-                        ClientsList.Add(args.ClientName);
+                        ClientsCollection.Add(args.ClientName);
                     }
                     else
                     {
-                        ClientsList.Remove(args.ClientName);
+                        ClientsCollection.Remove(args.ClientName);
                     }
                 });
         }
@@ -193,7 +193,7 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    MessagesList.Clear();
+                    MessagesCollection.Clear();
 
                     if (args.ChatHistory == null || args.ChatHistory.Count == 0)
                     {
@@ -202,21 +202,21 @@
 
                     foreach (Message message in args.ChatHistory)
                     {
-                        MessagesList.Add(message);
+                        MessagesCollection.Add(message);
                     }
                 });
         }
 
         private void HandlePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName == nameof(ClientsListSelectedItem))
+            if (args.PropertyName == nameof(ClientsCollectionSelectedItem))
             {
-                if (ClientsListSelectedItem != null)
+                if (ClientsCollectionSelectedItem != null)
                 {
                     MessageVisibility = Visibility.Visible;
                 }
 
-                _client.RequestChatHistory(ClientsListSelectedItem);
+                _client.RequestChatHistory(ClientsCollectionSelectedItem);
             }
         }
 

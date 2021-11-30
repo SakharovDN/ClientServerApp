@@ -4,8 +4,6 @@
     using System.Linq;
 
     using Storage;
-    using Storage.Client;
-    using Storage.EventLog;
 
     public class ClientService
     {

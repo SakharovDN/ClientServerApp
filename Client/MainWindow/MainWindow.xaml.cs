@@ -2,7 +2,6 @@
 {
     using System.Collections.Specialized;
     using System.Windows;
-    using System.Windows.Controls;
     using System.Windows.Media;
 
     public partial class MainWindow : Window
@@ -16,7 +15,7 @@
             DataContext = viewModelBase;
             Closing += viewModelBase.OnWindowClosing;
             Closed += viewModelBase.OnWindowClosed;
-            ((INotifyCollectionChanged)MessagesListBox.Items).CollectionChanged += MessagesListBox_CollectionChanged;
+            ((INotifyCollectionChanged)MessagesPanel.Items).CollectionChanged += MessagesListBox_CollectionChanged;
         }
 
         #endregion
@@ -25,14 +24,12 @@
 
         private void MessagesListBox_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (VisualTreeHelper.GetChildrenCount(MessagesListBox) <= 0)
+            if (VisualTreeHelper.GetChildrenCount(MessagesPanel) <= 0)
             {
                 return;
             }
 
-            var border = (Border)VisualTreeHelper.GetChild(MessagesListBox, 0);
-            var scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
-            scrollViewer.ScrollToBottom();
+            MessagePanelScrollViewer.ScrollToBottom();
         }
 
         #endregion

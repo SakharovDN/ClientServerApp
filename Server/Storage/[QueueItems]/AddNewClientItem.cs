@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.Client
+﻿namespace Server.Storage
 {
     public class AddNewClientItem : QueueItem
     {

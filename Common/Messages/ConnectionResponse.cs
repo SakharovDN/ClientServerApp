@@ -12,6 +12,8 @@
 
         public List<string> ConnectedClients { get; set; }
 
+        public int ClientId { get; set; }
+
         #endregion
 
         #region Methods

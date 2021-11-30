@@ -1,4 +1,4 @@
-﻿namespace Server.Storage.Message
+﻿namespace Server.Storage
 {
     using System.Collections.Generic;
     using System.Data.Entity;

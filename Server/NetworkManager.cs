@@ -77,17 +77,18 @@
 
         private void HandleConnectionRequestReceived(object sender, ConnectionRequestReceivedEventArgs args)
         {
-            var connectionResponse = new ConnectionResponse
-            {
-                Result = ResultCodes.Ok,
-                ConnectedClients = _clientService.ConnectedClients
-            };
+            var connectionResponse = new ConnectionResponse();
 
             if (_clientService.ClientIsConnected(args.ClientName))
             {
                 connectionResponse.Result = ResultCodes.Failure;
                 connectionResponse.Reason = $"Client named '{args.ClientName}' is already connected.";
-                connectionResponse.ConnectedClients = null;
+            }
+            else
+            {
+                connectionResponse.Result = ResultCodes.Ok;
+                connectionResponse.ConnectedClients = _clientService.ConnectedClients;
+                connectionResponse.ClientId = _storage.ClientContext.GetClientId(args.ClientName);
             }
 
             args.Send(sender, connectionResponse.GetContainer());
@@ -99,7 +100,7 @@
 
             if (sender is WsConnection connection)
             {
-                connection.ClientName = args.ClientName;
+                connection.ClientId = connectionResponse.ClientId;
             }
 
             _clientService.AddClient(args.ClientName);
@@ -137,7 +138,8 @@
             else
             {
                 args.Send(sender, messageBroadcast.GetContainer());
-                args.SendTo(sender, messageBroadcast.GetContainer(), args.Target);
+                int targetId = _storage.ClientContext.GetClientId(args.Target);
+                args.SendTo(sender, messageBroadcast.GetContainer(), targetId);
             }
         }
 
