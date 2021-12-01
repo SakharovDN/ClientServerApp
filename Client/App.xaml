@@ -3,11 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow/MainWindow.xaml">
     <Application.Resources>
-
-        <Style x:Key="AddressTextBox" TargetType="{x:Type TextBox}"
-               xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AddressTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
+               xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Address..." Foreground="Gray" FontSize="25" />
@@ -21,14 +30,14 @@
                 <Trigger Property="Text" Value="{x:Null}">
                     <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
                 </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="Background" Value="White" />
-                </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="PortTextBox" TargetType="{x:Type TextBox}" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-            <Setter Property="FontSize" Value="25" />
+        <Style x:Key="PortTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
+               xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Port..." Foreground="Gray" FontSize="25" />
@@ -42,17 +51,17 @@
                 <Trigger Property="Text" Value="{x:Null}">
                     <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
                 </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="Background" Value="White" />
-                </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="ClientNameTextBox" TargetType="{x:Type TextBox}"
+        <Style x:Key="LoginTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Name..." Foreground="Gray" />
+                        <Label Content="Login..." Foreground="Gray" FontSize="25" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -63,17 +72,17 @@
                 <Trigger Property="Text" Value="{x:Null}">
                     <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
                 </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="Background" Value="White" />
-                </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="MessageTextBox" TargetType="{x:Type TextBox}"
+        <Style x:Key="MessageTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5" />
+                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Type a message..." Foreground="Gray" />
+                        <Label Content="Type a message..." Foreground="Gray" FontSize="15" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -84,10 +93,100 @@
                 <Trigger Property="Text" Value="{x:Null}">
                     <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
                 </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="Background" Value="White" />
-                </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="ClientsCollection" TargetType="ListBox">
+            <Style.Resources>
+                <Style x:Key="FocusVisual">
+                    <Setter Property="Control.Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Rectangle Margin="2" SnapsToDevicePixels="true"
+                                           Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                           StrokeThickness="1" StrokeDashArray="1 2" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <SolidColorBrush x:Key="Item.MouseOver.Background" Color="LightGray" />
+                <SolidColorBrush x:Key="Item.MouseOver.Border" Color="LightGray" />
+                <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="White" />
+                <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="White" />
+                <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3fa0da" />
+                <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#3fa0da" />
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border x:Name="Bd" SnapsToDevicePixels="true">
+                                    <ContentPresenter />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd"
+                                                Value="{StaticResource Item.MouseOver.Background}" />
+                                        <Setter Property="BorderBrush" TargetName="Bd"
+                                                Value="{StaticResource Item.MouseOver.Border}" />
+                                    </MultiTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False" />
+                                            <Condition Property="IsMouseOver" Value="False" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedInactive.Background}" />
+                                        <Setter Property="BorderBrush" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedInactive.Border}" />
+                                    </MultiTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="Selector.IsSelectionActive" Value="False" />
+                                            <Condition Property="IsSelected" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Background}" />
+                                        <Setter Property="BorderBrush" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Border}" />
+                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="White" />
+                                    </MultiTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="Selector.IsSelectionActive" Value="True" />
+                                            <Condition Property="IsSelected" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Background}" />
+                                        <Setter Property="BorderBrush" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Border}" />
+                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="White" />
+                                    </MultiTrigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="TextElement.Foreground" TargetName="Bd"
+                                                Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="MessageBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="2" />
+            <Setter Property="Margin" Value="10,5" />
+            <Setter Property="Background" Value="LightGray" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="MaxWidth" Value="500" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+        </Style>
+        
     </Application.Resources>
 </Application>

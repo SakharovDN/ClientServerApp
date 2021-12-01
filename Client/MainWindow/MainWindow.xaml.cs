@@ -2,6 +2,7 @@
 {
     using System.Collections.Specialized;
     using System.Windows;
+    using System.Windows.Controls;
     using System.Windows.Media;
 
     public partial class MainWindow : Window
@@ -15,14 +16,14 @@
             DataContext = viewModelBase;
             Closing += viewModelBase.OnWindowClosing;
             Closed += viewModelBase.OnWindowClosed;
-            ((INotifyCollectionChanged)MessagesPanel.Items).CollectionChanged += MessagesListBox_CollectionChanged;
+            ((INotifyCollectionChanged)MessagesPanel.Items).CollectionChanged += MessagesCollection_CollectionChanged;
         }
 
         #endregion
 
         #region Methods
 
-        private void MessagesListBox_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void MessagesCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (VisualTreeHelper.GetChildrenCount(MessagesPanel) <= 0)
             {

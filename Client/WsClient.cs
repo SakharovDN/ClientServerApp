@@ -203,7 +203,7 @@
 
         private void OnClose(object sender, CloseEventArgs e)
         {
-            _keepAlive.Stop();
+            _keepAlive?.Stop();
             ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(false));
         }
 
