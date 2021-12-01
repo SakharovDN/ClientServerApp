@@ -17,6 +17,7 @@
 
         public MessageHandler MessageHandler;
 
+        private KeepAlive _keepAlive;
         private readonly JsonSerializerSettings _settings;
         private WebSocket _socket;
         private string _name;
@@ -65,6 +66,7 @@
         {
             MessageHandler = new MessageHandler();
             MessageContainerReceived += MessageHandler.HandleMessageContainer;
+            MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
             _settings = new JsonSerializerSettings
             {
@@ -143,6 +145,18 @@
             Send(new ChatHistoryRequest(participants).GetContainer());
         }
 
+        public void Ping()
+        {
+            try
+            {
+                _socket.Ping();
+            }
+            catch
+            {
+                Disconnect();
+            }
+        }
+
         private void Send(MessageContainer container)
         {
             if (!IsConnected)
@@ -154,7 +168,14 @@
             _socket.Send(serializedMessages);
         }
 
-        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs e)
+        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
+        {
+            Id = args.ClientId;
+            _keepAlive = new KeepAlive(this, args.KeepAliveInterval);
+            _keepAlive.Start();
+        }
+
+        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs args)
         {
             Disconnect();
         }
@@ -168,7 +189,7 @@
         {
             if (e.IsPing)
             {
-                _socket.Ping();
+                _keepAlive.ResetPingResponseCounter();
                 return;
             }
 
@@ -182,6 +203,7 @@
 
         private void OnClose(object sender, CloseEventArgs e)
         {
+            _keepAlive.Stop();
             ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(false));
         }
 

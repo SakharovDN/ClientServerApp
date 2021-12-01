@@ -14,6 +14,8 @@
 
         public int ClientId { get; set; }
 
+        public int KeepAliveInterval { get; set; }
+
         #endregion
 
         #region Methods

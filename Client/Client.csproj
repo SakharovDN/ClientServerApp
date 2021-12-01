@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="KeepAlive.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="MainWindow\ControlsEnabledViewModel.cs" />

@@ -1,7 +1,6 @@
 ﻿namespace Server.WebSocket
 {
     using System;
-    using System.Diagnostics;
     using System.Timers;
 
     using Common;
@@ -18,8 +17,7 @@
 
         private WsServer _server;
         private readonly JsonSerializerSettings _settings;
-        private Stopwatch _pingStopwatch;
-        private Timer _pingTimer;
+        private DateTime _lastActivity;
         private Timer _checkConnectionTimer;
         private int _inactivityTimeoutInterval;
 
@@ -104,10 +102,11 @@
 
         protected override void OnMessage(MessageEventArgs e)
         {
-            _pingStopwatch.Restart();
+            _lastActivity = DateTime.Now;
 
             if (e.IsPing)
             {
+                Sessions.PingTo(ID);
                 return;
             }
 
@@ -117,22 +116,15 @@
         protected override void OnOpen()
         {
             _server.AddConnection(this);
-            _pingTimer = new Timer(_inactivityTimeoutInterval / 2);
-            _pingTimer.Elapsed += Ping;
             _checkConnectionTimer = new Timer(_inactivityTimeoutInterval);
             _checkConnectionTimer.Elapsed += CheckConnection;
-            _pingStopwatch = new Stopwatch();
-            _pingTimer.Start();
             _checkConnectionTimer.Start();
-            _pingStopwatch.Start();
         }
 
         protected override void OnClose(CloseEventArgs closeEventArgs)
         {
             _server.FreeConnection(ID);
-            _pingTimer.Stop();
             _checkConnectionTimer.Stop();
-            _pingStopwatch.Reset();
         }
 
         private void SendCompleted(bool completed)
@@ -146,21 +138,9 @@
             Close();
         }
 
-        private void Ping(object sender, ElapsedEventArgs e)
-        {
-            try
-            {
-                Sessions.PingTo(ID);
-            }
-            catch
-            {
-                Close();
-            }
-        }
-
         private void CheckConnection(object sender, ElapsedEventArgs e)
         {
-            if (_pingStopwatch.Elapsed.Milliseconds > 3 * _inactivityTimeoutInterval)
+            if (DateTime.Now > _lastActivity + TimeSpan.FromMilliseconds(3 * _inactivityTimeoutInterval))
             {
                 Close();
             }

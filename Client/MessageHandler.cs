@@ -108,7 +108,9 @@
                     new ConnectionResponseReceivedEventArgs(
                         connectionResponse.Result,
                         connectionResponse.Reason,
-                        connectionResponse.ConnectedClients));
+                        connectionResponse.ConnectedClients,
+                        connectionResponse.ClientId,
+                        connectionResponse.KeepAliveInterval));
             }
         }
 
