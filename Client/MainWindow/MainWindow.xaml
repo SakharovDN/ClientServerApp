@@ -13,7 +13,7 @@
             <RowDefinition Height="40" />
             <RowDefinition Height="40" />
             <RowDefinition />
-            <RowDefinition Height="44" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="20" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
@@ -27,60 +27,22 @@
                 <MenuItem Header="Light" IsCheckable="True" />
                 <MenuItem Header="Dark" IsCheckable="True" />
             </MenuItem>
-            <MenuItem Header="Event Log" Command="{Binding GetEventLogsButton}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}"/>
+            <MenuItem Header="Event Log" Command="{Binding GetEventLogsButton}"
+                      IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}" />
         </Menu>
-        <Border Grid.Column="0" Grid.Row="1" Grid.RowSpan="6" BorderBrush="LightGray" BorderThickness="0,0,1,0" />
+        <Border Grid.Row="1" Grid.RowSpan="6" Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,1,0" />
         <DockPanel Grid.Row="1" Grid.Column="0">
-            <TextBox Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}">
-                <TextBox.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="5" />
-                    </Style>
-                </TextBox.Resources>
-            </TextBox>
+            <TextBox Name="AddressTextBox" Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}" />
         </DockPanel>
-        <DockPanel Grid.Row="2" Grid.Column="0">
-            <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}">
-                <TextBox.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="5" />
-                    </Style>
-                </TextBox.Resources>
-            </TextBox>
-        </DockPanel>
-        <DockPanel Grid.Row="5" Grid.Column="0">
-            <Button Command="{Binding StartCommand}"
-                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">
-                Start
-            </Button>
-        </DockPanel>
-        <DockPanel Grid.Row="6" Grid.Column="0">
-            <Button Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
-        </DockPanel>
-        <DockPanel Grid.Row="3" Grid.Column="0">
-            <ScrollViewer Name="EventsCollectionScrollViewer" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding EventsCollection}" Margin="5" />
-            </ScrollViewer>
-        </DockPanel>
-        <StackPanel Grid.Row="4" Grid.Column="0">
-            <Label>Login:</Label>
-            <TextBox Style="{StaticResource ClientNameTextBox}" Text="{Binding ClientName}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}" />
-
-        </StackPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="4" Grid.Column="1">
             <ScrollViewer Name="MessagePanelScrollViewer" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Name="MessagesPanel" ItemsSource="{Binding Messenger.MessagesCollection}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="LightGray" CornerRadius="2"
-                                    BorderThickness="2"
-                                    Margin="10,5" Background="LightGray" MinWidth="100" MaxWidth="500"
-                                    VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <Border Style="{StaticResource MessageBorder}">
                                 <StackPanel Margin="2">
-                                    <TextBlock FontSize="12" Foreground="DodgerBlue" Text="{Binding Path=Source}" />
+                                    <TextBlock FontSize="12" Foreground="#3fa0da" Text="{Binding Path=Source}" />
                                     <TextBlock FontSize="14" Text="{Binding Path=Body}" TextWrapping="Wrap"
                                                TextAlignment="Justify" />
                                     <TextBlock Margin="10,0,0,0" FontSize="10" Foreground="Gray"
@@ -93,34 +55,59 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-
+        </DockPanel>
+        <DockPanel Grid.Row="1" Grid.RowSpan="6" Grid.Column="2">
+            <ListBox Style="{StaticResource ClientsCollection}"
+                     ItemsSource="{Binding Messenger.ClientsCollection}"
+                     SelectedItem="{Binding Messenger.ClientsCollectionSelectedItem, Mode=TwoWay}"
+                     BorderThickness="1,0,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Height="30">
+                            <TextBlock Text="{Binding}" FontSize="15" FontFamily="Arial"
+                                       VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
         </DockPanel>
-        <DockPanel Grid.Column="1" Grid.Row="5" Grid.RowSpan="2">
+        <DockPanel Grid.Row="2" Grid.Column="0">
+            <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}" />
+        </DockPanel>
+        <DockPanel Grid.Row="3" Grid.Column="0">
+            <Border BorderBrush="LightGray" BorderThickness="1">
+                <ScrollViewer Name="EventsCollectionScrollViewer" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding EventsCollection}" Margin="5" />
+                </ScrollViewer>
+            </Border>
+        </DockPanel>
+        <DockPanel Grid.Row="4" Grid.Column="0" Dock="Top">
+            <Label Height="30" Content="Log in:" DockPanel.Dock="Top" VerticalContentAlignment="Bottom" />
+            <TextBox Style="{StaticResource LoginTextBox}" Text="{Binding ClientName}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}" />
+        </DockPanel>
+        <DockPanel Grid.Row="5" Grid.Column="0">
+            <Button Command="{Binding StartCommand}"
+                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">
+                Start
+            </Button>
+        </DockPanel>
+        <DockPanel Grid.Row="5" Grid.RowSpan="2" Grid.Column="1">
             <TextBox Style="{StaticResource MessageTextBox}"
                      Text="{Binding Messenger.Message, UpdateSourceTrigger=PropertyChanged}"
                      TextWrapping="Wrap"
                      Visibility="{Binding Messenger.MessageVisibility}"
                      HorizontalContentAlignment="Left"
                      VerticalContentAlignment="Center" FontSize="14">
-
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding Messenger.SendButton}" Key="Enter" />
                 </TextBox.InputBindings>
             </TextBox>
         </DockPanel>
-        <DockPanel Grid.Column="2" Grid.Row="1" Grid.RowSpan="6">
-            <ListBox ItemsSource="{Binding Messenger.ClientsCollection}"
-                     SelectedItem="{Binding Messenger.ClientsCollectionSelectedItem, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Height="30">
-                            <TextBlock Text="{Binding}" Margin="5" FontSize="15" FontFamily="Arial" FontWeight="Bold" />
-                        </StackPanel>
-
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+        <DockPanel Grid.Row="6" Grid.Column="0">
+            <Button Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
         </DockPanel>
     </Grid>
 </Window>
