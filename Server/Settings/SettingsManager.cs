@@ -55,7 +55,7 @@
         {
             bool isValid = true;
 
-            if (configSettings.NetworkInterface != "WebSocket" || configSettings.NetworkInterface != "TcpSocket")
+            if (configSettings.NetworkInterface != "WebSocket" && configSettings.NetworkInterface != "TcpSocket")
             {
                 _logger.Error("Configuration settings are invalid. The network interface can be either \"WebSocket\" or \"TcpSocket\"");
                 isValid = false;
