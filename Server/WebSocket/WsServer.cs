@@ -11,6 +11,8 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    using Settings;
+
     using WebSocketSharp.Server;
 
     public class WsServer
@@ -86,10 +88,7 @@
 
         internal void FreeConnection(string connectionId)
         {
-            if (_connections.TryRemove(connectionId, out WsConnection connection))
-            {
-                SendBroadcast(connection, new ConnectionStateChangedEcho("someClient", false).GetContainer());
-            }
+            _connections.TryRemove(connectionId, out WsConnection _);
         }
 
         private void HandleRequest(object sender, RequestReceivedEventArgs args)

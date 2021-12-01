@@ -166,6 +166,7 @@
                         EventsCollection.Clear();
                         Messenger.ClientsCollection.Clear();
                         Messenger.MessagesCollection.Clear();
+                        Messenger.MessageVisibility = Visibility.Hidden;
                         ControlsEnabledViewModel.SetDefaultControlsState();
                         EventsCollection.Add("Connection lost");
                     }
@@ -207,7 +208,7 @@
                 delegate
                 {
                     var eventLogWindow = new EventLogWindow(args.EventLogs);
-                    eventLogWindow.ShowDialog();
+                    eventLogWindow.Show();
                 });
         }
 

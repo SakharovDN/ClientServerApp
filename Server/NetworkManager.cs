@@ -11,6 +11,8 @@
 
     using Services;
 
+    using Settings;
+
     using Storage;
 
     using WebSocket;
@@ -24,6 +26,7 @@
         private readonly ClientService _clientService;
         private readonly MessageService _messageService;
         private readonly ConfigSettings _configSetting;
+        private readonly SettingsManager _settingsManager;
         private readonly Logger _logger;
 
         #endregion
@@ -32,7 +35,8 @@
 
         public NetworkManager()
         {
-            _configSetting = ConfigSettings.ReadConfigFile();
+            _settingsManager = new SettingsManager();
+            _configSetting = _settingsManager.ReadConfigFile();
             _wsServer = new WsServer(_configSetting);
             _wsServer.ConnectionRequestReceived += HandleConnectionRequestReceived;
             _wsServer.DisconnectionRequestReceived += HandleDisconnectionRequestReceived;
@@ -89,6 +93,7 @@
                 connectionResponse.Result = ResultCodes.Ok;
                 connectionResponse.ConnectedClients = _clientService.ConnectedClients;
                 connectionResponse.ClientId = _storage.ClientContext.GetClientId(args.ClientName);
+                connectionResponse.KeepAliveInterval = _configSetting.InactivityTimeoutInterval / 2;
             }
 
             args.Send(sender, connectionResponse.GetContainer());

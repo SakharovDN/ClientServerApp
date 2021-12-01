@@ -10,7 +10,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
-            <RowDefinition Height="20" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
             <RowDefinition />
             <RowDefinition Height="44" />
             <RowDefinition Height="20" />
@@ -21,55 +22,70 @@
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="15*" MinWidth="150" MaxWidth="250" />
         </Grid.ColumnDefinitions>
-        <DockPanel Grid.Row="0" Grid.Column="0">
-            <TextBox Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}" />
-        </DockPanel>
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+            <MenuItem Header="Theme">
+                <MenuItem Header="Light" IsCheckable="True" />
+                <MenuItem Header="Dark" IsCheckable="True" />
+            </MenuItem>
+            <MenuItem Header="Event Log" Command="{Binding GetEventLogsButton}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}"/>
+        </Menu>
+        <Border Grid.Column="0" Grid.Row="1" Grid.RowSpan="6" BorderBrush="LightGray" BorderThickness="0,0,1,0" />
         <DockPanel Grid.Row="1" Grid.Column="0">
-            <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}" />
+            <TextBox Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5" />
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
         </DockPanel>
-        <DockPanel Grid.Row="4" Grid.Column="0">
+        <DockPanel Grid.Row="2" Grid.Column="0">
+            <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
+                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5" />
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="5" Grid.Column="0">
             <Button Command="{Binding StartCommand}"
                     IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}">
                 Start
             </Button>
         </DockPanel>
-        <DockPanel Grid.Row="5" Grid.Column="0">
+        <DockPanel Grid.Row="6" Grid.Column="0">
             <Button Command="{Binding StopCommand}" IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}">Stop</Button>
         </DockPanel>
-        <DockPanel Grid.Row="2" Grid.Column="0">
+        <DockPanel Grid.Row="3" Grid.Column="0">
             <ScrollViewer Name="EventsCollectionScrollViewer" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding EventsCollection}" Margin="5" />
             </ScrollViewer>
         </DockPanel>
-        <StackPanel Grid.Row="3" Grid.Column="0">
+        <StackPanel Grid.Row="4" Grid.Column="0">
             <Label>Login:</Label>
             <TextBox Style="{StaticResource ClientNameTextBox}" Text="{Binding ClientName}"
                      IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}" />
+
         </StackPanel>
-        <DockPanel Grid.Row="5" Grid.Column="2">
-            <Button Command="{Binding GetEventLogsButton}"
-                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}">
-                GetEventLogs
-            </Button>
-        </DockPanel>
-        <DockPanel Grid.Row="0" Grid.RowSpan="4" Grid.Column="1">
+        <DockPanel Grid.Row="1" Grid.RowSpan="4" Grid.Column="1">
             <ScrollViewer Name="MessagePanelScrollViewer" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Name="MessagesPanel" ItemsSource="{Binding Messenger.MessagesCollection}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="LightGray" CornerRadius="2,2,2,2" BorderThickness="2,2,2,2"
+                            <Border BorderBrush="LightGray" CornerRadius="2"
+                                    BorderThickness="2"
                                     Margin="10,5" Background="LightGray" MinWidth="100" MaxWidth="500"
-                                    HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <StackPanel Margin="5">
+                                    VerticalAlignment="Top" HorizontalAlignment="Left">
+                                <StackPanel Margin="2">
                                     <TextBlock FontSize="12" Foreground="DodgerBlue" Text="{Binding Path=Source}" />
-                                    <DockPanel>
-                                        <TextBlock FontSize="14" Text="{Binding Path=Body}" />
-                                        <TextBlock Margin="10,0,0,0" FontSize="10" Foreground="Gray"
-                                                   Text="{Binding Path=Timestamp, StringFormat=HH:mm}"
-                                                   VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-                                    </DockPanel>
+                                    <TextBlock FontSize="14" Text="{Binding Path=Body}" TextWrapping="Wrap"
+                                               TextAlignment="Justify" />
+                                    <TextBlock Margin="10,0,0,0" FontSize="10" Foreground="Gray"
+                                               Text="{Binding Path=Timestamp, StringFormat=HH:mm}"
+                                               VerticalAlignment="Bottom" HorizontalAlignment="Right" />
                                 </StackPanel>
                             </Border>
 
@@ -80,16 +96,20 @@
 
 
         </DockPanel>
-        <DockPanel Grid.Column="1" Grid.Row="4" Grid.RowSpan="2">
+        <DockPanel Grid.Column="1" Grid.Row="5" Grid.RowSpan="2">
             <TextBox Style="{StaticResource MessageTextBox}"
                      Text="{Binding Messenger.Message, UpdateSourceTrigger=PropertyChanged}"
-                     Visibility="{Binding Messenger.MessageVisibility}">
+                     TextWrapping="Wrap"
+                     Visibility="{Binding Messenger.MessageVisibility}"
+                     HorizontalContentAlignment="Left"
+                     VerticalContentAlignment="Center" FontSize="14">
+
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding Messenger.SendButton}" Key="Enter" />
                 </TextBox.InputBindings>
             </TextBox>
         </DockPanel>
-        <DockPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="5">
+        <DockPanel Grid.Column="2" Grid.Row="1" Grid.RowSpan="6">
             <ListBox ItemsSource="{Binding Messenger.ClientsCollection}"
                      SelectedItem="{Binding Messenger.ClientsCollectionSelectedItem, Mode=TwoWay}">
                 <ListBox.ItemTemplate>

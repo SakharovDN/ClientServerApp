@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow/MainWindow.xaml">
     <Application.Resources>
+
         <Style x:Key="AddressTextBox" TargetType="{x:Type TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Setter Property="FontSize" Value="25" />
             <Style.Resources>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Address..." Foreground="Gray" />
+                        <Label Content="Address..." Foreground="Gray" FontSize="25" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -25,10 +27,11 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="PortTextBox" TargetType="{x:Type TextBox}" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Setter Property="FontSize" Value="25" />
             <Style.Resources>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
-                        <Label Content="Port..." Foreground="Gray" />
+                        <Label Content="Port..." Foreground="Gray" FontSize="25" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>
@@ -85,20 +88,6 @@
                     <Setter Property="Background" Value="White" />
                 </Trigger>
             </Style.Triggers>
-        </Style>
-        <Style x:Key="NotSelectable" TargetType="ListBoxItem">
-            <Style.Resources>
-                <!-- SelectedItem with focus -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                                 Color="Transparent" />
-                <!-- SelectedItem without focus -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}"
-                                 Color="Transparent" />
-                <!-- SelectedItem text foreground -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
-                                 Color="Black" />
-            </Style.Resources>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
     </Application.Resources>
 </Application>
