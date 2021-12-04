@@ -1,10 +1,12 @@
-﻿namespace Server.Storage
+﻿namespace Common
 {
+    using System;
+
     public class Client
     {
         #region Properties
 
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 

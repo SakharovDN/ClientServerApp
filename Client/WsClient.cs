@@ -1,7 +1,6 @@
 ﻿namespace Client
 {
     using System;
-    using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
     using Common;
@@ -13,10 +12,16 @@
 
     public class WsClient
     {
+        #region Constants
+
+        private const string PATTERN = @"[ ]{2,}";
+        private const string REPLACEMENT = @" ";
+
+        #endregion
+
         #region Fields
 
         public MessageHandler MessageHandler;
-
         private KeepAlive _keepAlive;
         private readonly JsonSerializerSettings _settings;
         private WebSocket _socket;
@@ -41,12 +46,12 @@
                     throw new Exception("The name can contain a maximum of 10 characters");
                 }
 
-                var regex = new Regex(@"[ ]{2,}", RegexOptions.None);
-                _name = regex.Replace(value, @" ").Trim();
+                var regex = new Regex(PATTERN, RegexOptions.None);
+                _name = regex.Replace(value, REPLACEMENT).Trim();
             }
         }
 
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public bool IsConnected => _socket?.ReadyState == WebSocketState.Open;
 
@@ -67,7 +72,6 @@
             MessageHandler = new MessageHandler();
             MessageContainerReceived += MessageHandler.HandleMessageContainer;
             MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            MessageHandler.DisconnectionResponseReceived += HandleDisconnectionResponseReceived;
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -120,29 +124,19 @@
             Send(new ConnectionRequest(Name).GetContainer());
         }
 
-        public void LogOut()
-        {
-            Send(new DisconnectionRequest(Name).GetContainer());
-        }
-
         public void RequestEventLogs()
         {
             Send(new EventLogsRequest().GetContainer());
         }
 
-        public void SendMessage(string message, string target)
+        public void RequestChatHistory(string chatId)
         {
-            Send(new MessageRequest(message, Name, target).GetContainer());
+            Send(new ChatHistoryRequest(chatId).GetContainer());
         }
 
-        public void RequestChatHistory(string targetName)
+        public void SendMessage(string body, Chat chat)
         {
-            var participants = new List<string>
-            {
-                Name,
-                targetName
-            };
-            Send(new ChatHistoryRequest(participants).GetContainer());
+            Send(new MessageRequest(body, Id, chat).GetContainer());
         }
 
         public void Ping()
@@ -170,14 +164,15 @@
 
         private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
         {
+            if (args.Result == ResultCodes.Failure)
+            {
+                Disconnect();
+                return;
+            }
+
             Id = args.ClientId;
             _keepAlive = new KeepAlive(this, args.KeepAliveInterval);
             _keepAlive.Start();
-        }
-
-        private void HandleDisconnectionResponseReceived(object sender, DisconnectionResponseReceivedEventArgs args)
-        {
-            Disconnect();
         }
 
         private static void OnError(object sender, ErrorEventArgs e)

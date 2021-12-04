@@ -2,7 +2,6 @@
 {
     using System.Collections.Specialized;
     using System.Windows;
-    using System.Windows.Controls;
     using System.Windows.Media;
 
     public partial class MainWindow : Window
@@ -15,7 +14,6 @@
             var viewModelBase = new MainViewModel();
             DataContext = viewModelBase;
             Closing += viewModelBase.OnWindowClosing;
-            Closed += viewModelBase.OnWindowClosed;
             ((INotifyCollectionChanged)MessagesPanel.Items).CollectionChanged += MessagesCollection_CollectionChanged;
         }
 

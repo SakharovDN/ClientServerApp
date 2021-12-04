@@ -16,13 +16,13 @@
 
         public event EventHandler<ConnectionResponseReceivedEventArgs> ConnectionResponseReceived;
 
-        public event EventHandler<DisconnectionResponseReceivedEventArgs> DisconnectionResponseReceived;
-
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public event EventHandler<ConnectionStateChangedEchoReceivedEventArgs> ConnectionStateChangedEchoReceived;
+        public event EventHandler<ConnectionStateChangedBroadcastReceivedEventArgs> ConnectionStateChangedEchoReceived;
 
         public event EventHandler<ChatHistoryReceivedEventArgs> ChatHistoryReceived;
+
+        public event EventHandler<ChatCreatedBroadcastReceivedEventArgs> ChatCreatedEchoReceived;
 
         #endregion
 
@@ -43,10 +43,6 @@
                     HandleConnectionResponse(container);
                     break;
 
-                case MessageTypes.DisconnectionResponse:
-                    HandleDisconnectionResponse(container);
-                    break;
-
                 case MessageTypes.MessageBroadcast:
                     HandleMessageBroadcast(container);
                     break;
@@ -62,24 +58,21 @@
                 case MessageTypes.ChatHistoryResponse:
                     HandleChatHistoryResponse(container);
                     break;
-            }
-        }
 
-        private void HandleDisconnectionResponse(MessageContainer container)
-        {
-            if (((JObject)container.Payload).ToObject(typeof(DisconnectionResponse)) is DisconnectionResponse disconnectionResponse)
-            {
-                DisconnectionResponseReceived?.Invoke(null, new DisconnectionResponseReceivedEventArgs());
+                case MessageTypes.ChatCreatedEcho:
+                    HandleChatCreatedEcho(container);
+                    break;
             }
         }
 
         private void HandleConnectionStateChangedEcho(MessageContainer container)
         {
-            if (((JObject)container.Payload).ToObject(typeof(ConnectionStateChangedEcho)) is ConnectionStateChangedEcho connectionStateChangedEcho)
+            if (((JObject)container.Payload).ToObject(typeof(ConnectionStateChangedBroadcast)) is ConnectionStateChangedBroadcast
+                connectionStateChangedEcho)
             {
                 ConnectionStateChangedEchoReceived?.Invoke(
                     null,
-                    new ConnectionStateChangedEchoReceivedEventArgs(connectionStateChangedEcho.ClientName, connectionStateChangedEcho.IsConnected));
+                    new ConnectionStateChangedBroadcastReceivedEventArgs(connectionStateChangedEcho.Client, connectionStateChangedEcho.IsConnected));
             }
         }
 
@@ -108,6 +101,7 @@
                     new ConnectionResponseReceivedEventArgs(
                         connectionResponse.Result,
                         connectionResponse.Reason,
+                        connectionResponse.AvailableChats,
                         connectionResponse.ConnectedClients,
                         connectionResponse.ClientId,
                         connectionResponse.KeepAliveInterval));
@@ -119,6 +113,14 @@
             if (((JObject)container.Payload).ToObject(typeof(ChatHistoryResponse)) is ChatHistoryResponse chatHistoryResponse)
             {
                 ChatHistoryReceived?.Invoke(null, new ChatHistoryReceivedEventArgs(chatHistoryResponse.ChatHistory));
+            }
+        }
+
+        private void HandleChatCreatedEcho(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(ChatCreatedBroadcast)) is ChatCreatedBroadcast chatCreatedEcho)
+            {
+                ChatCreatedEchoReceived?.Invoke(null, new ChatCreatedBroadcastReceivedEventArgs(chatCreatedEcho.Chat));
             }
         }
 

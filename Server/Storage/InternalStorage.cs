@@ -24,6 +24,8 @@
 
         public MessageContext MessageContext { get; set; }
 
+        public ChatContext ChatContext { get; set; }
+
         #endregion
 
         #region Constructors
@@ -37,6 +39,7 @@
             ClientContext = new ClientContext(dbConnection);
             EventLogContext = new EventLogContext(dbConnection);
             MessageContext = new MessageContext(dbConnection);
+            ChatContext = new ChatContext(dbConnection);
         }
 
         #endregion

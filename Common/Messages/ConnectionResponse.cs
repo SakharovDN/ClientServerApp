@@ -10,9 +10,11 @@
 
         public string Reason { get; set; }
 
-        public List<string> ConnectedClients { get; set; }
+        public List<Chat> AvailableChats { get; set; }
 
-        public int ClientId { get; set; }
+        public List<Client> ConnectedClients { get; set; }
+
+        public string ClientId { get; set; }
 
         public int KeepAliveInterval { get; set; }
 

@@ -6,7 +6,7 @@
     {
         #region Properties
 
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public DateTime Timestamp { get; set; }
 

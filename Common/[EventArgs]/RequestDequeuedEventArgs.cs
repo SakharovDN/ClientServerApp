@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class RequestReceivedEventArgs : EventArgs
+    public class RequestDequeuedEventArgs : EventArgs
     {
         #region Properties
 
@@ -14,7 +14,7 @@
 
         #region Constructors
 
-        public RequestReceivedEventArgs(string connectionId, string serializedRequest)
+        public RequestDequeuedEventArgs(string connectionId, string serializedRequest)
         {
             ConnectionId = connectionId;
             SerializedRequest = serializedRequest;

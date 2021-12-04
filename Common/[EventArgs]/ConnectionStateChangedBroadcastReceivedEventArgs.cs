@@ -2,11 +2,11 @@
 {
     using System;
 
-    public class ConnectionStateChangedEchoReceivedEventArgs : EventArgs
+    public class ConnectionStateChangedBroadcastReceivedEventArgs : EventArgs
     {
         #region Properties
 
-        public string ClientName { get; }
+        public Client Client { get; }
 
         public bool IsConnected { get; }
 
@@ -14,9 +14,9 @@
 
         #region Constructors
 
-        public ConnectionStateChangedEchoReceivedEventArgs(string clientName, bool isConnected)
+        public ConnectionStateChangedBroadcastReceivedEventArgs(Client client, bool isConnected)
         {
-            ClientName = clientName;
+            Client = client;
             IsConnected = isConnected;
         }
 

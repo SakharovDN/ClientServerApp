@@ -1,10 +1,10 @@
 ﻿namespace Common.Messages
 {
-    public class ConnectionStateChangedEcho
+    public class ConnectionStateChangedBroadcast
     {
         #region Properties
 
-        public string ClientName { get; set; }
+        public Client Client { get; set; }
 
         public bool IsConnected { get; set; }
 
@@ -12,9 +12,9 @@
 
         #region Constructors
 
-        public ConnectionStateChangedEcho(string clientName, bool isConnected)
+        public ConnectionStateChangedBroadcast(Client client, bool isConnected)
         {
-            ClientName = clientName;
+            Client = client;
             IsConnected = isConnected;
         }
 

@@ -10,15 +10,15 @@
 
         public string Body { get; }
 
-        public string Source { get; }
+        public string SourceId { get; }
 
-        public string Target { get; }
+        public Chat Chat { get; }
 
         public Action<object, MessageContainer> Send { get; }
 
-        public Action<object, MessageContainer, int> SendTo { get; }
+        public Action<object, MessageContainer, string> SendTo { get; }
 
-        public Action<object, MessageContainer> SendBroadcast { get; }
+        public Action<MessageContainer> SendBroadcast { get; }
 
         #endregion
 
@@ -26,15 +26,15 @@
 
         public MessageRequestReceivedEventArgs(
             string body,
-            string source,
-            string target,
+            string sourceId,
+            Chat chat,
             Action<object, MessageContainer> send,
-            Action<object, MessageContainer, int> sendTo,
-            Action<object, MessageContainer> sendBroadcast)
+            Action<object, MessageContainer, string> sendTo,
+            Action<MessageContainer> sendBroadcast)
         {
             Body = body;
-            Source = source;
-            Target = target;
+            SourceId = sourceId;
+            Chat = chat;
             Send = send;
             SendTo = sendTo;
             SendBroadcast = sendBroadcast;

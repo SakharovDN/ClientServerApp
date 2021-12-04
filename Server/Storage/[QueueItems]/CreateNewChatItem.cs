@@ -2,19 +2,19 @@
 {
     using Common;
 
-    public class AddNewMessageItem : QueueItem
+    public class CreateNewChatItem : QueueItem
     {
         #region Fields
 
-        private readonly Message _message;
+        private readonly Chat _chat;
 
         #endregion
 
         #region Constructors
 
-        public AddNewMessageItem(Message message)
+        public CreateNewChatItem(Chat chat)
         {
-            _message = message;
+            _chat = chat;
         }
 
         #endregion
@@ -23,7 +23,7 @@
 
         public override void Accept(InternalStorage storage)
         {
-            storage.MessageContext.AddMessageToDt(_message);
+            storage.ChatContext.AddNewChatToDt(_chat);
         }
 
         #endregion
