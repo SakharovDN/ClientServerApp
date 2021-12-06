@@ -12,16 +12,13 @@
 
         public Action<object, MessageContainer> Send { get; }
 
-        public Action<object, MessageContainer> SendBroadcast { get; }
+        public Action<MessageContainer> SendBroadcast { get; }
 
         #endregion
 
         #region Constructors
 
-        public ConnectionRequestReceivedEventArgs(
-            string clientName,
-            Action<object, MessageContainer> send,
-            Action<object, MessageContainer> sendBroadcast)
+        public ConnectionRequestReceivedEventArgs(string clientName, Action<object, MessageContainer> send, Action<MessageContainer> sendBroadcast)
         {
             ClientName = clientName;
             Send = send;

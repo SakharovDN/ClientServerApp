@@ -3,9 +3,11 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Common;
+
     using Storage;
 
-    public class ClientService
+    public class ClientService : IClientService
     {
         #region Fields
 
@@ -15,7 +17,7 @@
 
         #region Properties
 
-        public List<string> ConnectedClients { get; set; }
+        public List<Client> ConnectedClients { get; set; }
 
         #endregion
 
@@ -24,29 +26,43 @@
         public ClientService(InternalStorage storage)
         {
             _storage = storage;
-            ConnectedClients = new List<string>();
+            ConnectedClients = new List<Client>();
         }
 
         #endregion
 
         #region Methods
 
-        public bool ClientIsConnected(string clientName)
+        public bool ClientIsConnected(string clientId)
         {
-            return ConnectedClients.Any(client => client == clientName);
+            return ConnectedClients.Any(connectedClient => clientId == connectedClient.Id.ToString());
         }
 
-        public void AddClient(string clientName)
+        public void SetClientConnected(Client client)
         {
-            ConnectedClients.Add(clientName);
-            _storage.AddQueueItem(new AddNewClientItem(clientName));
-            _storage.AddQueueItem(new AddEventLogItem(clientName, true));
+            ConnectedClients.Add(client);
+            _storage.AddQueueItem(new AddEventLogItem(client.Name, true));
         }
 
-        public void RemoveClient(string clientName)
+        public void SetClientDisconnected(Client client)
         {
-            ConnectedClients.Remove(clientName);
-            _storage.AddQueueItem(new AddEventLogItem(clientName, false));
+            ConnectedClients.Remove(client);
+            _storage.AddQueueItem(new AddEventLogItem(client.Name, false));
+        }
+
+        public void CreateNewClient(Client client)
+        {
+            _storage.AddQueueItem(new AddNewClientItem(client));
+        }
+
+        public Client GetClientById(string clientId)
+        {
+            return _storage.ClientContext.GetClientById(clientId);
+        }
+
+        public Client GetClientByName(string clientName)
+        {
+            return _storage.ClientContext.GetClientByName(clientName);
         }
 
         #endregion

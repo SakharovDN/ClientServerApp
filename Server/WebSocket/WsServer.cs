@@ -11,6 +11,8 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    using Requests;
+
     using Settings;
 
     using WebSocketSharp.Server;
@@ -23,6 +25,7 @@
         private WebSocketServer _server;
         private readonly ConcurrentDictionary<string, WsConnection> _connections;
         private readonly ConfigSettings _configSettings;
+        private readonly RequestQueue _requestQueue;
 
         #endregion
 
@@ -30,7 +33,7 @@
 
         public event EventHandler<ConnectionRequestReceivedEventArgs> ConnectionRequestReceived;
 
-        public event EventHandler<DisconnectionRequestReceivedEventArgs> DisconnectionRequestReceived;
+        public event EventHandler<ConnectionClosedEventArgs> ConnectionClosed;
 
         public event EventHandler<MessageRequestReceivedEventArgs> MessageRequestReceived;
 
@@ -47,6 +50,8 @@
             _configSettings = configSettings;
             _listenAddress = new IPEndPoint(IPAddress.Any, _configSettings.Port);
             _connections = new ConcurrentDictionary<string, WsConnection>();
+            _requestQueue = new RequestQueue();
+            _requestQueue.RequestDequeued += HandleRequest;
         }
 
         #endregion
@@ -62,7 +67,7 @@
                 {
                     connection.AddServer(this);
                     connection.SetInactivityTimeout(_configSettings.InactivityTimeoutInterval);
-                    connection.RequestReceived += HandleRequest;
+                    connection.RequestReceived += _requestQueue.EnqueueRequest;
                 });
             _server.Start();
         }
@@ -88,17 +93,20 @@
 
         internal void FreeConnection(string connectionId)
         {
-            _connections.TryRemove(connectionId, out WsConnection _);
+            if (_connections.TryRemove(connectionId, out WsConnection connection))
+            {
+                ConnectionClosed?.Invoke(connection, new ConnectionClosedEventArgs(SendBroadcast));
+            }
         }
 
-        private void HandleRequest(object sender, RequestReceivedEventArgs args)
+        private void HandleRequest(object sender, RequestDequeuedEventArgs args)
         {
-            if (!_connections.TryGetValue(args.ConnectionId, out WsConnection connection))
+            if (!_connections.TryGetValue(args.ConnectionId, out WsConnection senderConnection))
             {
                 return;
             }
 
-            var container = JsonConvert.DeserializeObject<MessageContainer>(args.Request);
+            var container = JsonConvert.DeserializeObject<MessageContainer>(args.SerializedRequest);
 
             if (container == null)
             {
@@ -114,19 +122,8 @@
                     }
 
                     ConnectionRequestReceived?.Invoke(
-                        sender,
+                        senderConnection,
                         new ConnectionRequestReceivedEventArgs(connectionRequest.ClientName, Send, SendBroadcast));
-                    break;
-
-                case MessageTypes.DisconnectionRequest:
-                    if (!(((JObject)container.Payload).ToObject(typeof(DisconnectionRequest)) is DisconnectionRequest disconnectionRequest))
-                    {
-                        return;
-                    }
-
-                    DisconnectionRequestReceived?.Invoke(
-                        sender,
-                        new DisconnectionRequestReceivedEventArgs(disconnectionRequest.ClientName, Send, SendBroadcast));
                     break;
 
                 case MessageTypes.MessageRequest:
@@ -136,18 +133,18 @@
                     }
 
                     MessageRequestReceived?.Invoke(
-                        sender,
+                        senderConnection,
                         new MessageRequestReceivedEventArgs(
                             messageRequest.Body,
-                            messageRequest.Source,
-                            messageRequest.Target,
+                            messageRequest.SourceId,
+                            messageRequest.Chat,
                             Send,
                             SendTo,
                             SendBroadcast));
                     break;
 
                 case MessageTypes.EventLogsRequest:
-                    EventLogsRequestReceived?.Invoke(sender, new EventLogsRequestReceivedEventArgs(Send));
+                    EventLogsRequestReceived?.Invoke(senderConnection, new EventLogsRequestReceivedEventArgs(Send));
                     break;
 
                 case MessageTypes.ChatHistoryRequest:
@@ -156,7 +153,7 @@
                         return;
                     }
 
-                    ChatHistoryRequestReceived?.Invoke(sender, new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.Participants, Send));
+                    ChatHistoryRequestReceived?.Invoke(senderConnection, new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.ChatId, Send));
                     break;
             }
         }
@@ -167,7 +164,7 @@
             connection?.Send(container);
         }
 
-        private void SendTo(object sender, MessageContainer container, int targetId)
+        private void SendTo(object sender, MessageContainer container, string targetId)
         {
             var connection = sender as WsConnection;
             string targetConnectionId =
@@ -175,10 +172,9 @@
             connection?.SendTo(container, targetConnectionId);
         }
 
-        private void SendBroadcast(object sender, MessageContainer container)
+        private void SendBroadcast(MessageContainer container)
         {
-            var connection = sender as WsConnection;
-            connection?.Broadcast(container);
+            _connections.Values.FirstOrDefault(connection => connection.IsConnected)?.Broadcast(container);
         }
 
         #endregion

@@ -6,19 +6,19 @@
 
         public string Body { get; set; }
 
-        public string Source { get; set; }
+        public string SourceId { get; set; }
 
-        public string Target { get; set; }
+        public Chat Chat { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public MessageRequest(string body, string source, string target)
+        public MessageRequest(string body, string sourceId, Chat chat)
         {
             Body = body;
-            Source = source;
-            Target = target;
+            SourceId = sourceId;
+            Chat = chat;
         }
 
         #endregion

@@ -18,7 +18,7 @@
         private readonly WsClient _client;
         private CommandHandler _startCommand;
         private CommandHandler _stopCommand;
-        private CommandHandler _getEventLogsButton;
+        private CommandHandler _getEventLogsCommand;
         private string _address;
         private string _port;
         private string _clientName;
@@ -76,7 +76,7 @@
 
         public ICommand StopCommand => _stopCommand ?? (_stopCommand = new CommandHandler(PerformStopButton));
 
-        public ICommand GetEventLogsButton => _getEventLogsButton ?? (_getEventLogsButton = new CommandHandler(PerformGetEventLogsButton));
+        public ICommand GetEventLogsCommand => _getEventLogsCommand ?? (_getEventLogsCommand = new CommandHandler(PerformGetEventLogsButton));
 
         #endregion
 
@@ -110,14 +110,6 @@
         {
             if (_client.IsConnected)
             {
-                _client.LogOut();
-            }
-        }
-
-        public void OnWindowClosed(object sender, EventArgs args)
-        {
-            if (_client.IsConnected)
-            {
                 _client.Disconnect();
             }
         }
@@ -131,8 +123,9 @@
         {
             try
             {
+                EventsCollection.Clear();
                 _client.Connect(Address, Port);
-                _client?.LogIn(ClientName);
+                _client.LogIn(ClientName);
             }
             catch (Exception ex)
             {
@@ -143,7 +136,7 @@
 
         private void PerformStopButton(object commandParameter)
         {
-            _client.LogOut();
+            _client.Disconnect();
             ControlsEnabledViewModel.SetDefaultControlsState();
         }
 
@@ -163,23 +156,20 @@
                     }
                     else
                     {
-                        EventsCollection.Clear();
-                        Messenger.ClientsCollection.Clear();
-                        Messenger.MessagesCollection.Clear();
-                        Messenger.MessageVisibility = Visibility.Hidden;
+                        Messenger.Dispose();
                         ControlsEnabledViewModel.SetDefaultControlsState();
                         EventsCollection.Add("Connection lost");
                     }
                 });
         }
 
-        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedEchoReceivedEventArgs args)
+        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
                     string clientState = args.IsConnected ? "is connected" : "is disconnected";
-                    string message = $"Client {args.ClientName} {clientState}";
+                    string message = $"Client {args.Client.Name} {clientState}";
                     EventsCollection.Add(message);
                 });
         }

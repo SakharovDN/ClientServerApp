@@ -25,7 +25,7 @@
 
         #region Properties
 
-        public int ClientId { get; set; }
+        public string ClientId { get; set; }
 
         public bool IsConnected => Context.WebSocket?.ReadyState == WebSocketState.Open;
 
@@ -100,17 +100,17 @@
             Context.WebSocket.Close();
         }
 
-        protected override void OnMessage(MessageEventArgs e)
+        protected override void OnMessage(MessageEventArgs args)
         {
             _lastActivity = DateTime.Now;
 
-            if (e.IsPing)
+            if (args.IsPing)
             {
                 Sessions.PingTo(ID);
                 return;
             }
 
-            RequestReceived?.Invoke(this, new RequestReceivedEventArgs(ID, e.Data));
+            RequestReceived?.Invoke(this, new RequestReceivedEventArgs(ID, args.Data));
         }
 
         protected override void OnOpen()
@@ -123,8 +123,8 @@
 
         protected override void OnClose(CloseEventArgs closeEventArgs)
         {
-            _server.FreeConnection(ID);
             _checkConnectionTimer.Stop();
+            _server.FreeConnection(ID);
         }
 
         private void SendCompleted(bool completed)
@@ -138,7 +138,7 @@
             Close();
         }
 
-        private void CheckConnection(object sender, ElapsedEventArgs e)
+        private void CheckConnection(object sender, ElapsedEventArgs args)
         {
             if (DateTime.Now > _lastActivity + TimeSpan.FromMilliseconds(3 * _inactivityTimeoutInterval))
             {

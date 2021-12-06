@@ -6,12 +6,11 @@
         ConnectionResponse,
         MessageRequest,
         MessageBroadcast,
-        DisconnectionRequest,
-        DisconnectionResponse,
         EventLogsRequest,
         EventLogsResponse,
         ConnectionStateChangedEcho,
         ChatHistoryRequest,
-        ChatHistoryResponse
+        ChatHistoryResponse,
+        ChatCreatedEcho
     }
 }

@@ -48,10 +48,10 @@
     {
         #region Methods
 
-        public static DataTable ToDataTable<T>(this DbSet<T> data)
-            where T : class
+        public static DataTable ToDataTable(this DbSet<EventLog> data)
         {
-            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
+            IOrderedQueryable<EventLog> orderedData = data.OrderByDescending(eventLog => eventLog.Id);
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(EventLog));
             var table = new DataTable();
 
             foreach (PropertyDescriptor prop in properties.Cast<PropertyDescriptor>().Where(prop => prop.Name != "Id"))
@@ -59,7 +59,7 @@
                 table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
             }
 
-            foreach (T item in data)
+            foreach (EventLog item in orderedData)
             {
                 DataRow row = table.NewRow();
 
@@ -70,12 +70,7 @@
 
                 table.Rows.Add(row);
             }
-
-            OrderedEnumerableRowCollection<DataRow> orderedRows = from row in table.AsEnumerable()
-                                                                  orderby row.Field<DateTime>("Timestamp") descending
-                                                                  select row;
-            DataTable orderedTable = orderedRows.CopyToDataTable();
-            return orderedTable;
+            return table;
         }
 
         #endregion

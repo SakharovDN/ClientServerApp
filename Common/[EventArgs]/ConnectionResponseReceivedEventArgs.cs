@@ -11,9 +11,11 @@
 
         public string Reason { get; }
 
-        public List<string> ConnectedClients { get; }
+        public List<Chat> AvailableChats { get; }
 
-        public int ClientId { get; }
+        public List<Client> ConnectedClients { get; }
+
+        public string ClientId { get; }
 
         public int KeepAliveInterval { get; }
 
@@ -24,12 +26,14 @@
         public ConnectionResponseReceivedEventArgs(
             ResultCodes result,
             string reason,
-            List<string> connectedClients,
-            int clientId,
+            List<Chat> availableChats,
+            List<Client> connectedClients,
+            string clientId,
             int keepAliveInterval)
         {
             Result = result;
             Reason = reason;
+            AvailableChats = availableChats;
             ConnectedClients = connectedClients;
             ClientId = clientId;
             KeepAliveInterval = keepAliveInterval;

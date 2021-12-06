@@ -1,20 +1,18 @@
 ﻿namespace Common.Messages
 {
-    using System.Collections.Generic;
-
     public class ChatHistoryRequest
     {
         #region Properties
 
-        public List<string> Participants { get; set; }
+        public string ChatId { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequest(List<string> participants)
+        public ChatHistoryRequest(string chatId)
         {
-            Participants = participants;
+            ChatId = chatId;
         }
 
         #endregion

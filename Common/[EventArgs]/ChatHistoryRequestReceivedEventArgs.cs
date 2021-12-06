@@ -1,7 +1,6 @@
 ﻿namespace Common
 {
     using System;
-    using System.Collections.Generic;
 
     using Messages;
 
@@ -9,7 +8,7 @@
     {
         #region Properties
 
-        public List<string> Participants { get; set; }
+        public string ChatId { get; set; }
 
         public Action<object, MessageContainer> Send { get; set; }
 
@@ -17,9 +16,9 @@
 
         #region Constructors
 
-        public ChatHistoryRequestReceivedEventArgs(List<string> participants, Action<object, MessageContainer> send)
+        public ChatHistoryRequestReceivedEventArgs(string chatId, Action<object, MessageContainer> send)
         {
-            Participants = participants;
+            ChatId = chatId;
             Send = send;
         }
 

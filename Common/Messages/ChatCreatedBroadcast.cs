@@ -1,18 +1,18 @@
 ﻿namespace Common.Messages
 {
-    public class DisconnectionRequest
+    public class ChatCreatedBroadcast
     {
         #region Properties
 
-        public string ClientName { get; set; }
+        public Chat Chat { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public DisconnectionRequest(string clientName)
+        public ChatCreatedBroadcast(Chat chat)
         {
-            ClientName = clientName;
+            Chat = chat;
         }
 
         #endregion
@@ -23,7 +23,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.DisconnectionRequest,
+                Type = MessageTypes.ChatCreatedEcho,
                 Payload = this
             };
         }

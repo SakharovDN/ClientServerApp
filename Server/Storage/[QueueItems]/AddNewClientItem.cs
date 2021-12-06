@@ -1,18 +1,20 @@
 ﻿namespace Server.Storage
 {
+    using Common;
+
     public class AddNewClientItem : QueueItem
     {
         #region Fields
 
-        private readonly string _clientName;
+        private readonly Client _client;
 
         #endregion
 
         #region Constructors
 
-        public AddNewClientItem(string clientName)
+        public AddNewClientItem(Client client)
         {
-            _clientName = clientName;
+            _client = client;
         }
 
         #endregion
@@ -21,10 +23,7 @@
 
         public override void Accept(InternalStorage storage)
         {
-            if (!storage.ClientContext.ClientExists(_clientName))
-            {
-                storage.ClientContext.AddNewClientToDt(_clientName);
-            }
+            storage.ClientContext.AddNewClientToDt(_client);
         }
 
         #endregion

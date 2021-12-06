@@ -3,6 +3,8 @@
     using System.Data.Entity;
     using System.Linq;
 
+    using Common;
+
     public class ClientContext : DbContext
     {
         #region Properties
@@ -22,24 +24,25 @@
 
         #region Methods
 
-        public void AddNewClientToDt(string name)
+        public void AddNewClientToDt(Client client)
         {
-            var client = new Client
-            {
-                Name = name
-            };
             Clients.Add(client);
             SaveChanges();
         }
 
-        public bool ClientExists(string name)
+        public bool ClientExists(string clientName)
         {
-            return Enumerable.Any(Clients, client => client.Name == name);
+            return Enumerable.Any(Clients, client => client.Name == clientName);
         }
 
-        public int GetClientId(string clientName)
+        public Client GetClientById(string clientId)
         {
-            return Enumerable.FirstOrDefault(from client in Clients where client.Name == clientName select client.Id);
+            return Enumerable.FirstOrDefault(Clients, client => client.Id.ToString() == clientId);
+        }
+
+        public Client GetClientByName(string clientName)
+        {
+            return Enumerable.FirstOrDefault(Clients, client => client.Name == clientName);
         }
 
         #endregion
