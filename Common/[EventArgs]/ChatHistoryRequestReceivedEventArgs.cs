@@ -2,24 +2,25 @@
 {
     using System;
 
-    using Messages;
-
     public class ChatHistoryRequestReceivedEventArgs : EventArgs
     {
         #region Properties
 
-        public string ChatId { get; set; }
+        public string TargetId { get; }
 
-        public Action<object, MessageContainer> Send { get; set; }
+        public string SourceId { get; }
+
+        public ChatTypes ChatType { get; }
 
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequestReceivedEventArgs(string chatId, Action<object, MessageContainer> send)
+        public ChatHistoryRequestReceivedEventArgs(string targetId, string sourceId, ChatTypes chatType)
         {
-            ChatId = chatId;
-            Send = send;
+            TargetId = targetId;
+            SourceId = sourceId;
+            ChatType = chatType;
         }
 
         #endregion

@@ -2,6 +2,8 @@
 {
     using System;
 
+    using Common;
+
     internal class UpdateChatRecordItem : QueueItem
     {
         #region Fields
@@ -25,7 +27,15 @@
 
         public override void Accept(InternalStorage storage)
         {
-            storage.ChatContext.UpdateChatRecord(_chatId, _timestamp);
+            Chat chat = storage.Chats.Find(Guid.Parse(_chatId));
+
+            if (chat != null)
+            {
+                chat.LastMessageTimestamp = _timestamp;
+                chat.MessageAmount++;
+            }
+
+            storage.SaveChanges();
         }
 
         #endregion

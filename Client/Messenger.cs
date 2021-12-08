@@ -1,6 +1,5 @@
 ﻿namespace Client
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
@@ -13,6 +12,8 @@
     using Annotations;
 
     using Common;
+
+    using NewGroupWindow;
 
     public class Messenger : INotifyPropertyChanged
     {
@@ -34,6 +35,7 @@
         private ObservableCollection<Chat> _chatsCollection;
         private Chat _chatsCollectionSelectedItem;
         private CommandHandler _sendCommand;
+        private CommandHandler _createNewGroupCommand;
         private Visibility _messageVisibility;
 
         #endregion
@@ -41,6 +43,8 @@
         #region Properties
 
         public ICommand SendCommand => _sendCommand ?? (_sendCommand = new CommandHandler(PerformSendButton));
+
+        public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
         public string Message
         {
@@ -127,9 +131,10 @@
             _client = client;
             _client.MessageHandler.MessageReceived += HandleMessageReceived;
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
+            _client.MessageHandler.ChatListResponseReceived += HandledChatListResponseReceived;
+            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcastReceived;
             _client.MessageHandler.ChatHistoryReceived += HandleChatHistoryReceived;
-            _client.MessageHandler.ChatCreatedEchoReceived += HandleChatCreatedEchoReceived;
+            _client.MessageHandler.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcastReceived;
             ConnectedClientsCollection = new ObservableCollection<Client>();
             MessagesCollection = new ObservableCollection<Message>();
             ChatsCollection = new ObservableCollection<Chat>();
@@ -164,15 +169,30 @@
             }
 
             Message = _messageRegex.Replace(Message, REPLACEMENT).Trim();
-            Chat chat = ChatsCollectionSelectedItem ?? new Chat
+
+            if (ChatsCollectionSelectedItem != null)
             {
-                Id = Guid.Empty,
-                Type = ChatTypes.Private,
-                SourceId = _client.Id,
-                TargetId = ConnectedClientsCollectionSelectedItem.Id.ToString()
-            };
-            _client.SendMessage(Message, chat);
+                _client.SendMessage(
+                    ChatsCollectionSelectedItem.TargetId == _client.Id ? ChatsCollectionSelectedItem.SourceId : ChatsCollectionSelectedItem.TargetId,
+                    Message,
+                    ChatsCollectionSelectedItem.Type);
+            }
+            else if (ConnectedClientsCollectionSelectedItem != null)
+            {
+                _client.SendMessage(ConnectedClientsCollectionSelectedItem.Id.ToString(), Message, ChatTypes.Private);
+            }
+
             Message = string.Empty;
+        }
+
+        private void CreateNewGroup(object obj)
+        {
+            var newGroupWindow = new CreateNewGroupWindow(ConnectedClientsCollection);
+
+            if (newGroupWindow.ShowDialog() == true)
+            {
+                _client.RequestGroupCreation(newGroupWindow.GroupTitle, newGroupWindow.SelectedClients);
+            }
         }
 
         private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
@@ -185,17 +205,32 @@
                         return;
                     }
 
-                    foreach (Chat availableChat in args.AvailableChats)
-                    {
-                        ChatsCollection.Add(availableChat);
-                    }
-
-                    RefreshChatsCollection();
-
-                    foreach (Client client in args.ConnectedClients)
+                    foreach (Client client in args.ConnectedClients.Where(client => client.Name != _client.Name))
                     {
                         ConnectedClientsCollection.Add(client);
                     }
+                });
+        }
+
+        private void HandledChatListResponseReceived(object sender, ChatListResponseReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    foreach (Chat chat in args.Chats)
+                    {
+                        if (chat.Type == ChatTypes.Private)
+                        {
+                            if (chat.TargetId == _client.Id)
+                            {
+                                chat.TargetName = chat.SourceName;
+                            }
+                        }
+
+                        ChatsCollection.Add(chat);
+                    }
+
+                    RefreshChatsCollection();
                 });
         }
 
@@ -229,12 +264,12 @@
                 });
         }
 
-        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
+        private void HandleConnectionStateChangedBroadcastReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (args.Client.Id.ToString() == _client.Id)
+                    if (args.Client.Name == _client.Name)
                     {
                         return;
                     }
@@ -269,11 +304,19 @@
                 });
         }
 
-        private void HandleChatCreatedEchoReceived(object sender, ChatCreatedBroadcastReceivedEventArgs args)
+        private void HandleChatCreatedBroadcastReceived(object sender, ChatCreatedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
+                    if (args.Chat.Type == ChatTypes.Private)
+                    {
+                        if (args.Chat.TargetId == _client.Id)
+                        {
+                            args.Chat.TargetName = args.Chat.SourceName;
+                        }
+                    }
+
                     ChatsCollection.Add(args.Chat);
                     RefreshChatsCollection();
 
@@ -302,7 +345,11 @@
                 case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem != null:
                     ConnectedClientsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
-                    _client.RequestChatHistory(ChatsCollectionSelectedItem.Id.ToString());
+                    _client.RequestChatHistory(
+                        _client.Id == ChatsCollectionSelectedItem.TargetId
+                            ? ChatsCollectionSelectedItem.SourceId
+                            : ChatsCollectionSelectedItem.TargetId,
+                        ChatsCollectionSelectedItem.Type);
                     break;
 
                 case nameof(ConnectedClientsCollectionSelectedItem) when ConnectedClientsCollectionSelectedItem == null:

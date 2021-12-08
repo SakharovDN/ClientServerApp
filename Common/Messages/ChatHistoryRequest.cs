@@ -4,15 +4,21 @@
     {
         #region Properties
 
-        public string ChatId { get; set; }
+        public string TargetId { get; set; }
+
+        public string SourceId { get; set; }
+
+        public ChatTypes ChatType { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequest(string chatId)
+        public ChatHistoryRequest(string targetId, string sourceId, ChatTypes chatType)
         {
-            ChatId = chatId;
+            TargetId = targetId;
+            SourceId = sourceId;
+            ChatType = chatType;
         }
 
         #endregion

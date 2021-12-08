@@ -1,5 +1,7 @@
 ﻿namespace Server.Storage
 {
+    using System;
+
     public class AddEventLogItem : QueueItem
     {
         #region Fields
@@ -24,8 +26,14 @@
         public override void Accept(InternalStorage storage)
         {
             string clientState = _isConnected ? "is connected" : "is disconnected";
-            string eventLog = $"Client '{_clientName}' {clientState}.";
-            storage.EventLogContext.AddEventLogToDt(eventLog);
+            string message = $"Client '{_clientName}' {clientState}.";
+            var eventLog = new EventLog
+            {
+                Message = message,
+                Timestamp = DateTime.Now
+            };
+            storage.EventLogs.Add(eventLog);
+            storage.SaveChanges();
         }
 
         #endregion

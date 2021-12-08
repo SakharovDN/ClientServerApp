@@ -1,4 +1,4 @@
-﻿namespace Server.Storage
+﻿namespace Server.Services
 {
     using System;
     using System.ComponentModel;
@@ -6,42 +6,34 @@
     using System.Data.Entity;
     using System.Linq;
 
-    public class EventLogContext : DbContext
-    {
-        #region Properties
+    using Storage;
 
-        public DbSet<EventLog> EventLogs { get; set; }
+    public class EventLogService
+    {
+        #region Fields
+
+        private readonly InternalStorage _storage;
 
         #endregion
 
         #region Constructors
 
-        public EventLogContext(string dbConnection)
-            : base(dbConnection)
+        public EventLogService(InternalStorage storage)
         {
+            _storage = storage;
         }
 
         #endregion
 
         #region Methods
 
-        public void AddEventLogToDt(string message)
-        {
-            var eventLog = new EventLog
-            {
-                Timestamp = DateTime.Now,
-                Message = message
-            };
-            EventLogs.Add(eventLog);
-            SaveChanges();
-        }
-
         public DataTable GetEventLogs()
         {
-            return EventLogs.ToDataTable();
+            return _storage.EventLogs.ToDataTable();
         }
 
         #endregion
+        
     }
 
     public static class DataTableExtensions
@@ -50,7 +42,6 @@
 
         public static DataTable ToDataTable(this DbSet<EventLog> data)
         {
-            IOrderedQueryable<EventLog> orderedData = data.OrderByDescending(eventLog => eventLog.Id);
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(EventLog));
             var table = new DataTable();
 
@@ -59,7 +50,7 @@
                 table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
             }
 
-            foreach (EventLog item in orderedData)
+            foreach (EventLog item in data)
             {
                 DataRow row = table.NewRow();
 
@@ -70,6 +61,7 @@
 
                 table.Rows.Add(row);
             }
+
             return table;
         }
 

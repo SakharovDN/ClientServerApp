@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Data.Entity;
     using System.Threading.Tasks;
+
+    using Common;
 
     using NLog;
 
-    public class InternalStorage
+    public class InternalStorage : DbContext
     {
         #region Fields
 
@@ -18,28 +21,26 @@
 
         #region Properties
 
-        public ClientContext ClientContext { get; set; }
+        public DbSet<Client> Clients { get; set; }
 
-        public EventLogContext EventLogContext { get; set; }
+        public DbSet<Group> Groups { get; set; }
 
-        public MessageContext MessageContext { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
-        public ChatContext ChatContext { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+
+        public DbSet<EventLog> EventLogs { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public InternalStorage(string dbServerName)
+        public InternalStorage(string dbConnection)
+            : base(dbConnection)
         {
             _workQueue = new ConcurrentQueue<QueueItem>();
             _logger = LogManager.GetCurrentClassLogger();
-            string dbConnection = GetDbConnectionString(dbServerName);
             //todo: check connection
-            ClientContext = new ClientContext(dbConnection);
-            EventLogContext = new EventLogContext(dbConnection);
-            MessageContext = new MessageContext(dbConnection);
-            ChatContext = new ChatContext(dbConnection);
         }
 
         #endregion
@@ -57,11 +58,6 @@
                     _queueItemTask = Task.Run(HandleQueueItems);
                 }
             }
-        }
-
-        private string GetDbConnectionString(string dbServerName)
-        {
-            return $"Data Source={dbServerName};Initial Catalog=ClientServerApp;Integrated Security=True";
         }
 
         private void HandleQueueItems()

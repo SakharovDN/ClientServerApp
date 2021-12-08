@@ -1,6 +1,9 @@
 ﻿namespace Client
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     using Common;
@@ -9,6 +12,8 @@
     using Newtonsoft.Json;
 
     using WebSocketSharp;
+
+    using Group = Common.Group;
 
     public class WsClient
     {
@@ -53,6 +58,8 @@
 
         public string Id { get; set; }
 
+        public List<Group> Groups { get; set; }
+
         public bool IsConnected => _socket?.ReadyState == WebSocketState.Open;
 
         #endregion
@@ -72,6 +79,7 @@
             MessageHandler = new MessageHandler();
             MessageContainerReceived += MessageHandler.HandleMessageContainer;
             MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            MessageHandler.GroupListResponseReceived += HandleGroupListResponseReceived;
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -129,14 +137,21 @@
             Send(new EventLogsRequest().GetContainer());
         }
 
-        public void RequestChatHistory(string chatId)
+        public void RequestChatHistory(string targetId, ChatTypes chatType)
         {
-            Send(new ChatHistoryRequest(chatId).GetContainer());
+            Send(new ChatHistoryRequest(targetId, Id, chatType).GetContainer());
         }
 
-        public void SendMessage(string body, Chat chat)
+        public void SendMessage(string targetId, string body, ChatTypes chatType)
         {
-            Send(new MessageRequest(body, Id, chat).GetContainer());
+            Send(new MessageRequest(body, Id, targetId, chatType).GetContainer());
+        }
+
+        public void RequestGroupCreation(string groupTitle, ObservableCollection<Client> selectedClients)
+        {
+            List<string> clientIds = selectedClients.Select(client => client.Id.ToString()).ToList();
+            clientIds.Add(Id);
+            Send(new GroupCreationRequest(groupTitle, clientIds, Id).GetContainer());
         }
 
         public void Ping()
@@ -162,6 +177,12 @@
             _socket.Send(serializedMessages);
         }
 
+        private void HandleGroupListResponseReceived(object sender, GroupListResponseReceivedEventArgs args)
+        {
+            Groups = args.Groups;
+            RequestChatList();
+        }
+
         private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
         {
             if (args.Result == ResultCodes.Failure)
@@ -171,32 +192,43 @@
             }
 
             Id = args.ClientId;
+            RequestGroupList();
             _keepAlive = new KeepAlive(this, args.KeepAliveInterval);
             _keepAlive.Start();
         }
 
-        private static void OnError(object sender, ErrorEventArgs e)
+        private void RequestChatList()
         {
-            throw e.Exception;
+            Send(new ChatListRequest(Id, Groups).GetContainer());
         }
 
-        private void OnMessage(object sender, MessageEventArgs e)
+        private void RequestGroupList()
         {
-            if (e.IsPing)
+            Send(new GroupListRequest(Id).GetContainer());
+        }
+
+        private static void OnError(object sender, ErrorEventArgs args)
+        {
+            throw args.Exception;
+        }
+
+        private void OnMessage(object sender, MessageEventArgs args)
+        {
+            if (args.IsPing)
             {
                 _keepAlive.ResetPingResponseCounter();
                 return;
             }
 
-            MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(e.Data));
+            MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(args.Data));
         }
 
-        private void OnOpen(object sender, EventArgs e)
+        private void OnOpen(object sender, EventArgs args)
         {
             ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(true));
         }
 
-        private void OnClose(object sender, CloseEventArgs e)
+        private void OnClose(object sender, CloseEventArgs args)
         {
             _keepAlive?.Stop();
             ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(false));

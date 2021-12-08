@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
 
     using Common;
     using Common.Messages;
@@ -23,9 +22,11 @@
 
         private readonly WsServer _wsServer;
         private readonly InternalStorage _storage;
-        private readonly ClientService _clientService;
-        private readonly MessageService _messageService;
-        private readonly ChatService _chatService;
+        private readonly IClientService _clientService;
+        private readonly IMessageService _messageService;
+        private readonly IChatService _chatService;
+        private readonly IGroupService _groupService;
+        private readonly EventLogService _eventLogService;
         private readonly ConfigSettings _configSetting;
         private readonly SettingsManager _settingsManager;
         private readonly Logger _logger;
@@ -39,16 +40,30 @@
             _settingsManager = new SettingsManager();
             _configSetting = _settingsManager.ReadConfigFile();
             _wsServer = new WsServer(_configSetting);
-            _wsServer.ConnectionRequestReceived += HandleConnectionRequestReceived;
-            _wsServer.ConnectionClosed += HandleConnectionClosed;
-            _wsServer.MessageRequestReceived += HandleMessageRequestReceived;
-            _wsServer.EventLogsRequestReceived += HandleEventLogsRequestReceived;
-            _wsServer.ChatHistoryRequestReceived += HandleChatHistoryRequestReceived;
-            _storage = new InternalStorage(_configSetting.DbServerName);
+            _storage = new InternalStorage(GetDbConnectionString(_configSetting.DbServerName));
+            _chatService = new ChatService(_storage);
+            _groupService = new GroupService(_storage);
             _clientService = new ClientService(_storage);
             _messageService = new MessageService(_storage);
-            _chatService = new ChatService(_storage);
+            _eventLogService = new EventLogService(_storage);
             _logger = LogManager.GetCurrentClassLogger();
+            _wsServer.ConnectionRequestReceived += _clientService.HandleConnectionRequest;
+            _clientService.ConnectionRequestHandled += SendConnectionResponse;
+            _wsServer.ConnectionClosed += HandleConnectionClosed;
+            _wsServer.MessageRequestReceived += _messageService.HandleMessageRequest;
+            _messageService.MessageRequestHandled += SendBroadcast;
+            _chatService.NewChatCreated += SendBroadcast;
+            _wsServer.ChatHistoryRequestReceived += _chatService.HandleChatHistoryRequest;
+            _chatService.ChatHistoryRequestHandled += SendChatHistoryResponse;
+            _wsServer.GroupCreationRequestReceived += _groupService.HandleGroupCreationRequest;
+            _wsServer.EventLogsRequestReceived += SendEventLogsResponse;
+            _messageService.ChatNotExists += _chatService.CreateNewChat;
+            _groupService.ChatNotExists += _chatService.CreateNewChat;
+            _messageService.MessageAddedToDb += _chatService.UpdateChatRecord;
+            _wsServer.GroupListRequestReceived += _groupService.HandleGroupListRequest;
+            _groupService.GroupListRequestHandled += Send;
+            _wsServer.ChatListRequestReceived += _chatService.HandleChatListRequest;
+            _chatService.ChatListRequestHandled += Send;
         }
 
         #endregion
@@ -81,7 +96,12 @@
             }
         }
 
-        private void HandleConnectionClosed(object sender, ConnectionClosedEventArgs args)
+        private string GetDbConnectionString(string dbServerName)
+        {
+            return $"Data Source={dbServerName};Initial Catalog=ClientServerApp;Integrated Security=True;MultipleActiveResultSets=True";
+        }
+
+        private void HandleConnectionClosed(object sender, EventArgs args)
         {
             var connection = sender as WsConnection;
             Client client = _clientService.GetClientById(connection?.ClientId);
@@ -97,121 +117,66 @@
             }
 
             _clientService.SetClientDisconnected(client);
-            args.SendBroadcast(new ConnectionStateChangedBroadcast(client, false).GetContainer());
+            _wsServer.SendBroadcast(new ConnectionStateChangedBroadcast(client, false).GetContainer());
         }
 
-        private void HandleConnectionRequestReceived(object sender, ConnectionRequestReceivedEventArgs args)
+        private void SendConnectionResponse(object sender, ConnectionRequestHandledEventArgs args)
         {
-            var client = new Client
+            if (args.ConnectionResponse.Result == ResultCodes.Ok)
             {
-                Name = args.ClientName
-            };
-
-            if (!_storage.ClientContext.ClientExists(client.Name))
-            {
-                client.Id = Guid.NewGuid();
-                _clientService.CreateNewClient(client);
-            }
-            else
-            {
-                client = _clientService.GetClientByName(client.Name);
-            }
-
-            var connectionResponse = new ConnectionResponse();
-
-            if (_clientService.ClientIsConnected(client.Id.ToString()))
-            {
-                connectionResponse.Result = ResultCodes.Failure;
-                connectionResponse.Reason = $"Client named '{client.Name}' is already connected.";
-            }
-            else
-            {
-                connectionResponse.Result = ResultCodes.Ok;
-                connectionResponse.ClientId = client.Id.ToString();
-                connectionResponse.AvailableChats = _chatService.GetAvailableChats(client.Id.ToString());
-                connectionResponse.ConnectedClients = _clientService.ConnectedClients;
-                connectionResponse.KeepAliveInterval = _configSetting.InactivityTimeoutInterval / 2;
-            }
-
-            args.Send(sender, connectionResponse.GetContainer());
-
-            if (connectionResponse.Result == ResultCodes.Failure)
-            {
-                return;
-            }
-
-            if (sender is WsConnection connection)
-            {
-                connection.ClientId = client.Id.ToString();
-            }
-
-            _clientService.SetClientConnected(client);
-            args.SendBroadcast(new ConnectionStateChangedBroadcast(client, true).GetContainer());
-        }
-
-        private void HandleChatHistoryRequestReceived(object sender, ChatHistoryRequestReceivedEventArgs args)
-        {
-            List<Message> chatHistory = _messageService.GetChatHistory(args.ChatId);
-            args.Send(sender, new ChatHistoryResponse(chatHistory).GetContainer());
-        }
-
-        private void HandleMessageRequestReceived(object sender, MessageRequestReceivedEventArgs args)
-        {
-            DateTime timestamp = DateTime.Now;
-            Chat chat = args.Chat;
-
-            if (chat.Id == Guid.Empty)
-            {
-                chat = new Chat
+                if (sender is WsConnection connection)
                 {
-                    Id = Guid.NewGuid(),
-                    Type = ChatTypes.Private,
-                    SourceId = args.SourceId,
-                    TargetId = args.Chat.TargetId,
-                    LastMessageTimestamp = timestamp,
-                    MessageAmount = 0
-                };
-                _chatService.CreateNewChat(chat);
-                chat.TargetName = _clientService.GetClientById(chat.TargetId).Name;
-                args.Send(sender, new ChatCreatedBroadcast(chat).GetContainer());
-                chat.TargetName = _clientService.GetClientById(chat.SourceId).Name;
-                args.SendTo(sender, new ChatCreatedBroadcast(chat).GetContainer(), chat.TargetId);
+                    connection.ClientId = args.Client.Id.ToString();
+                }
+
+                args.ConnectionResponse.KeepAliveInterval = _configSetting.InactivityTimeoutInterval / 2;
+                _wsServer.SendBroadcast(new ConnectionStateChangedBroadcast(args.Client, true).GetContainer());
             }
 
-            var message = new Message
-            {
-                Body = args.Body,
-                ChatId = chat.Id.ToString(),
-                SourceId = args.SourceId,
-                SourceName = _clientService.GetClientById(args.SourceId).Name,
-                Timestamp = timestamp
-            };
-            _messageService.AddNewMessage(message);
-            _chatService.UpdateRecord(chat.Id.ToString(), timestamp);
+            _wsServer.Send(sender, args.ConnectionResponse.GetContainer());
+        }
 
-            switch (chat.Type)
+        private void SendChatHistoryResponse(object sender, ChatHistoryRequestHandledEventArgs args)
+        {
+            _wsServer.Send(sender, args.ChatHistoryResponse);
+        }
+
+        private void Send(object sender, RequestHandledEventArgs args)
+        {
+            _wsServer.Send(sender, args.Response);
+        }
+
+        private void SendBroadcast(object sender, RequestHandledEventArgs args)
+        {
+            switch (args.Chat.Type)
             {
                 case ChatTypes.Common:
-                {
-                    var messageBroadcast = new MessageBroadcast(message);
-                    args.SendBroadcast(messageBroadcast.GetContainer());
+                    _wsServer.SendBroadcast(args.Response);
                     break;
-                }
 
                 case ChatTypes.Private:
-                {
-                    var messageBroadcast = new MessageBroadcast(message);
-                    args.SendTo(sender, messageBroadcast.GetContainer(), chat.TargetId);
-                    args.SendTo(sender, messageBroadcast.GetContainer(), chat.SourceId);
+                    _wsServer.SendTo(sender, args.Response, args.Chat.TargetId);
+                    _wsServer.SendTo(sender, args.Response, args.Chat.SourceId);
                     break;
-                }
+
+                case ChatTypes.Group:
+                    List<string> clientIds = _groupService.GetClientIds(args.Chat.TargetId);
+
+                    if (clientIds != null)
+                    {
+                        foreach (string clientId in clientIds)
+                        {
+                            _wsServer.SendTo(sender, args.Response, clientId);
+                        }
+                    }
+
+                    break;
             }
         }
 
-        private void HandleEventLogsRequestReceived(object sender, EventLogsRequestReceivedEventArgs args)
+        private void SendEventLogsResponse(object sender, EventArgs args)
         {
-            DataTable eventLogs = _storage.EventLogContext.GetEventLogs();
-            args.Send(sender, new EventLogsResponse(eventLogs).GetContainer());
+            _wsServer.Send(sender, new EventLogsResponse(_eventLogService.GetEventLogs()).GetContainer());
         }
 
         #endregion

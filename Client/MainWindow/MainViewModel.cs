@@ -94,7 +94,7 @@
             _client.ConnectionStateChanged += HandleConnectionStateChanged;
             _client.MessageHandler.EventLogsReceived += HandleEventLogsReceived;
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            _client.MessageHandler.ConnectionStateChangedEchoReceived += HandleConnectionStateChangedEchoReceived;
+            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcastReceived;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             Messenger = new Messenger(_client);
             EventsCollection = new ObservableCollection<string>();
@@ -163,7 +163,7 @@
                 });
         }
 
-        private void HandleConnectionStateChangedEchoReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
+        private void HandleConnectionStateChangedBroadcastReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate

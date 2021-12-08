@@ -74,15 +74,21 @@
   <ItemGroup>
     <Compile Include="Chat.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="Group.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Messages\ChatCreatedBroadcast.cs" />
     <Compile Include="Messages\ChatHistoryRequest.cs" />
     <Compile Include="Messages\ChatHistoryResponse.cs" />
+    <Compile Include="Messages\ChatListRequest.cs" />
+    <Compile Include="Messages\ChatListResponse.cs" />
     <Compile Include="Messages\ConnectionRequest.cs" />
     <Compile Include="Messages\ConnectionResponse.cs" />
     <Compile Include="Messages\ConnectionStateChangedBroadcast.cs" />
     <Compile Include="Messages\EventLogsRequest.cs" />
     <Compile Include="Messages\EventLogsResponse.cs" />
+    <Compile Include="Messages\GroupCreationRequest.cs" />
+    <Compile Include="Messages\GroupListRequest.cs" />
+    <Compile Include="Messages\GroupListResponse.cs" />
     <Compile Include="Messages\MessageBroadcast.cs" />
     <Compile Include="Messages\MessageContainer.cs" />
     <Compile Include="Messages\MessageRequest.cs" />
@@ -92,14 +98,22 @@
     <Compile Include="[Enums]\ResultCodes.cs" />
     <Compile Include="[EventArgs]\ChatCreatedBroadcastReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatHistoryReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ChatHistoryRequestHandledEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatHistoryRequestReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ChatListRequestReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ChatListResponseReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\ChatNotExistsEventArgs.cs" />
+    <Compile Include="[EventArgs]\ConnectionRequestHandledEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionStateChangedBroadcastReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionStateChangedEventArgs.cs" />
-    <Compile Include="[EventArgs]\ConnectionClosedEventArgs.cs" />
     <Compile Include="[EventArgs]\EventLogsReceivedEventArgs.cs" />
-    <Compile Include="[EventArgs]\EventLogsRequestReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\GroupCreationRequestReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\GroupListRequesttReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\GroupListResponseReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\MessageAddedToDbEventArgs.cs" />
+    <Compile Include="[EventArgs]\RequestHandledEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\RequestDequeuedEventArgs.cs" />
     <Compile Include="[EventArgs]\RequestReceivedEventArgs.cs" />
@@ -122,6 +136,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
