@@ -121,7 +121,7 @@
             _checkConnectionTimer.Start();
         }
 
-        protected override void OnClose(CloseEventArgs closeEventArgs)
+        protected override void OnClose(CloseEventArgs args)
         {
             _checkConnectionTimer.Stop();
             _server.CloseConnection(ID);

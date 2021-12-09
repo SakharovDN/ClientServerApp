@@ -348,8 +348,7 @@
                     _client.RequestChatHistory(
                         _client.Id == ChatsCollectionSelectedItem.TargetId
                             ? ChatsCollectionSelectedItem.SourceId
-                            : ChatsCollectionSelectedItem.TargetId,
-                        ChatsCollectionSelectedItem.Type);
+                            : ChatsCollectionSelectedItem.TargetId);
                     break;
 
                 case nameof(ConnectedClientsCollectionSelectedItem) when ConnectedClientsCollectionSelectedItem == null:

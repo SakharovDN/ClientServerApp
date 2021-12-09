@@ -94,45 +94,40 @@
 
         public void HandleChatHistoryRequest(object sender, ChatHistoryRequestReceivedEventArgs args)
         {
-            var chatHistory = new List<Message>();
+            string chatId = null;
 
-            switch (args.ChatType)
+            foreach (Chat chat in _storage.Chats)
             {
-                case ChatTypes.Common:
-                    chatHistory.AddRange(_storage.Messages.Where(message => message.ChatId == CommonChat.Id.ToString()));
-                    break;
-
-                case ChatTypes.Private:
-                    foreach (Message message in _storage.Messages)
+                if (args.TargetId == chat.TargetId)
+                {
+                    if (chat.Type == ChatTypes.Common || chat.Type == ChatTypes.Group)
                     {
-                        Chat chat = GetChatById(message.ChatId);
-
-                        if (args.TargetId == chat.TargetId && args.SourceId == chat.SourceId)
-                        {
-                            chatHistory.Add(message);
-                        }
-                        else if (args.TargetId == chat.SourceId && args.SourceId == chat.TargetId)
-                        {
-                            chatHistory.Add(message);
-                        }
+                        chatId = chat.Id.ToString();
+                        break;
                     }
 
-                    break;
-
-                case ChatTypes.Group:
-                    foreach (Message message in _storage.Messages)
+                    if (args.SourceId == chat.SourceId)
                     {
-                        Chat chat = GetChatById(message.ChatId);
-
-                        if (args.TargetId == chat.TargetId)
-                        {
-                            chatHistory.Add(message);
-                        }
+                        chatId = chat.Id.ToString();
+                        break;
                     }
-
-                    break;
+                }
+                else if (args.TargetId == chat.SourceId)
+                {
+                    if (args.SourceId == chat.TargetId)
+                    {
+                        chatId = chat.Id.ToString();
+                        break;
+                    }
+                }
             }
 
+            if (chatId == null)
+            {
+                return;
+            }
+
+            List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chatId).ToList();
             MessageContainer chatHistoryResponse = new ChatHistoryResponse(chatHistory).GetContainer();
             ChatHistoryRequestHandled?.Invoke(sender, new ChatHistoryRequestHandledEventArgs(chatHistoryResponse));
         }
@@ -144,21 +139,7 @@
 
         private IEnumerable<Chat> GetPrivateChats(string clientId)
         {
-            var chats = new List<Chat>();
-
-            foreach (Chat chat in _storage.Chats)
-            {
-                if (chat.SourceId == clientId)
-                {
-                    chats.Add(chat);
-                }
-                else if (chat.TargetId == clientId)
-                {
-                    chats.Add(chat);
-                }
-            }
-
-            return chats;
+            return _storage.Chats.Where(chat => chat.SourceId == clientId || chat.TargetId == clientId).ToList();
         }
 
         private IEnumerable<Chat> GetGroupChats(IEnumerable<Group> clientGroups)
