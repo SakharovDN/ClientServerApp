@@ -9,73 +9,29 @@
     {
         #region Fields
 
-        private bool _addressIsEnabled;
-        private bool _portIsEnabled;
-        private bool _clientNameIsEnabled;
-        private bool _buttonStartIsEnabled;
-        private bool _buttonStopIsEnabled;
-        private bool _buttonGetEventLogsIsEnabled;
+        private bool _messengerControlIsEnabled;
+        private bool _connectionControlIsEnabled;
 
         #endregion
 
         #region Properties
 
-        public bool ButtonGetEventLogsIsEnabled
+        public bool MessengerControlIsEnabled
         {
-            get => _buttonGetEventLogsIsEnabled;
+            get => _messengerControlIsEnabled;
             set
             {
-                _buttonGetEventLogsIsEnabled = value;
+                _messengerControlIsEnabled = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool AddressIsEnabled
+        public bool ConnectionControlIsEnabled
         {
-            get => _addressIsEnabled;
+            get => _connectionControlIsEnabled;
             set
             {
-                _addressIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool PortIsEnabled
-        {
-            get => _portIsEnabled;
-            set
-            {
-                _portIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ClientNameIsEnabled
-        {
-            get => _clientNameIsEnabled;
-            set
-            {
-                _clientNameIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ButtonStartIsEnabled
-        {
-            get => _buttonStartIsEnabled;
-            set
-            {
-                _buttonStartIsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool ButtonStopIsEnabled
-        {
-            get => _buttonStopIsEnabled;
-            set
-            {
-                _buttonStopIsEnabled = value;
+                _connectionControlIsEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -101,22 +57,14 @@
 
         public void SetDefaultControlsState()
         {
-            AddressIsEnabled = true;
-            PortIsEnabled = true;
-            ClientNameIsEnabled = true;
-            ButtonStartIsEnabled = true;
-            ButtonStopIsEnabled = false;
-            ButtonGetEventLogsIsEnabled = false;
+            MessengerControlIsEnabled = false;
+            ConnectionControlIsEnabled = true;
         }
 
         public void SetAfterStartControlsState()
         {
-            AddressIsEnabled = false;
-            PortIsEnabled = false;
-            ClientNameIsEnabled = false;
-            ButtonStartIsEnabled = false;
-            ButtonStopIsEnabled = true;
-            ButtonGetEventLogsIsEnabled = true;
+            MessengerControlIsEnabled = true;
+            ConnectionControlIsEnabled = false;
         }
 
         [NotifyPropertyChangedInvocator]
