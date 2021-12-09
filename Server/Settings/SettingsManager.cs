@@ -36,14 +36,16 @@
         {
             if (File.Exists(CONFIG_FILE_PATH))
             {
-                var configSettings = JsonConvert.DeserializeObject<ConfigSettings>(File.ReadAllText(CONFIG_FILE_PATH));
-
-                if (SettingIsValid(configSettings))
+                try
                 {
-                    return configSettings;
+                    var configSettings = JsonConvert.DeserializeObject<ConfigSettings>(File.ReadAllText(CONFIG_FILE_PATH));
+                    CheckSettingsValidity(configSettings);
                 }
-
-                Environment.Exit(1);
+                catch (Exception ex)
+                {
+                    _logger.Error(() => $"{ex}");
+                    Environment.Exit(1);
+                }
             }
 
             var settings = new ConfigSettings();
@@ -51,22 +53,17 @@
             return settings;
         }
 
-        private bool SettingIsValid(ConfigSettings configSettings)
+        private void CheckSettingsValidity(ConfigSettings configSettings)
         {
-            bool isValid = true;
-
             if (configSettings.NetworkInterface != "WebSocket" && configSettings.NetworkInterface != "TcpSocket")
             {
-                _logger.Error("Configuration settings are invalid. The network interface can be either \"WebSocket\" or \"TcpSocket\"");
-                isValid = false;
-            }
-            else if (configSettings.InactivityTimeoutInterval <= 0)
-            {
-                _logger.Error("Configuration settings are invalid. Inactivity timeout interval must be greater than 0.");
-                isValid = false;
+                throw new Exception("Configuration settings are invalid. The network interface can be either \"WebSocket\" or \"TcpSocket\"");
             }
 
-            return isValid;
+            if (configSettings.InactivityTimeoutInterval <= 59999)
+            {
+                throw new Exception("Configuration settings are invalid. Inactivity timeout interval must be at least 60000 milliseconds.");
+            }
         }
 
         #endregion

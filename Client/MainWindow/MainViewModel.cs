@@ -124,7 +124,10 @@
             try
             {
                 EventsCollection.Clear();
-                _client.Connect(Address, Port);
+                _client.IpAddress = Address;
+                _client.Port = Port;
+                _client.Name = ClientName;
+                _client.Connect();
                 _client.LogIn(ClientName);
             }
             catch (Exception ex)

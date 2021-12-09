@@ -28,14 +28,14 @@
                 <MenuItem Header="Dark" IsCheckable="True" />
             </MenuItem>
             <MenuItem Header="Create new group" Command="{Binding Messenger.CreateNewGroupCommand}"
-                      IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}" />
+                      IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
             <MenuItem Header="Event Log" Command="{Binding GetEventLogsCommand}"
-                      IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}" />
+                      IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
         </Menu>
         <Border Grid.Row="1" Grid.RowSpan="6" Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,1,0" />
         <DockPanel Grid.Row="1" Grid.Column="0">
             <TextBox Name="AddressTextBox" Style="{StaticResource AddressTextBox}" Text="{Binding Address}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.AddressIsEnabled}" />
+                     IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="4" Grid.Column="1">
             <Label Content="{Binding Messenger.ChatsCollectionSelectedItem.TargetName}" DockPanel.Dock="Top"
@@ -105,24 +105,32 @@
         </Grid>
         <DockPanel Grid.Row="2" Grid.Column="0">
             <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.PortIsEnabled}" />
+                     IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="3" Grid.Column="0">
             <Border BorderBrush="LightGray" BorderThickness="1">
                 <ScrollViewer Name="EventsCollectionScrollViewer" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding EventsCollection}" Margin="5" />
+                    <ItemsControl ItemsSource="{Binding EventsCollection}" Margin="5">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ScrollViewer>
             </Border>
         </DockPanel>
         <DockPanel Grid.Row="4" Grid.Column="0" Dock="Top">
             <Label Height="30" Content="Log in:" DockPanel.Dock="Top" VerticalContentAlignment="Bottom" />
             <TextBox Style="{StaticResource LoginTextBox}" Text="{Binding ClientName}"
-                     IsEnabled="{Binding ControlsEnabledViewModel.ClientNameIsEnabled}" />
+                     IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="5" Grid.Column="0">
             <Button Content="Start"
                     Command="{Binding StartCommand}"
-                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonStartIsEnabled}" />
+                    IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="5" Grid.RowSpan="2" Grid.Column="1">
             <TextBox Style="{StaticResource MessageTextBox}"
@@ -138,7 +146,7 @@
         </DockPanel>
         <DockPanel Grid.Row="6" Grid.Column="0">
             <Button Content="Stop" Command="{Binding StopCommand}"
-                    IsEnabled="{Binding ControlsEnabledViewModel.ButtonStopIsEnabled}" />
+                    IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
         </DockPanel>
     </Grid>
 </Window>

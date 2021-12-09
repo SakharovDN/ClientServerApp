@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Net;
     using System.Text.RegularExpressions;
 
     using Common;
@@ -31,6 +32,8 @@
         private readonly JsonSerializerSettings _settings;
         private WebSocket _socket;
         private string _name;
+        private string _ipAddress;
+        private string _port;
 
         #endregion
 
@@ -43,16 +46,44 @@
             {
                 if (value.IsNullOrEmpty())
                 {
-                    throw new Exception("Enter your name to log in");
+                    throw new Exception("Enter your name to log in.");
                 }
 
                 if (value.Length > 10)
                 {
-                    throw new Exception("The name can contain a maximum of 10 characters");
+                    throw new Exception("The name can contain a maximum of 10 characters.");
                 }
 
                 var regex = new Regex(PATTERN, RegexOptions.None);
                 _name = regex.Replace(value, REPLACEMENT).Trim();
+            }
+        }
+
+        public string IpAddress
+        {
+            get => _ipAddress;
+            set
+            {
+                if (!IPAddress.TryParse(value, out _))
+                {
+                    throw new Exception("The IP address was entered incorrectly.");
+                }
+
+                _ipAddress = value;
+            }
+        }
+
+        public string Port
+        {
+            get => _port;
+            set
+            {
+                if (!int.TryParse(value, out int portNumber) || portNumber < 49152 || portNumber > 65535)
+                {
+                    throw new Exception("Port entered incorrectly.");
+                }
+
+                _port = value;
             }
         }
 
@@ -90,14 +121,14 @@
 
         #region Methods
 
-        public void Connect(string address, string port)
+        public void Connect()
         {
             if (IsConnected)
             {
                 Disconnect();
             }
 
-            _socket = new WebSocket($"ws://{address}:{port}/Connection");
+            _socket = new WebSocket($"ws://{IpAddress}:{Port}/Connection");
             _socket.OnOpen += OnOpen;
             _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
@@ -128,7 +159,6 @@
 
         public void LogIn(string clientName)
         {
-            Name = clientName;
             Send(new ConnectionRequest(Name).GetContainer());
         }
 
