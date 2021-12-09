@@ -23,7 +23,8 @@
 
         public override void Accept(InternalStorage storage)
         {
-            storage.ChatContext.AddNewChatToDt(_chat);
+            storage.Chats.Add(_chat);
+            storage.SaveChanges();
         }
 
         #endregion

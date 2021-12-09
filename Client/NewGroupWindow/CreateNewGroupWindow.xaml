@@ -1,0 +1,40 @@
+﻿<Window x:Class="Client.NewGroupWindow.CreateNewGroupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.NewGroupWindow"
+        xmlns:multiSelector="clr-namespace:Client.MultiSelector"
+        d:DataContext="{d:DesignInstance Type=local:NewGroupViewModel}"
+        mc:Ignorable="d"
+        Title="CreateNewGroupWindow" Height="450" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <ListBox Name="ConnectedClientsList"
+                     Style="{StaticResource ClientsCollection}"
+                     ItemsSource="{Binding ConnectedClients}"
+                     SelectionMode="Multiple"
+                     multiSelector:MultiSelectorBehavior.SynchronizedSelectedItems="{Binding SelectedClients}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Height="30">
+                            <TextBlock Text="{Binding Path=Name}" FontSize="15" FontFamily="Arial"
+                                       VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <DockPanel Grid.Row="1">
+            <TextBox Text="{Binding GroupTitle}" />
+        </DockPanel>
+        <DockPanel Grid.Row="2">
+            <Button Content="Create group" Command="{Binding CreateNewGroupCommand}" IsDefault="True" />
+        </DockPanel>
+    </Grid>
+</Window>

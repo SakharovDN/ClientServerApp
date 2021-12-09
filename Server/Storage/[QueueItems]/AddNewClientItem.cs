@@ -23,7 +23,8 @@
 
         public override void Accept(InternalStorage storage)
         {
-            storage.ClientContext.AddNewClientToDt(_client);
+            storage.Clients.Add(_client);
+            storage.SaveChanges();
         }
 
         #endregion

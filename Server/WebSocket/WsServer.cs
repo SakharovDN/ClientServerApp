@@ -33,13 +33,19 @@
 
         public event EventHandler<ConnectionRequestReceivedEventArgs> ConnectionRequestReceived;
 
-        public event EventHandler<ConnectionClosedEventArgs> ConnectionClosed;
+        public event EventHandler ConnectionClosed;
 
         public event EventHandler<MessageRequestReceivedEventArgs> MessageRequestReceived;
 
-        public event EventHandler<EventLogsRequestReceivedEventArgs> EventLogsRequestReceived;
+        public event EventHandler EventLogsRequestReceived;
 
         public event EventHandler<ChatHistoryRequestReceivedEventArgs> ChatHistoryRequestReceived;
+
+        public event EventHandler<GroupCreationRequestReceivedEventArgs> GroupCreationRequestReceived;
+
+        public event EventHandler<GroupListRequestReceivedEventArgs> GroupListRequestReceived;
+
+        public event EventHandler<ChatListRequestReceivedEventArgs> ChatListRequestReceived;
 
         #endregion
 
@@ -86,16 +92,39 @@
             _connections.Clear();
         }
 
+        public void Send(object sender, MessageContainer container)
+        {
+            var connection = sender as WsConnection;
+            connection?.Send(container);
+        }
+
+        public void SendTo(object sender, MessageContainer container, string targetId)
+        {
+            var connection = sender as WsConnection;
+            string targetConnectionId =
+                (from connectionItem in _connections.Values where connectionItem.ClientId == targetId select connectionItem.ID).FirstOrDefault();
+
+            if (targetConnectionId != null)
+            {
+                connection?.SendTo(container, targetConnectionId);
+            }
+        }
+
+        public void SendBroadcast(MessageContainer container)
+        {
+            _connections.Values.FirstOrDefault(connection => connection.IsConnected)?.Broadcast(container);
+        }
+
         internal void AddConnection(WsConnection connection)
         {
             _connections.TryAdd(connection.ID, connection);
         }
 
-        internal void FreeConnection(string connectionId)
+        internal void CloseConnection(string connectionId)
         {
             if (_connections.TryRemove(connectionId, out WsConnection connection))
             {
-                ConnectionClosed?.Invoke(connection, new ConnectionClosedEventArgs(SendBroadcast));
+                ConnectionClosed?.Invoke(connection, EventArgs.Empty);
             }
         }
 
@@ -121,9 +150,7 @@
                         return;
                     }
 
-                    ConnectionRequestReceived?.Invoke(
-                        senderConnection,
-                        new ConnectionRequestReceivedEventArgs(connectionRequest.ClientName, Send, SendBroadcast));
+                    ConnectionRequestReceived?.Invoke(senderConnection, new ConnectionRequestReceivedEventArgs(connectionRequest.ClientName));
                     break;
 
                 case MessageTypes.MessageRequest:
@@ -137,14 +164,12 @@
                         new MessageRequestReceivedEventArgs(
                             messageRequest.Body,
                             messageRequest.SourceId,
-                            messageRequest.Chat,
-                            Send,
-                            SendTo,
-                            SendBroadcast));
+                            messageRequest.TargetId,
+                            messageRequest.ChatType));
                     break;
 
                 case MessageTypes.EventLogsRequest:
-                    EventLogsRequestReceived?.Invoke(senderConnection, new EventLogsRequestReceivedEventArgs(Send));
+                    EventLogsRequestReceived?.Invoke(senderConnection, EventArgs.Empty);
                     break;
 
                 case MessageTypes.ChatHistoryRequest:
@@ -153,28 +178,48 @@
                         return;
                     }
 
-                    ChatHistoryRequestReceived?.Invoke(senderConnection, new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.ChatId, Send));
+                    ChatHistoryRequestReceived?.Invoke(
+                        senderConnection,
+                        new ChatHistoryRequestReceivedEventArgs(
+                            chatHistoryRequest.TargetId,
+                            chatHistoryRequest.SourceId,
+                            chatHistoryRequest.ChatType));
+                    break;
+
+                case MessageTypes.GroupCreationRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(GroupCreationRequest)) is GroupCreationRequest groupCreationRequest))
+                    {
+                        return;
+                    }
+
+                    GroupCreationRequestReceived?.Invoke(
+                        senderConnection,
+                        new GroupCreationRequestReceivedEventArgs(
+                            groupCreationRequest.GroupTitle,
+                            groupCreationRequest.ClientIds,
+                            groupCreationRequest.CreatorId));
+                    break;
+
+                case MessageTypes.GroupListRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(GroupListRequest)) is GroupListRequest groupListRequest))
+                    {
+                        return;
+                    }
+
+                    GroupListRequestReceived?.Invoke(senderConnection, new GroupListRequestReceivedEventArgs(groupListRequest.ClientId));
+                    break;
+
+                case MessageTypes.ChatListRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(ChatListRequest)) is ChatListRequest chatListRequest))
+                    {
+                        return;
+                    }
+
+                    ChatListRequestReceived?.Invoke(
+                        senderConnection,
+                        new ChatListRequestReceivedEventArgs(chatListRequest.ClientId, chatListRequest.ClientGroups));
                     break;
             }
-        }
-
-        private void Send(object sender, MessageContainer container)
-        {
-            var connection = sender as WsConnection;
-            connection?.Send(container);
-        }
-
-        private void SendTo(object sender, MessageContainer container, string targetId)
-        {
-            var connection = sender as WsConnection;
-            string targetConnectionId =
-                (from connectionItem in _connections.Values where connectionItem.ClientId == targetId select connectionItem.ID).FirstOrDefault();
-            connection?.SendTo(container, targetConnectionId);
-        }
-
-        private void SendBroadcast(MessageContainer container)
-        {
-            _connections.Values.FirstOrDefault(connection => connection.IsConnected)?.Broadcast(container);
         }
 
         #endregion

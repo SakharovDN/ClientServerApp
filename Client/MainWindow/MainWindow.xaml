@@ -27,6 +27,8 @@
                 <MenuItem Header="Light" IsCheckable="True" />
                 <MenuItem Header="Dark" IsCheckable="True" />
             </MenuItem>
+            <MenuItem Header="Create new group" Command="{Binding Messenger.CreateNewGroupCommand}"
+                      IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}" />
             <MenuItem Header="Event Log" Command="{Binding GetEventLogsCommand}"
                       IsEnabled="{Binding ControlsEnabledViewModel.ButtonGetEventLogsIsEnabled}" />
         </Menu>

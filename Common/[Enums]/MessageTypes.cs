@@ -8,9 +8,14 @@
         MessageBroadcast,
         EventLogsRequest,
         EventLogsResponse,
-        ConnectionStateChangedEcho,
+        ConnectionStateChangedBroadcast,
         ChatHistoryRequest,
         ChatHistoryResponse,
-        ChatCreatedEcho
+        ChatCreatedBroadcast,
+        GroupCreationRequest,
+        GroupListRequest,
+        GroupListResponse,
+        ChatListRequest,
+        ChatListResponse,
     }
 }

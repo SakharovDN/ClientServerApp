@@ -18,11 +18,15 @@
 
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public event EventHandler<ConnectionStateChangedBroadcastReceivedEventArgs> ConnectionStateChangedEchoReceived;
+        public event EventHandler<ConnectionStateChangedBroadcastReceivedEventArgs> ConnectionStateChangedBroadcastReceived;
 
         public event EventHandler<ChatHistoryReceivedEventArgs> ChatHistoryReceived;
 
-        public event EventHandler<ChatCreatedBroadcastReceivedEventArgs> ChatCreatedEchoReceived;
+        public event EventHandler<ChatCreatedBroadcastReceivedEventArgs> ChatCreatedBroadcastReceived;
+
+        public event EventHandler<GroupListResponseReceivedEventArgs> GroupListResponseReceived;
+
+        public event EventHandler<ChatListResponseReceivedEventArgs> ChatListResponseReceived;
 
         #endregion
 
@@ -51,28 +55,54 @@
                     HandleEventLogsResponse(container);
                     break;
 
-                case MessageTypes.ConnectionStateChangedEcho:
-                    HandleConnectionStateChangedEcho(container);
+                case MessageTypes.ConnectionStateChangedBroadcast:
+                    HandleConnectionStateChangedBroadcast(container);
                     break;
 
                 case MessageTypes.ChatHistoryResponse:
                     HandleChatHistoryResponse(container);
                     break;
 
-                case MessageTypes.ChatCreatedEcho:
-                    HandleChatCreatedEcho(container);
+                case MessageTypes.ChatCreatedBroadcast:
+                    HandleChatCreatedBroadcast(container);
+                    break;
+
+                case MessageTypes.GroupListResponse:
+                    HandleGroupListResponse(container);
+                    break;
+
+                case MessageTypes.ChatListResponse:
+                    HandleChatListResponse(container);
                     break;
             }
         }
 
-        private void HandleConnectionStateChangedEcho(MessageContainer container)
+        private void HandleChatListResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(ChatListResponse)) is ChatListResponse chatListResponse)
+            {
+                ChatListResponseReceived?.Invoke(null, new ChatListResponseReceivedEventArgs(chatListResponse.Chats));
+            }
+        }
+
+        private void HandleGroupListResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(GroupListResponse)) is GroupListResponse groupListResponse)
+            {
+                GroupListResponseReceived?.Invoke(null, new GroupListResponseReceivedEventArgs(groupListResponse.Groups));
+            }
+        }
+
+        private void HandleConnectionStateChangedBroadcast(MessageContainer container)
         {
             if (((JObject)container.Payload).ToObject(typeof(ConnectionStateChangedBroadcast)) is ConnectionStateChangedBroadcast
-                connectionStateChangedEcho)
+                connectionStateChangedBroadcast)
             {
-                ConnectionStateChangedEchoReceived?.Invoke(
+                ConnectionStateChangedBroadcastReceived?.Invoke(
                     null,
-                    new ConnectionStateChangedBroadcastReceivedEventArgs(connectionStateChangedEcho.Client, connectionStateChangedEcho.IsConnected));
+                    new ConnectionStateChangedBroadcastReceivedEventArgs(
+                        connectionStateChangedBroadcast.Client,
+                        connectionStateChangedBroadcast.IsConnected));
             }
         }
 
@@ -101,7 +131,6 @@
                     new ConnectionResponseReceivedEventArgs(
                         connectionResponse.Result,
                         connectionResponse.Reason,
-                        connectionResponse.AvailableChats,
                         connectionResponse.ConnectedClients,
                         connectionResponse.ClientId,
                         connectionResponse.KeepAliveInterval));
@@ -116,11 +145,11 @@
             }
         }
 
-        private void HandleChatCreatedEcho(MessageContainer container)
+        private void HandleChatCreatedBroadcast(MessageContainer container)
         {
-            if (((JObject)container.Payload).ToObject(typeof(ChatCreatedBroadcast)) is ChatCreatedBroadcast chatCreatedEcho)
+            if (((JObject)container.Payload).ToObject(typeof(ChatCreatedBroadcast)) is ChatCreatedBroadcast chatCreatedBroadcast)
             {
-                ChatCreatedEchoReceived?.Invoke(null, new ChatCreatedBroadcastReceivedEventArgs(chatCreatedEcho.Chat));
+                ChatCreatedBroadcastReceived?.Invoke(null, new ChatCreatedBroadcastReceivedEventArgs(chatCreatedBroadcast.Chat));
             }
         }
 

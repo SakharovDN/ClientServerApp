@@ -10,8 +10,6 @@
 
         public string Reason { get; set; }
 
-        public List<Chat> AvailableChats { get; set; }
-
         public List<Client> ConnectedClients { get; set; }
 
         public string ClientId { get; set; }

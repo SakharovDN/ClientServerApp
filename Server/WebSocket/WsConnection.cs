@@ -124,7 +124,7 @@
         protected override void OnClose(CloseEventArgs closeEventArgs)
         {
             _checkConnectionTimer.Stop();
-            _server.FreeConnection(ID);
+            _server.CloseConnection(ID);
         }
 
         private void SendCompleted(bool completed)
@@ -134,7 +134,7 @@
                 return;
             }
 
-            _server.FreeConnection(ID);
+            _server.CloseConnection(ID);
             Close();
         }
 

@@ -4,5 +4,6 @@
     {
         Common,
         Private,
+        Group,
     }
 }

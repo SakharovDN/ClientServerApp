@@ -23,7 +23,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ChatCreatedEcho,
+                Type = MessageTypes.ChatCreatedBroadcast,
                 Payload = this
             };
         }

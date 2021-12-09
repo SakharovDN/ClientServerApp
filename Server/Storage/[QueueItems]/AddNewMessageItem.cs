@@ -23,7 +23,7 @@
 
         public override void Accept(InternalStorage storage)
         {
-            storage.MessageContext.AddMessageToDt(_message);
+            storage.Messages.Add(_message);
         }
 
         #endregion
