@@ -12,18 +12,15 @@
 
         public string TargetId { get; }
 
-        public ChatTypes ChatType { get; }
-
         #endregion
 
         #region Constructors
 
-        public MessageRequestReceivedEventArgs(string body, string sourceId, string targetId, ChatTypes chatType)
+        public MessageRequestReceivedEventArgs(string body, string sourceId, string targetId)
         {
             Body = body;
             SourceId = sourceId;
             TargetId = targetId;
-            ChatType = chatType;
         }
 
         #endregion

@@ -167,9 +167,9 @@
             Send(new EventLogsRequest().GetContainer());
         }
 
-        public void RequestChatHistory(string targetId, ChatTypes chatType)
+        public void RequestChatHistory(string targetId)
         {
-            Send(new ChatHistoryRequest(targetId, Id, chatType).GetContainer());
+            Send(new ChatHistoryRequest(targetId, Id).GetContainer());
         }
 
         public void SendMessage(string targetId, string body, ChatTypes chatType)

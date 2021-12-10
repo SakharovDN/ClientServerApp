@@ -8,17 +8,14 @@
 
         public string SourceId { get; set; }
 
-        public ChatTypes ChatType { get; set; }
-
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequest(string targetId, string sourceId, ChatTypes chatType)
+        public ChatHistoryRequest(string targetId, string sourceId)
         {
             TargetId = targetId;
             SourceId = sourceId;
-            ChatType = chatType;
         }
 
         #endregion

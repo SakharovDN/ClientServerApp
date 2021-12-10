@@ -38,7 +38,7 @@
         public NetworkManager()
         {
             _settingsManager = new SettingsManager();
-            _configSetting = _settingsManager.ReadConfigFile();
+            _configSetting = _settingsManager.GetConfigSettings();
             _wsServer = new WsServer(_configSetting);
             _storage = new InternalStorage(GetDbConnectionString(_configSetting.DbServerName));
             _chatService = new ChatService(_storage);

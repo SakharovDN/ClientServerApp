@@ -18,6 +18,7 @@
         #region Fields
 
         private readonly Logger _logger;
+        private readonly ConfigSettings _configSettings;
 
         #endregion
 
@@ -26,13 +27,19 @@
         public SettingsManager()
         {
             _logger = LogManager.GetCurrentClassLogger();
+            _configSettings = ReadConfigFile();
         }
 
         #endregion
 
         #region Methods
 
-        public ConfigSettings ReadConfigFile()
+        public ConfigSettings GetConfigSettings()
+        {
+            return _configSettings;
+        }
+
+        private ConfigSettings ReadConfigFile()
         {
             if (File.Exists(CONFIG_FILE_PATH))
             {

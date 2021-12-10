@@ -10,17 +10,14 @@
 
         public string SourceId { get; }
 
-        public ChatTypes ChatType { get; }
-
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequestReceivedEventArgs(string targetId, string sourceId, ChatTypes chatType)
+        public ChatHistoryRequestReceivedEventArgs(string targetId, string sourceId)
         {
             TargetId = targetId;
             SourceId = sourceId;
-            ChatType = chatType;
         }
 
         #endregion

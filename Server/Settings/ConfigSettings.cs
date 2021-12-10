@@ -26,7 +26,7 @@
         {
             NetworkInterface = "WebSocket";
             Port = 65000;
-            InactivityTimeoutInterval = 10000;
+            InactivityTimeoutInterval = 60000;
             DbServerName = @"localhost\SQLExpress";
         }
 
