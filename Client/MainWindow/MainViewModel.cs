@@ -3,7 +3,6 @@
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Windows.Input;
 
@@ -11,7 +10,7 @@
 
     using EventLog;
 
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : ViewModelBase
     {
         #region Fields
 
@@ -28,7 +27,7 @@
 
         #region Properties
 
-        public Messenger Messenger { get; set; }
+        public Messenger.Messenger Messenger { get; set; }
 
         public ControlsEnabledViewModel ControlsEnabledViewModel { get; set; }
 
@@ -80,12 +79,6 @@
 
         #endregion
 
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
         #region Constructors
 
         public MainViewModel()
@@ -96,7 +89,7 @@
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
             _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcastReceived;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
-            Messenger = new Messenger(_client);
+            Messenger = new Messenger.Messenger(_client);
             EventsCollection = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
@@ -114,11 +107,6 @@
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private void PerformStartButton(object commandParameter)
         {
             try
@@ -128,7 +116,7 @@
                 _client.Port = Port;
                 _client.Name = ClientName;
                 _client.Connect();
-                _client.LogIn(ClientName);
+                _client.LogIn();
             }
             catch (Exception ex)
             {

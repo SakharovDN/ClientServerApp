@@ -83,7 +83,7 @@
                 ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(targetChat));
             }
 
-            var message = new Message
+            var message = new StorageMessage
             {
                 Body = args.Body,
                 ChatId = targetChat.Id.ToString(),

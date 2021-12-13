@@ -3,11 +3,8 @@
     using System;
     using System.ComponentModel;
     using System.Data;
-    using System.Runtime.CompilerServices;
 
-    using Annotations;
-
-    public class EventLogViewModel : INotifyPropertyChanged
+    public class EventLogViewModel : ViewModelBase
     {
         #region Fields
 
@@ -60,12 +57,6 @@
 
         #endregion
 
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
         #region Constructors
 
         public EventLogViewModel(DataTable eventLogs)
@@ -80,12 +71,6 @@
         #endregion
 
         #region Methods
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         private void HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
         {

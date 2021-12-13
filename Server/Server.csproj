@@ -77,6 +77,7 @@
     <Compile Include="Services\Clients\IClientService.cs" />
     <Compile Include="Services\Groups\IGroupService.cs" />
     <Compile Include="Services\Messages\IMessageService.cs" />
+    <Compile Include="Storage\StorageMessage.cs" />
     <Compile Include="Settings\ConfigSettings.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Program.cs" />
@@ -84,7 +85,7 @@
     <Compile Include="Services\Messages\MessageService.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Storage\[QueueItems]\AddNewClientItem.cs" />
-    <Compile Include="Services\EventLogs\EventLog.cs" />
+    <Compile Include="Storage\EventLog.cs" />
     <Compile Include="Storage\[QueueItems]\AddEventLogItem.cs" />
     <Compile Include="Storage\InternalStorage.cs" />
     <Compile Include="Storage\[QueueItems]\AddNewMessageItem.cs" />

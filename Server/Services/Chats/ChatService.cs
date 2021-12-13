@@ -127,7 +127,7 @@
                 return;
             }
 
-            List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chatId).ToList();
+            List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chatId).ToList().Cast<Message>().ToList();
             MessageContainer chatHistoryResponse = new ChatHistoryResponse(chatHistory).GetContainer();
             ChatHistoryRequestHandled?.Invoke(sender, new ChatHistoryRequestHandledEventArgs(chatHistoryResponse));
         }
