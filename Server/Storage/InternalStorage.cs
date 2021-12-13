@@ -25,7 +25,7 @@
 
         public DbSet<Group> Groups { get; set; }
 
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<StorageMessage> Messages { get; set; }
 
         public DbSet<Chat> Chats { get; set; }
 

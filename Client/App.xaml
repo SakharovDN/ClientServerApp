@@ -5,6 +5,7 @@
     <Application.Resources>
         <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
+            <Setter Property="BorderBrush" Value="LightGray"></Setter>
             <Style.Triggers>
                 <Trigger Property="IsKeyboardFocused" Value="True">
                     <Setter Property="Background" Value="White" />
@@ -14,9 +15,6 @@
         <Style x:Key="AddressTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Address..." Foreground="Gray" FontSize="25" />
@@ -35,9 +33,6 @@
         <Style x:Key="PortTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Port..." Foreground="Gray" FontSize="25" />
@@ -56,9 +51,6 @@
         <Style x:Key="LoginTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Login..." Foreground="Gray" FontSize="25" />
@@ -77,9 +69,6 @@
         <Style x:Key="MessageTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
                xmlns:sys="clr-namespace:System;assembly=mscorlib">
             <Style.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Type a message..." Foreground="Gray" FontSize="15" />

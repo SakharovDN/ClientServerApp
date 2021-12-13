@@ -2,15 +2,11 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
     using System.Windows.Input;
-
-    using Annotations;
 
     using Common;
 
-    public class NewGroupViewModel : INotifyPropertyChanged
+    public class NewGroupViewModel : ViewModelBase
     {
         #region Fields
 
@@ -77,8 +73,6 @@
 
         public event EventHandler GroupCreated;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         #endregion
 
         #region Constructors
@@ -92,12 +86,6 @@
         #endregion
 
         #region Methods
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         private void CreateNewGroup(object obj)
         {

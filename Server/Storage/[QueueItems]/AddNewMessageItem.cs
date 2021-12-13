@@ -1,18 +1,16 @@
 ﻿namespace Server.Storage
 {
-    using Common;
-
     public class AddNewMessageItem : QueueItem
     {
         #region Fields
 
-        private readonly Message _message;
+        private readonly StorageMessage _message;
 
         #endregion
 
         #region Constructors
 
-        public AddNewMessageItem(Message message)
+        public AddNewMessageItem(StorageMessage message)
         {
             _message = message;
         }

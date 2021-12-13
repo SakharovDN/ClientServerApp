@@ -157,7 +157,7 @@
             _socket = null;
         }
 
-        public void LogIn(string clientName)
+        public void LogIn()
         {
             Send(new ConnectionRequest(Name).GetContainer());
         }
@@ -172,9 +172,9 @@
             Send(new ChatHistoryRequest(targetId, Id).GetContainer());
         }
 
-        public void SendMessage(string targetId, string body, ChatTypes chatType)
+        public void SendMessage(string targetId, string body)
         {
-            Send(new MessageRequest(body, Id, targetId, chatType).GetContainer());
+            Send(new MessageRequest(body, Id, targetId).GetContainer());
         }
 
         public void RequestGroupCreation(string groupTitle, ObservableCollection<Client> selectedClients)

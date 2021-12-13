@@ -1,21 +1,18 @@
-﻿namespace Client
+﻿namespace Client.Messenger
 {
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Data;
     using System.Windows.Input;
 
-    using Annotations;
-
     using Common;
 
     using NewGroupWindow;
 
-    public class Messenger : INotifyPropertyChanged
+    public class Messenger : ViewModelBase
     {
         #region Constants
 
@@ -29,7 +26,7 @@
         private readonly Regex _messageRegex;
         private readonly WsClient _client;
         private string _message;
-        private ObservableCollection<Message> _messagesCollection;
+        private ObservableCollection<ClientMessage> _messagesCollection;
         private ObservableCollection<Client> _connectedClientsCollection;
         private Client _connectedClientsCollectionSelectedItem;
         private ObservableCollection<Chat> _chatsCollection;
@@ -66,7 +63,7 @@
             }
         }
 
-        public ObservableCollection<Message> MessagesCollection
+        public ObservableCollection<ClientMessage> MessagesCollection
         {
             get => _messagesCollection;
             set
@@ -118,12 +115,6 @@
 
         #endregion
 
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
         #region Constructors
 
         public Messenger(WsClient client)
@@ -136,7 +127,7 @@
             _client.MessageHandler.ChatHistoryReceived += HandleChatHistoryReceived;
             _client.MessageHandler.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcastReceived;
             ConnectedClientsCollection = new ObservableCollection<Client>();
-            MessagesCollection = new ObservableCollection<Message>();
+            MessagesCollection = new ObservableCollection<ClientMessage>();
             ChatsCollection = new ObservableCollection<Chat>();
             MessageVisibility = Visibility.Hidden;
             _messageRegex = new Regex(PATTERN, RegexOptions.None);
@@ -155,12 +146,6 @@
             MessageVisibility = Visibility.Hidden;
         }
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private void PerformSendButton(object commandParameter)
         {
             if (string.IsNullOrEmpty(Message))
@@ -174,12 +159,11 @@
             {
                 _client.SendMessage(
                     ChatsCollectionSelectedItem.TargetId == _client.Id ? ChatsCollectionSelectedItem.SourceId : ChatsCollectionSelectedItem.TargetId,
-                    Message,
-                    ChatsCollectionSelectedItem.Type);
+                    Message);
             }
             else if (ConnectedClientsCollectionSelectedItem != null)
             {
-                _client.SendMessage(ConnectedClientsCollectionSelectedItem.Id.ToString(), Message, ChatTypes.Private);
+                _client.SendMessage(ConnectedClientsCollectionSelectedItem.Id.ToString(), Message);
             }
 
             Message = string.Empty;
@@ -219,12 +203,9 @@
                 {
                     foreach (Chat chat in args.Chats)
                     {
-                        if (chat.Type == ChatTypes.Private)
+                        if (chat.TargetId == _client.Id)
                         {
-                            if (chat.TargetId == _client.Id)
-                            {
-                                chat.TargetName = chat.SourceName;
-                            }
+                            chat.TargetName = chat.SourceName;
                         }
 
                         ChatsCollection.Add(chat);
@@ -241,7 +222,7 @@
                 {
                     foreach (Chat chat in ChatsCollection)
                     {
-                        if (chat.Id.ToString() != args.Message.ChatId)
+                        if (chat.Id.ToString() != args.Message.ChatId) //?????id?
                         {
                             continue;
                         }
@@ -259,7 +240,7 @@
 
                     if (args.Message.ChatId == ChatsCollectionSelectedItem.Id.ToString())
                     {
-                        MessagesCollection.Add(args.Message);
+                        MessagesCollection.Add(new ClientMessage(args.Message, _client.Name));
                     }
                 });
         }
@@ -299,7 +280,7 @@
 
                     foreach (Message message in args.ChatHistory)
                     {
-                        MessagesCollection.Add(message);
+                        MessagesCollection.Add(new ClientMessage(message, _client.Name));
                     }
                 });
         }
@@ -309,12 +290,9 @@
             Application.Current.Dispatcher.Invoke(
                 delegate
                 {
-                    if (args.Chat.Type == ChatTypes.Private)
+                    if (args.Chat.TargetId == _client.Id)
                     {
-                        if (args.Chat.TargetId == _client.Id)
-                        {
-                            args.Chat.TargetName = args.Chat.SourceName;
-                        }
+                        args.Chat.TargetName = args.Chat.SourceName;
                     }
 
                     ChatsCollection.Add(args.Chat);
