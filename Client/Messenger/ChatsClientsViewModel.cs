@@ -9,6 +9,8 @@
 
     using Common;
 
+    using ConnectedClients;
+
     using NewGroupWindow;
 
     public partial class Messenger
@@ -16,10 +18,11 @@
         #region Fields
 
         private ObservableCollection<Client> _connectedClientsCollection;
-        private Client _connectedClientsCollectionSelectedItem;
         private ObservableCollection<Chat> _chatsCollection;
         private Chat _chatsCollectionSelectedItem;
         private CommandHandler _createNewGroupCommand;
+        private CommandHandler _showConnectedClientsCommand;
+        private Client _selectedClient;
 
         #endregion
 
@@ -31,16 +34,6 @@
             set
             {
                 _connectedClientsCollection = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Client ConnectedClientsCollectionSelectedItem
-        {
-            get => _connectedClientsCollectionSelectedItem;
-            set
-            {
-                _connectedClientsCollectionSelectedItem = value;
                 OnPropertyChanged();
             }
         }
@@ -67,9 +60,44 @@
 
         public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
+        public ICommand ShowConnectedClientsCommand =>
+            _showConnectedClientsCommand ?? (_showConnectedClientsCommand = new CommandHandler(ShowConnectedClients));
+
         #endregion
 
         #region Methods
+
+        private void ShowConnectedClients(object obj)
+        {
+            var connectedClientWindow = new ConnectedClientsWindow(ConnectedClientsCollection);
+
+            if (connectedClientWindow.ShowDialog() != true)
+            {
+                return;
+            }
+
+            ChatsCollectionSelectedItem = null;
+
+            foreach (Chat chat in ChatsCollection)
+            {
+                if (chat.TargetName != connectedClientWindow.SelectedClient.Name)
+                {
+                    continue;
+                }
+
+                ChatsCollectionSelectedItem = chat;
+                _selectedClient = null;
+
+                break;
+            }
+
+            if (ChatsCollectionSelectedItem == null)
+            {
+                MessagesCollection.Clear();
+                _selectedClient = connectedClientWindow.SelectedClient;
+            }
+        }
+
         private void CreateNewGroup(object obj)
         {
             var newGroupWindow = new CreateNewGroupWindow(ConnectedClientsCollection);
@@ -79,6 +107,7 @@
                 _client.RequestGroupCreation(newGroupWindow.GroupTitle, newGroupWindow.SelectedClients);
             }
         }
+
         private void HandleConnectionResponse(object sender, ConnectionResponseReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
@@ -114,8 +143,6 @@
                     RefreshChatsCollection();
                 });
         }
-
-        
 
         private void HandleConnectionStateChangedBroadcast(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
@@ -172,18 +199,11 @@
                     ChatsCollection.Add(args.Chat);
                     RefreshChatsCollection();
 
-                    if (ConnectedClientsCollectionSelectedItem == null)
+                    if (args.Chat.TargetName == _selectedClient.Name)
                     {
-                        return;
+                        ChatsCollectionSelectedItem = args.Chat;
+                        _selectedClient = null;
                     }
-
-                    if (args.Chat.TargetName != ConnectedClientsCollectionSelectedItem.Name)
-                    {
-                        return;
-                    }
-
-                    ChatsCollectionSelectedItem = args.Chat;
-                    ConnectedClientsCollectionSelectedItem = null;
                 });
         }
 
@@ -192,35 +212,10 @@
             switch (args.PropertyName)
             {
                 case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem != null:
-                    ConnectedClientsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
                     _client.RequestChatHistory(ChatsCollectionSelectedItem.Id.ToString());
 
                     break;
-
-                case nameof(ConnectedClientsCollectionSelectedItem) when ConnectedClientsCollectionSelectedItem != null:
-                {
-                    MessagesCollection.Clear();
-
-                    foreach (Chat chat in ChatsCollection)
-                    {
-                        if (ConnectedClientsCollectionSelectedItem.Name != chat.TargetName)
-                        {
-                            continue;
-                        }
-
-                        ChatsCollectionSelectedItem = chat;
-                        ConnectedClientsCollectionSelectedItem = null;
-
-                        goto End;
-                    }
-
-                    ChatsCollectionSelectedItem = null;
-                    MessageVisibility = Visibility.Visible;
-                    End:
-
-                    break;
-                }
             }
         }
 

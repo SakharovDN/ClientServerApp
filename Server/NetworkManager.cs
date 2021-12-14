@@ -153,12 +153,10 @@
                 case ChatTypes.Common:
                     _wsServer.SendBroadcast(args.Response);
                     break;
-
                 case ChatTypes.Private:
                     _wsServer.SendTo(sender, args.Response, args.Chat.TargetId);
                     _wsServer.SendTo(sender, args.Response, args.Chat.SourceId);
                     break;
-
                 case ChatTypes.Group:
                     List<string> clientIds = _groupService.GetClientIds(args.Chat.TargetId);
 

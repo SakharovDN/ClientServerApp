@@ -1,0 +1,28 @@
+﻿<Window x:Class="Client.ConnectedClients.ConnectedClientsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.ConnectedClients"
+        d:DataContext="{d:DesignInstance Type=local:ConnectedClientsViewModel}"
+        mc:Ignorable="d"
+        Title="Connected Clients" Height="450" Width="300" ResizeMode="CanMinimize">
+    <Grid>
+        <DockPanel>
+            <ListBox Style="{StaticResource ClientsCollection}"
+                     ItemsSource="{Binding ConnectedClientsCollection}"
+                     SelectedItem="{Binding ConnectedClientsCollectionSelectedItem, Mode=TwoWay}"
+                     BorderBrush="LightGray"
+                     BorderThickness="1,0,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel Height="30">
+                            <TextBlock Text="{Binding Path=Name}" FontSize="15" FontFamily="Arial"
+                                       VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</Window>
