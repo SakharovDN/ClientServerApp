@@ -10,17 +10,17 @@
 
         public string SourceId { get; }
 
-        public string TargetId { get; }
+        public string ChatId { get; }
 
         #endregion
 
         #region Constructors
 
-        public MessageRequestReceivedEventArgs(string body, string sourceId, string targetId)
+        public MessageRequestReceivedEventArgs(string body, string sourceId, string chatId)
         {
             Body = body;
             SourceId = sourceId;
-            TargetId = targetId;
+            ChatId = chatId;
         }
 
         #endregion

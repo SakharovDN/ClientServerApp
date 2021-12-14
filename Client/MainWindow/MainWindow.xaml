@@ -8,6 +8,17 @@
         mc:Ignorable="d"
         Title="ClientServerApp" Height="600" Width="1000" MinWidth="750" MinHeight="450">
     <Grid>
+        <Grid.Resources>
+            <Style x:Key="ChatsItemTextBlock" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Gray" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Foreground, ElementName=TargetNameTB}"
+                                 Value="White">
+                        <Setter Property="Foreground" Value="White" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
             <RowDefinition Height="40" />
@@ -80,27 +91,17 @@
                                 <DockPanel Margin="0,5">
                                     <Image Source="{Binding Type, StringFormat='../ChatTypeIcons/{}{0}.png'}"
                                            Height="20" />
-                                    <TextBlock Text="{Binding Path=TargetName}" FontSize="14" FontFamily="Arial"
+                                    <TextBlock x:Name="TargetNameTB" Text="{Binding Path=TargetName}" FontSize="14"
+                                               FontFamily="Arial"
                                                FontWeight="Bold"
-                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="Black" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Foreground, ElementName=timestamp}"
-                                                                 Value="White">
-                                                        <Setter Property="Foreground" Value="White" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBlock x:Name="timestamp"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Style="{StaticResource ChatsItemTextBlock}"
                                                Text="{Binding Path=LastMessage.Timestamp, StringFormat=dd.MM.yy}"
                                                VerticalAlignment="Center" HorizontalAlignment="Right" />
                                 </DockPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock FontSize="14" TextTrimming="CharacterEllipsis" MaxWidth="150">
+                                    <TextBlock Style="{StaticResource ChatsItemTextBlock}" FontSize="14"
+                                               TextTrimming="CharacterEllipsis" MaxWidth="150">
                                         <Run Text="{Binding Path=LastMessage.SourceName}" />
                                         <Run Text=": " />
                                         <Run Text="{Binding Path=LastMessage.Body}" />

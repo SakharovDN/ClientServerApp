@@ -8,17 +8,17 @@
 
         public string SourceId { get; set; }
 
-        public string TargetId { get; set; }
+        public string ChatId { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public MessageRequest(string body, string sourceId, string targetId)
+        public MessageRequest(string body, string sourceId, string chatId)
         {
             Body = body;
             SourceId = sourceId;
-            TargetId = targetId;
+            ChatId = chatId;
         }
 
         #endregion

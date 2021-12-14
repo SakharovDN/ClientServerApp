@@ -6,18 +6,15 @@
     {
         #region Properties
 
-        public string TargetId { get; }
-
-        public string SourceId { get; }
+        public string ChatId { get; }
 
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequestReceivedEventArgs(string targetId, string sourceId)
+        public ChatHistoryRequestReceivedEventArgs(string chatId)
         {
-            TargetId = targetId;
-            SourceId = sourceId;
+            ChatId = chatId;
         }
 
         #endregion
