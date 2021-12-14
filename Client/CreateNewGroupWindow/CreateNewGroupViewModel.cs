@@ -6,7 +6,7 @@
 
     using Common;
 
-    public class NewGroupViewModel : ViewModelBase
+    public class CreateNewGroupViewModel : ViewModelBase
     {
         #region Fields
 
@@ -77,7 +77,7 @@
 
         #region Constructors
 
-        public NewGroupViewModel(ObservableCollection<Client> connectedClients)
+        public CreateNewGroupViewModel(ObservableCollection<Client> connectedClients)
         {
             ConnectedClients = connectedClients;
             SelectedClients = new ObservableCollection<Client>();

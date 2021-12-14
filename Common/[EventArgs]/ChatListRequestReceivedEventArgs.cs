@@ -9,16 +9,13 @@
 
         public string ClientId { get; }
 
-        public List<Group> ClientGroups { get; }
-
         #endregion
 
         #region Constructors
 
-        public ChatListRequestReceivedEventArgs(string clientId, List<Group> clientGroups)
+        public ChatListRequestReceivedEventArgs(string clientId)
         {
             ClientId = clientId;
-            ClientGroups = clientGroups;
         }
 
         #endregion

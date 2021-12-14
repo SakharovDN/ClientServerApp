@@ -210,7 +210,7 @@
 
                     ChatListRequestReceived?.Invoke(
                         senderConnection,
-                        new ChatListRequestReceivedEventArgs(chatListRequest.ClientId, chatListRequest.ClientGroups));
+                        new ChatListRequestReceivedEventArgs(chatListRequest.ClientId));
                     break;
             }
         }

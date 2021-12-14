@@ -13,7 +13,7 @@
     {
         #region Fields
 
-        private readonly NewGroupViewModel _newGroupViewModel;
+        private readonly CreateNewGroupViewModel _newGroupViewModel;
 
         #endregion
 
@@ -30,7 +30,7 @@
         public CreateNewGroupWindow(ObservableCollection<Client> connectedClients)
         {
             InitializeComponent();
-            _newGroupViewModel = new NewGroupViewModel(connectedClients);
+            _newGroupViewModel = new CreateNewGroupViewModel(connectedClients);
             DataContext = _newGroupViewModel;
             _newGroupViewModel.GroupCreated += HandleGroupCreated;
         }
