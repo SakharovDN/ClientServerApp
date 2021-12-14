@@ -155,16 +155,11 @@
 
             Message = _messageRegex.Replace(Message, REPLACEMENT).Trim();
 
-            if (ChatsCollectionSelectedItem != null)
-            {
-                _client.SendMessage(
-                    ChatsCollectionSelectedItem.TargetId == _client.Id ? ChatsCollectionSelectedItem.SourceId : ChatsCollectionSelectedItem.TargetId,
-                    Message);
-            }
-            else if (ConnectedClientsCollectionSelectedItem != null)
-            {
-                _client.SendMessage(ConnectedClientsCollectionSelectedItem.Id.ToString(), Message);
-            }
+            _client.SendMessage(
+                ChatsCollectionSelectedItem != null
+                    ? ChatsCollectionSelectedItem.Id.ToString()
+                    : ConnectedClientsCollectionSelectedItem.Id.ToString(),
+                Message);
 
             Message = string.Empty;
         }
@@ -222,7 +217,7 @@
                 {
                     foreach (Chat chat in ChatsCollection)
                     {
-                        if (chat.Id.ToString() != args.Message.ChatId) //?????id?
+                        if (chat.Id.ToString() != args.Message.ChatId)
                         {
                             continue;
                         }
@@ -322,19 +317,11 @@
         {
             switch (args.PropertyName)
             {
-                case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem == null:
-                    break;
-
                 case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem != null:
                     ConnectedClientsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
-                    _client.RequestChatHistory(
-                        _client.Id == ChatsCollectionSelectedItem.TargetId
-                            ? ChatsCollectionSelectedItem.SourceId
-                            : ChatsCollectionSelectedItem.TargetId);
-                    break;
+                    _client.RequestChatHistory(ChatsCollectionSelectedItem.Id.ToString());
 
-                case nameof(ConnectedClientsCollectionSelectedItem) when ConnectedClientsCollectionSelectedItem == null:
                     break;
 
                 case nameof(ConnectedClientsCollectionSelectedItem) when ConnectedClientsCollectionSelectedItem != null:
@@ -355,7 +342,7 @@
 
                     ChatsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
-                    End: 
+                    End:
                     break;
                 }
             }

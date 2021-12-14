@@ -110,7 +110,6 @@
                                                 Value="{StaticResource Item.MouseOver.Background}" />
                                         <Setter Property="BorderBrush" TargetName="Bd"
                                                 Value="{StaticResource Item.MouseOver.Border}" />
-                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="Gray" />
 
                                     </MultiTrigger>
                                     <MultiTrigger>
@@ -122,7 +121,6 @@
                                                 Value="{StaticResource Item.SelectedInactive.Background}" />
                                         <Setter Property="BorderBrush" TargetName="Bd"
                                                 Value="{StaticResource Item.SelectedInactive.Border}" />
-                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="Gray" />
 
                                     </MultiTrigger>
                                     <MultiTrigger>

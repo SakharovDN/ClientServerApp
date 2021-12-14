@@ -39,62 +39,37 @@
         public void HandleMessageRequest(object sender, MessageRequestReceivedEventArgs args)
         {
             DateTime timestamp = DateTime.Now;
-            Chat targetChat = null;
+            Chat chat = _storage.Chats.Find(Guid.Parse(args.ChatId));
 
-            foreach (Chat chat in _storage.Chats)
+            if (chat == null)
             {
-                if (args.TargetId == chat.TargetId)
+                chat = new Chat
                 {
-                    if (chat.Type == ChatTypes.Common || chat.Type == ChatTypes.Group)
-                    {
-                        targetChat = chat;
-                        break;
-                    }
+                    Id = Guid.NewGuid(),
+                    Type = ChatTypes.Private,
+                    SourceId = args.SourceId,
+                    SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
+                    TargetId = args.ChatId,
+                    TargetName = _storage.Clients.Find(Guid.Parse(args.ChatId))?.Name,
+                    MessageAmount = 0
 
-                    if (args.SourceId == chat.SourceId)
-                    {
-                        targetChat = chat;
-                        break;
-                    }
-                }
-                else if (args.TargetId == chat.SourceId)
-                {
-                    if (args.SourceId == chat.TargetId)
-                    {
-                        targetChat = chat;
-                        break;
-                    }
-                }
-            }
-
-            if (targetChat == null)
-            {
-                targetChat = new Chat
-                             {
-                                 Id = Guid.NewGuid(),
-                                 Type = ChatTypes.Private,
-                                 SourceId = args.SourceId,
-                                 SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
-                                 TargetId = args.TargetId,
-                                 TargetName = _storage.Clients.Find(Guid.Parse(args.TargetId))?.Name,
-                                 MessageAmount = 0
-                             };
-                ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(targetChat));
+                };
+                ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
             }
 
             var message = new StorageMessage
-                          {
-                              Id = Guid.NewGuid(),
-                              Body = args.Body,
-                              ChatId = targetChat.Id.ToString(),
-                              SourceId = args.SourceId,
-                              SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
-                              Timestamp = timestamp
-                          };
-            targetChat.LastMessage = message;
+            {
+                Id = Guid.NewGuid(),
+                Body = args.Body,
+                ChatId = chat.Id.ToString(),
+                SourceId = args.SourceId,
+                SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
+                Timestamp = timestamp
+            };
+            chat.LastMessage = message;
             _storage.AddQueueItem(new AddNewMessageItem(message));
-            MessageAddedToDb?.Invoke(sender, new MessageAddedToDbEventArgs(targetChat.Id.ToString(), message.Id.ToString()));
-            MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), targetChat));
+            MessageAddedToDb?.Invoke(sender, new MessageAddedToDbEventArgs(chat.Id.ToString(), message.Id.ToString()));
+            MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), chat));
         }
 
         #endregion

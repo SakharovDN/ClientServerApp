@@ -167,14 +167,14 @@
             Send(new EventLogsRequest().GetContainer());
         }
 
-        public void RequestChatHistory(string targetId)
+        public void RequestChatHistory(string chatId)
         {
-            Send(new ChatHistoryRequest(targetId, Id).GetContainer());
+            Send(new ChatHistoryRequest(chatId).GetContainer());
         }
 
-        public void SendMessage(string targetId, string body)
+        public void SendMessage(string chatId, string body)
         {
-            Send(new MessageRequest(body, Id, targetId).GetContainer());
+            Send(new MessageRequest(body, Id, chatId).GetContainer());
         }
 
         public void RequestGroupCreation(string groupTitle, ObservableCollection<Client> selectedClients)

@@ -90,42 +90,9 @@
 
         public void HandleChatHistoryRequest(object sender, ChatHistoryRequestReceivedEventArgs args)
         {
-            string chatId = null;
-
-            foreach (Chat chat in _storage.Chats)
-            {
-                if (args.TargetId == chat.TargetId)
-                {
-                    if (chat.Type == ChatTypes.Common || chat.Type == ChatTypes.Group)
-                    {
-                        chatId = chat.Id.ToString();
-                        break;
-                    }
-
-                    if (args.SourceId == chat.SourceId)
-                    {
-                        chatId = chat.Id.ToString();
-                        break;
-                    }
-                }
-                else if (args.TargetId == chat.SourceId)
-                {
-                    if (args.SourceId == chat.TargetId)
-                    {
-                        chatId = chat.Id.ToString();
-                        break;
-                    }
-                }
-            }
-
-            if (chatId == null)
-            {
-                return;
-            }
-
-            List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chatId).ToList().Cast<Message>().ToList();
-            MessageContainer chatHistoryResponse = new ChatHistoryResponse(chatHistory).GetContainer();
-            ChatHistoryRequestHandled?.Invoke(sender, new ChatHistoryRequestHandledEventArgs(chatHistoryResponse));
+            Chat chat = _storage.Chats.Find(Guid.Parse(args.ChatId));
+            List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chat.Id.ToString()).ToList().Cast<Message>().ToList();
+            ChatHistoryRequestHandled?.Invoke(sender, new ChatHistoryRequestHandledEventArgs(new ChatHistoryResponse(chatHistory).GetContainer()));
         }
 
         private List<Chat> GetClientsChats(string clientId)
@@ -148,10 +115,12 @@
                             }
 
                             chat.LastMessage = message;
+
                             break;
                         }
 
                         chats.Add(chat);
+
                         break;
                     }
 
@@ -181,6 +150,7 @@
                                     }
 
                                     chat.LastMessage = message;
+
                                     break;
                                 }
 

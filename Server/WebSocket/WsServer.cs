@@ -161,7 +161,7 @@
 
                     MessageRequestReceived?.Invoke(
                         senderConnection,
-                        new MessageRequestReceivedEventArgs(messageRequest.Body, messageRequest.SourceId, messageRequest.TargetId));
+                        new MessageRequestReceivedEventArgs(messageRequest.Body, messageRequest.SourceId, messageRequest.ChatId));
                     break;
 
                 case MessageTypes.EventLogsRequest:
@@ -176,7 +176,7 @@
 
                     ChatHistoryRequestReceived?.Invoke(
                         senderConnection,
-                        new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.TargetId, chatHistoryRequest.SourceId));
+                        new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.ChatId));
                     break;
 
                 case MessageTypes.GroupCreationRequest:
