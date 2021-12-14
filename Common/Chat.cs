@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Chat
     {
@@ -20,7 +21,10 @@
 
         public string TargetName { get; set; }
 
-        public DateTime LastMessageTimestamp { get; set; }
+        public string LastMessageId { get; set; }
+
+        [NotMapped]
+        public Message LastMessage { get; set; }
 
         public int MessageAmount { get; set; }
 

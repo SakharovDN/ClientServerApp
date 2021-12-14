@@ -9,16 +9,16 @@
         #region Fields
 
         private readonly string _chatId;
-        private readonly DateTime _timestamp;
+        private readonly string _lastMessageId;
 
         #endregion
 
         #region Constructors
 
-        public UpdateChatRecordItem(string chatId, DateTime timestamp)
+        public UpdateChatRecordItem(string chatId, string lastMessageId)
         {
             _chatId = chatId;
-            _timestamp = timestamp;
+            _lastMessageId = lastMessageId;
         }
 
         #endregion
@@ -31,7 +31,7 @@
 
             if (chat != null)
             {
-                chat.LastMessageTimestamp = _timestamp;
+                chat.LastMessageId = _lastMessageId;
                 chat.MessageAmount++;
             }
 

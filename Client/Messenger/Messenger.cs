@@ -227,7 +227,7 @@
                             continue;
                         }
 
-                        chat.LastMessageTimestamp = args.Message.Timestamp;
+                        chat.LastMessage = args.Message;
                         break;
                     }
 
@@ -238,10 +238,13 @@
                         return;
                     }
 
-                    if (args.Message.ChatId == ChatsCollectionSelectedItem.Id.ToString())
+                    if (args.Message.ChatId != ChatsCollectionSelectedItem.Id.ToString())
                     {
-                        MessagesCollection.Add(new ClientMessage(args.Message, _client.Name));
+                        return;
                     }
+
+                    MessagesCollection.Add(new ClientMessage(args.Message, _client.Name));
+                    MessagesCollection = new ObservableCollection<ClientMessage>(MessagesCollection.OrderBy(message => message.Timestamp));
                 });
         }
 
@@ -282,6 +285,8 @@
                     {
                         MessagesCollection.Add(new ClientMessage(message, _client.Name));
                     }
+
+                    MessagesCollection = new ObservableCollection<ClientMessage>(MessagesCollection.OrderBy(message => message.Timestamp));
                 });
         }
 
@@ -350,7 +355,7 @@
 
                     ChatsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
-                    End:
+                    End: 
                     break;
                 }
             }
@@ -358,7 +363,7 @@
 
         private void RefreshChatsCollection()
         {
-            ChatsCollection = new ObservableCollection<Chat>(ChatsCollection.OrderByDescending(chat => chat.LastMessageTimestamp));
+            ChatsCollection = new ObservableCollection<Chat>(ChatsCollection.OrderByDescending(chat => chat.LastMessage.Timestamp));
             CollectionViewSource.GetDefaultView(ChatsCollection).Refresh();
         }
 

@@ -70,29 +70,30 @@
             if (targetChat == null)
             {
                 targetChat = new Chat
-                {
-                    Id = Guid.NewGuid(),
-                    Type = ChatTypes.Private,
-                    SourceId = args.SourceId,
-                    SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
-                    TargetId = args.TargetId,
-                    TargetName = _storage.Clients.Find(Guid.Parse(args.TargetId))?.Name,
-                    LastMessageTimestamp = timestamp,
-                    MessageAmount = 0
-                };
+                             {
+                                 Id = Guid.NewGuid(),
+                                 Type = ChatTypes.Private,
+                                 SourceId = args.SourceId,
+                                 SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
+                                 TargetId = args.TargetId,
+                                 TargetName = _storage.Clients.Find(Guid.Parse(args.TargetId))?.Name,
+                                 MessageAmount = 0
+                             };
                 ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(targetChat));
             }
 
             var message = new StorageMessage
-            {
-                Body = args.Body,
-                ChatId = targetChat.Id.ToString(),
-                SourceId = args.SourceId,
-                SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
-                Timestamp = timestamp
-            };
+                          {
+                              Id = Guid.NewGuid(),
+                              Body = args.Body,
+                              ChatId = targetChat.Id.ToString(),
+                              SourceId = args.SourceId,
+                              SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
+                              Timestamp = timestamp
+                          };
+            targetChat.LastMessage = message;
             _storage.AddQueueItem(new AddNewMessageItem(message));
-            MessageAddedToDb?.Invoke(sender, new MessageAddedToDbEventArgs(targetChat.Id.ToString(), timestamp));
+            MessageAddedToDb?.Invoke(sender, new MessageAddedToDbEventArgs(targetChat.Id.ToString(), message.Id.ToString()));
             MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), targetChat));
         }
 

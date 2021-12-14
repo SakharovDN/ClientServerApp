@@ -39,7 +39,7 @@
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="4" Grid.Column="1">
             <Label Content="{Binding Messenger.ChatsCollectionSelectedItem.TargetName}" DockPanel.Dock="Top"
-                   BorderThickness="0,0,0,1" BorderBrush="LightGray" MinHeight="27"/>
+                   BorderThickness="0,0,0,1" BorderBrush="LightGray" MinHeight="27" />
             <ScrollViewer Name="MessagePanelScrollViewer" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Name="MessagesPanel" ItemsSource="{Binding Messenger.MessagesCollection}">
                     <ItemsControl.ItemTemplate>
@@ -72,14 +72,41 @@
                          ItemsSource="{Binding Messenger.ChatsCollection}"
                          SelectedItem="{Binding Messenger.ChatsCollectionSelectedItem, Mode=TwoWay}"
                          BorderThickness="1,0,0,1"
-                         BorderBrush="LightGray">
+                         BorderBrush="LightGray"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel Height="30">
-                                <TextBlock Text="{Binding Path=TargetName}" FontSize="15" FontFamily="Arial"
-                                           VerticalAlignment="Center" Margin="5,0,0,0" />
-                                <TextBlock Text="{Binding Path=LastMessageTimestamp, StringFormat=HH:mm}" />
-                            </DockPanel>
+                            <StackPanel Margin="5">
+                                <DockPanel Margin="0,5">
+                                    <Image Source="{Binding Type, StringFormat='../ChatTypeIcons/{}{0}.png'}"
+                                           Height="20" />
+                                    <TextBlock Text="{Binding Path=TargetName}" FontSize="14" FontFamily="Arial"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="Black" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Foreground, ElementName=timestamp}"
+                                                                 Value="White">
+                                                        <Setter Property="Foreground" Value="White" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock x:Name="timestamp"
+                                               Text="{Binding Path=LastMessage.Timestamp, StringFormat=dd.MM.yy}"
+                                               VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </DockPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,5">
+                                    <TextBlock FontSize="14" TextTrimming="CharacterEllipsis" MaxWidth="150">
+                                        <Run Text="{Binding Path=LastMessage.SourceName}" />
+                                        <Run Text=": " />
+                                        <Run Text="{Binding Path=LastMessage.Body}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
