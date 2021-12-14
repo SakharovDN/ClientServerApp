@@ -3,7 +3,6 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Data;
     using System.Windows.Input;
@@ -12,66 +11,19 @@
 
     using NewGroupWindow;
 
-    public class Messenger : ViewModelBase
+    public partial class Messenger
     {
-        #region Constants
-
-        private const string PATTERN = @"[ ]{2,}";
-        private const string REPLACEMENT = @" ";
-
-        #endregion
-
         #region Fields
 
-        private readonly Regex _messageRegex;
-        private readonly WsClient _client;
-        private string _message;
-        private ObservableCollection<ClientMessage> _messagesCollection;
         private ObservableCollection<Client> _connectedClientsCollection;
         private Client _connectedClientsCollectionSelectedItem;
         private ObservableCollection<Chat> _chatsCollection;
         private Chat _chatsCollectionSelectedItem;
-        private CommandHandler _sendCommand;
         private CommandHandler _createNewGroupCommand;
-        private Visibility _messageVisibility;
 
         #endregion
 
         #region Properties
-
-        public ICommand SendCommand => _sendCommand ?? (_sendCommand = new CommandHandler(PerformSendButton));
-
-        public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
-
-        public string Message
-        {
-            get => _message;
-            set
-            {
-                _message = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Visibility MessageVisibility
-        {
-            get => _messageVisibility;
-            set
-            {
-                _messageVisibility = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ObservableCollection<ClientMessage> MessagesCollection
-        {
-            get => _messagesCollection;
-            set
-            {
-                _messagesCollection = value;
-                OnPropertyChanged();
-            }
-        }
 
         public ObservableCollection<Client> ConnectedClientsCollection
         {
@@ -113,57 +65,11 @@
             }
         }
 
-        #endregion
-
-        #region Constructors
-
-        public Messenger(WsClient client)
-        {
-            _client = client;
-            _client.MessageHandler.MessageReceived += HandleMessageReceived;
-            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            _client.MessageHandler.ChatListResponseReceived += HandledChatListResponseReceived;
-            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcastReceived;
-            _client.MessageHandler.ChatHistoryReceived += HandleChatHistoryReceived;
-            _client.MessageHandler.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcastReceived;
-            ConnectedClientsCollection = new ObservableCollection<Client>();
-            MessagesCollection = new ObservableCollection<ClientMessage>();
-            ChatsCollection = new ObservableCollection<Chat>();
-            MessageVisibility = Visibility.Hidden;
-            _messageRegex = new Regex(PATTERN, RegexOptions.None);
-            PropertyChanged += HandlePropertyChanged;
-        }
+        public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
         #endregion
 
         #region Methods
-
-        public void Dispose()
-        {
-            ChatsCollection.Clear();
-            ConnectedClientsCollection.Clear();
-            MessagesCollection.Clear();
-            MessageVisibility = Visibility.Hidden;
-        }
-
-        private void PerformSendButton(object commandParameter)
-        {
-            if (string.IsNullOrEmpty(Message))
-            {
-                return;
-            }
-
-            Message = _messageRegex.Replace(Message, REPLACEMENT).Trim();
-
-            _client.SendMessage(
-                ChatsCollectionSelectedItem != null
-                    ? ChatsCollectionSelectedItem.Id.ToString()
-                    : ConnectedClientsCollectionSelectedItem.Id.ToString(),
-                Message);
-
-            Message = string.Empty;
-        }
-
         private void CreateNewGroup(object obj)
         {
             var newGroupWindow = new CreateNewGroupWindow(ConnectedClientsCollection);
@@ -173,8 +79,7 @@
                 _client.RequestGroupCreation(newGroupWindow.GroupTitle, newGroupWindow.SelectedClients);
             }
         }
-
-        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
+        private void HandleConnectionResponse(object sender, ConnectionResponseReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -191,7 +96,7 @@
                 });
         }
 
-        private void HandledChatListResponseReceived(object sender, ChatListResponseReceivedEventArgs args)
+        private void HandledChatListResponse(object sender, ChatListResponseReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -210,40 +115,9 @@
                 });
         }
 
-        private void HandleMessageReceived(object sender, MessageReceivedEventArgs args)
-        {
-            Application.Current.Dispatcher.Invoke(
-                delegate
-                {
-                    foreach (Chat chat in ChatsCollection)
-                    {
-                        if (chat.Id.ToString() != args.Message.ChatId)
-                        {
-                            continue;
-                        }
+        
 
-                        chat.LastMessage = args.Message;
-                        break;
-                    }
-
-                    RefreshChatsCollection();
-
-                    if (ChatsCollectionSelectedItem == null)
-                    {
-                        return;
-                    }
-
-                    if (args.Message.ChatId != ChatsCollectionSelectedItem.Id.ToString())
-                    {
-                        return;
-                    }
-
-                    MessagesCollection.Add(new ClientMessage(args.Message, _client.Name));
-                    MessagesCollection = new ObservableCollection<ClientMessage>(MessagesCollection.OrderBy(message => message.Timestamp));
-                });
-        }
-
-        private void HandleConnectionStateChangedBroadcastReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
+        private void HandleConnectionStateChangedBroadcast(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -264,7 +138,7 @@
                 });
         }
 
-        private void HandleChatHistoryReceived(object sender, ChatHistoryReceivedEventArgs args)
+        private void ShowChatHistory(object sender, ChatHistoryReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -285,7 +159,7 @@
                 });
         }
 
-        private void HandleChatCreatedBroadcastReceived(object sender, ChatCreatedBroadcastReceivedEventArgs args)
+        private void HandleChatCreatedBroadcast(object sender, ChatCreatedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -337,12 +211,14 @@
 
                         ChatsCollectionSelectedItem = chat;
                         ConnectedClientsCollectionSelectedItem = null;
+
                         goto End;
                     }
 
                     ChatsCollectionSelectedItem = null;
                     MessageVisibility = Visibility.Visible;
                     End:
+
                     break;
                 }
             }

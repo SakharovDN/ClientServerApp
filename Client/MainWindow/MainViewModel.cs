@@ -71,11 +71,11 @@
             }
         }
 
-        public ICommand StartCommand => _startCommand ?? (_startCommand = new CommandHandler(PerformStartButton));
+        public ICommand StartCommand => _startCommand ?? (_startCommand = new CommandHandler(StartConnection));
 
-        public ICommand StopCommand => _stopCommand ?? (_stopCommand = new CommandHandler(PerformStopButton));
+        public ICommand StopCommand => _stopCommand ?? (_stopCommand = new CommandHandler(StopConnection));
 
-        public ICommand GetEventLogsCommand => _getEventLogsCommand ?? (_getEventLogsCommand = new CommandHandler(PerformGetEventLogsButton));
+        public ICommand GetEventLogsCommand => _getEventLogsCommand ?? (_getEventLogsCommand = new CommandHandler(GetEventLogs));
 
         #endregion
 
@@ -85,9 +85,9 @@
         {
             _client = new WsClient();
             _client.ConnectionStateChanged += HandleConnectionStateChanged;
-            _client.MessageHandler.EventLogsReceived += HandleEventLogsReceived;
-            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcastReceived;
+            _client.MessageHandler.EventLogsReceived += ShowEventLogs;
+            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponse;
+            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             Messenger = new Messenger.Messenger(_client);
             EventsCollection = new ObservableCollection<string>();
@@ -107,7 +107,7 @@
             }
         }
 
-        private void PerformStartButton(object commandParameter)
+        private void StartConnection(object commandParameter)
         {
             try
             {
@@ -125,13 +125,13 @@
             }
         }
 
-        private void PerformStopButton(object commandParameter)
+        private void StopConnection(object commandParameter)
         {
             _client.Disconnect();
             ControlsEnabledViewModel.SetDefaultControlsState();
         }
 
-        private void PerformGetEventLogsButton(object commandParameter)
+        private void GetEventLogs(object commandParameter)
         {
             _client.RequestEventLogs();
         }
@@ -154,7 +154,7 @@
                 });
         }
 
-        private void HandleConnectionStateChangedBroadcastReceived(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
+        private void HandleConnectionStateChangedBroadcast(object sender, ConnectionStateChangedBroadcastReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -165,7 +165,7 @@
                 });
         }
 
-        private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
+        private void HandleConnectionResponse(object sender, ConnectionResponseReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate
@@ -183,7 +183,7 @@
                 });
         }
 
-        private static void HandleEventLogsReceived(object sender, EventLogsReceivedEventArgs args)
+        private static void ShowEventLogs(object sender, EventLogsReceivedEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(
                 delegate

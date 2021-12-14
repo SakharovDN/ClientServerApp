@@ -229,7 +229,7 @@
 
         private void RequestChatList()
         {
-            Send(new ChatListRequest(Id, Groups).GetContainer());
+            Send(new ChatListRequest(Id).GetContainer());
         }
 
         private void RequestGroupList()
