@@ -8,16 +8,16 @@
 
         public string ChatId { get; }
 
-        public DateTime Timestamp { get; }
+        public string LastMessageId { get; }
 
         #endregion
 
         #region Constructors
 
-        public MessageAddedToDbEventArgs(string chatId, DateTime timestamp)
+        public MessageAddedToDbEventArgs(string chatId, string lastMessageId)
         {
             ChatId = chatId;
-            Timestamp = timestamp;
+            LastMessageId = lastMessageId;
         }
 
         #endregion

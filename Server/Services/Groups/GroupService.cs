@@ -71,7 +71,6 @@
                 SourceName = null,
                 TargetId = group.Id.ToString(),
                 TargetName = args.GroupTitle,
-                LastMessageTimestamp = timestamp,
                 MessageAmount = 0
             };
             ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
