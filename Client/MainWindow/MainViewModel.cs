@@ -121,7 +121,7 @@
             catch (Exception ex)
             {
                 _client.Disconnect();
-                EventsCollection.Add(ex.Message);
+                EventsCollection.Add($"{ex.Message} {DateTime.Now:HH:mm}");
             }
         }
 
@@ -143,13 +143,13 @@
                 {
                     if (args.IsConnected)
                     {
-                        EventsCollection.Add("Connection established");
+                        EventsCollection.Add($"Connection established {DateTime.Now:HH:mm}");
                     }
                     else
                     {
                         Messenger.Dispose();
                         ControlsEnabledViewModel.SetDefaultControlsState();
-                        EventsCollection.Add("Connection lost");
+                        EventsCollection.Add($"Connection lost {DateTime.Now:HH:mm}");
                     }
                 });
         }
@@ -160,7 +160,7 @@
                 delegate
                 {
                     string clientState = args.IsConnected ? "is connected" : "is disconnected";
-                    string message = $"Client {args.Client.Name} {clientState}";
+                    string message = $"Client {args.Client.Name} {clientState} {DateTime.Now:HH:mm}";
                     EventsCollection.Add(message);
                 });
         }
