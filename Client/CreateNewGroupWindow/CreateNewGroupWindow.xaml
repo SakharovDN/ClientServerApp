@@ -7,7 +7,7 @@
         xmlns:multiSelector="clr-namespace:Client.MultiSelector"
         d:DataContext="{d:DesignInstance Type=local:CreateNewGroupViewModel}"
         mc:Ignorable="d"
-        Title="CreateNewGroupWindow" Height="450" Width="300">
+        Title="CreateNewGroupWindow" Height="450" Width="300" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />

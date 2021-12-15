@@ -5,7 +5,7 @@
     <Application.Resources>
         <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
-            <Setter Property="BorderBrush" Value="LightGray"></Setter>
+            <Setter Property="BorderBrush" Value="LightGray" />
             <Style.Triggers>
                 <Trigger Property="IsKeyboardFocused" Value="True">
                     <Setter Property="Background" Value="White" />
@@ -114,6 +114,16 @@
                                     </MultiTrigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Background}" />
+                                        <Setter Property="BorderBrush" TargetName="Bd"
+                                                Value="{StaticResource Item.SelectedActive.Border}" />
+                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="White" />
+                                    </MultiTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
                                             <Condition Property="IsSelected" Value="False" />
                                             <Condition Property="IsMouseOver" Value="False" />
                                         </MultiTrigger.Conditions>
@@ -122,17 +132,6 @@
                                         <Setter Property="BorderBrush" TargetName="Bd"
                                                 Value="{StaticResource Item.SelectedInactive.Border}" />
 
-                                    </MultiTrigger>
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="Selector.IsSelectionActive" Value="True" />
-                                            <Condition Property="IsSelected" Value="True" />
-                                        </MultiTrigger.Conditions>
-                                        <Setter Property="Background" TargetName="Bd"
-                                                Value="{StaticResource Item.SelectedActive.Background}" />
-                                        <Setter Property="BorderBrush" TargetName="Bd"
-                                                Value="{StaticResource Item.SelectedActive.Border}" />
-                                        <Setter Property="TextElement.Foreground" TargetName="Bd" Value="White" />
                                     </MultiTrigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -150,8 +149,8 @@
             <Setter Property="MinWidth" Value="100" />
             <Setter Property="MaxWidth" Value="500" />
             <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+            <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
-        
+
     </Application.Resources>
 </Application>

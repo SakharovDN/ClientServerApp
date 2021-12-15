@@ -10,7 +10,6 @@
     {
         #region Fields
 
-        private bool? _dialogResult;
         private ObservableCollection<Client> _connectedClients;
         private CommandHandler _createNewGroupCommand;
         private ObservableCollection<Client> _selectedClients;
@@ -19,21 +18,6 @@
         #endregion
 
         #region Properties
-
-        public bool? DialogResult
-        {
-            get => _dialogResult;
-            set
-            {
-                if (value == _dialogResult)
-                {
-                    return;
-                }
-
-                _dialogResult = value;
-                OnPropertyChanged();
-            }
-        }
 
         public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
@@ -89,7 +73,6 @@
 
         private void CreateNewGroup(object obj)
         {
-            DialogResult = true;
             GroupCreated?.Invoke(null, EventArgs.Empty);
         }
 

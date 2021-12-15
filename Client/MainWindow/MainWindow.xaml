@@ -38,6 +38,8 @@
                 <MenuItem Header="Light" IsCheckable="True" />
                 <MenuItem Header="Dark" IsCheckable="True" />
             </MenuItem>
+            <MenuItem Header="Connected clients" Command="{Binding Messenger.ShowConnectedClientsCommand}"
+                      IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
             <MenuItem Header="Create new group" Command="{Binding Messenger.CreateNewGroupCommand}"
                       IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
             <MenuItem Header="Event Log" Command="{Binding GetEventLogsCommand}"
@@ -71,66 +73,40 @@
                 </ItemsControl>
             </ScrollViewer>
         </DockPanel>
-        <Grid Grid.Row="1" Grid.RowSpan="6" Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <DockPanel Grid.Row="0">
-                <Label Content="Available chats:" DockPanel.Dock="Top" BorderBrush="LightGray"
-                       BorderThickness="1,0,0,1" />
-                <ListBox Style="{StaticResource ClientsCollection}"
-                         ItemsSource="{Binding Messenger.ChatsCollection}"
-                         SelectedItem="{Binding Messenger.ChatsCollectionSelectedItem, Mode=TwoWay}"
-                         BorderThickness="1,0,0,1"
-                         BorderBrush="LightGray"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="5">
-                                <DockPanel Margin="0,5">
-                                    <Image Source="{Binding Type, StringFormat='../ChatTypeIcons/{}{0}.png'}"
-                                           Height="20" />
-                                    <TextBlock x:Name="TargetNameTB" Text="{Binding Path=TargetName}" FontSize="14"
-                                               FontFamily="Arial"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Style="{StaticResource ChatsItemTextBlock}"
-                                               Text="{Binding Path=LastMessage.Timestamp, StringFormat=dd.MM.yy}"
-                                               VerticalAlignment="Center" HorizontalAlignment="Right" />
-                                </DockPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,5">
-                                    <TextBlock Style="{StaticResource ChatsItemTextBlock}" FontSize="14"
-                                               TextTrimming="CharacterEllipsis" MaxWidth="150">
-                                        <Run Text="{Binding Path=LastMessage.SourceName}" />
-                                        <Run Text=": " />
-                                        <Run Text="{Binding Path=LastMessage.Body}" />
-                                    </TextBlock>
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-            <DockPanel Grid.Row="1">
-                <Label Content="Connected clients:" DockPanel.Dock="Top" BorderBrush="LightGray"
-                       BorderThickness="1,0,0,1" />
-                <ListBox Style="{StaticResource ClientsCollection}"
-                         ItemsSource="{Binding Messenger.ConnectedClientsCollection}"
-                         SelectedItem="{Binding Messenger.ConnectedClientsCollectionSelectedItem, Mode=TwoWay}"
-                         BorderBrush="LightGray"
-                         BorderThickness="1,0,0,0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel Height="30">
-                                <TextBlock Text="{Binding Path=Name}" FontSize="15" FontFamily="Arial"
-                                           VerticalAlignment="Center" Margin="5,0,0,0" />
+        <DockPanel Grid.Row="1" Grid.RowSpan="6" Grid.Column="2">
+            <ListBox Style="{StaticResource ClientsCollection}"
+                     ItemsSource="{Binding Messenger.ChatsCollection}"
+                     SelectedItem="{Binding Messenger.ChatsCollectionSelectedItem, Mode=TwoWay}"
+                     BorderThickness="1,0,0,1"
+                     BorderBrush="LightGray"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <DockPanel Margin="0,5">
+                                <Image Source="{Binding Type, StringFormat='../ChatTypeIcons/{}{0}.png'}"
+                                       Height="20" />
+                                <TextBlock x:Name="TargetNameTB" Text="{Binding Path=TargetName}" FontSize="14"
+                                           FontFamily="Arial"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Style="{StaticResource ChatsItemTextBlock}"
+                                           Text="{Binding Path=LastMessage.Timestamp, StringFormat=dd.MM.yy}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
                             </DockPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-        </Grid>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <TextBlock Style="{StaticResource ChatsItemTextBlock}" FontSize="14"
+                                           TextTrimming="CharacterEllipsis" MaxWidth="150">
+                                    <Run Text="{Binding Path=LastMessage.SourceName}" />
+                                    <Run Text=": " />
+                                    <Run Text="{Binding Path=LastMessage.Body}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
         <DockPanel Grid.Row="2" Grid.Column="0">
             <TextBox Style="{StaticResource PortTextBox}" Text="{Binding Port}"
                      IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />

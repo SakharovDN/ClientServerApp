@@ -79,6 +79,7 @@
             ConnectedClientsCollection = new ObservableCollection<Client>();
             MessagesCollection = new ObservableCollection<ClientMessage>();
             ChatsCollection = new ObservableCollection<Chat>();
+            ChatsCollectionSelectedItem = new Chat();
             MessageVisibility = Visibility.Hidden;
             _messageRegex = new Regex(PATTERN, RegexOptions.None);
             PropertyChanged += HandlePropertyChanged;
@@ -108,7 +109,7 @@
             _client.SendMessage(
                 ChatsCollectionSelectedItem != null
                     ? ChatsCollectionSelectedItem.Id.ToString()
-                    : ConnectedClientsCollectionSelectedItem.Id.ToString(),
+                    : _selectedClient.Id.ToString(),
                 Message);
 
             Message = string.Empty;
