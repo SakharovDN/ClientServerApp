@@ -6,6 +6,9 @@
     using System.Data.Entity;
     using System.Linq;
 
+    using Common;
+    using Common.Messages;
+
     using Storage;
 
     public class EventLogService
@@ -13,6 +16,12 @@
         #region Fields
 
         private readonly InternalStorage _storage;
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<RequestHandledEventArgs> EventLogRequestHandled;
 
         #endregion
 
@@ -27,9 +36,10 @@
 
         #region Methods
 
-        public DataTable GetEventLogs()
+        public void HandleEventLogsRequest(object sender, EventArgs args)
         {
-            return _storage.EventLogs.ToDataTable();
+            MessageContainer eventLogsResponse = new EventLogsResponse(_storage.EventLogs.ToDataTable()).GetContainer();
+            EventLogRequestHandled?.Invoke(sender, new RequestHandledEventArgs(eventLogsResponse));
         }
 
         #endregion

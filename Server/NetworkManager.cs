@@ -55,7 +55,8 @@
             _wsServer.ChatHistoryRequestReceived += _chatService.HandleChatHistoryRequest;
             _chatService.ChatHistoryRequestHandled += Send;
             _wsServer.GroupCreationRequestReceived += _groupService.HandleGroupCreationRequest;
-            _wsServer.EventLogsRequestReceived += SendEventLogsResponse;
+            _wsServer.EventLogsRequestReceived += _eventLogService.HandleEventLogsRequest;
+            _eventLogService.EventLogRequestHandled += Send;
             _messageService.ChatNotExists += _chatService.CreateNewChat;
             _groupService.ChatNotExists += _chatService.CreateNewChat;
             _messageService.MessageAddedToDb += _chatService.UpdateChatRecord;
@@ -152,11 +153,6 @@
                         });
                     break;
             }
-        }
-
-        private void SendEventLogsResponse(object sender, EventArgs args)
-        {
-            _wsServer.Send(sender, new EventLogsResponse(_eventLogService.GetEventLogs()).GetContainer());
         }
 
         #endregion
