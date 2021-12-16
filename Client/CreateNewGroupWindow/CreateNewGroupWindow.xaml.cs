@@ -39,7 +39,7 @@
 
         #region Methods
 
-        private void HandleGroupCreated(object sender, EventArgs e)
+        private void HandleGroupCreated(object sender, EventArgs args)
         {
             DialogResult = true;
             SelectedClients = _createNewGroupViewModel.SelectedClients;

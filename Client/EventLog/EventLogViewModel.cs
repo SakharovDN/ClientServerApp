@@ -72,9 +72,9 @@
 
         #region Methods
 
-        private void HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void HandlePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (e.PropertyName == "SelectedDateFrom" || e.PropertyName == "SelectedDateTo")
+            if (args.PropertyName == nameof(SelectedDateFrom) || args.PropertyName == nameof(SelectedDateTo))
             {
                 FilterEventLogs();
             }

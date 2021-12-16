@@ -50,7 +50,7 @@
             _pingResponseCounter = 0;
         }
 
-        private void Perform(object sender, ElapsedEventArgs e)
+        private void Perform(object sender, ElapsedEventArgs args)
         {
             if (_pingResponseCounter > 3)
             {

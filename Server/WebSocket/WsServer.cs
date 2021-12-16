@@ -43,8 +43,6 @@
 
         public event EventHandler<GroupCreationRequestReceivedEventArgs> GroupCreationRequestReceived;
 
-        public event EventHandler<GroupListRequestReceivedEventArgs> GroupListRequestReceived;
-
         public event EventHandler<ChatListRequestReceivedEventArgs> ChatListRequestReceived;
 
         #endregion
@@ -94,25 +92,34 @@
 
         public void Send(object sender, MessageContainer container)
         {
-            var connection = sender as WsConnection;
-            connection?.Send(container);
+            if (sender is WsConnection connection)
+            {
+                connection.Send(container);
+            }
         }
 
         public void SendTo(object sender, MessageContainer container, string targetId)
         {
-            var connection = sender as WsConnection;
-            string targetConnectionId =
-                (from connectionItem in _connections.Values where connectionItem.ClientId == targetId select connectionItem.ID).FirstOrDefault();
+            if (!(sender is WsConnection connection))
+            {
+                return;
+            }
+
+            string targetConnectionId = _connections.Values.Where(connectionItem => connectionItem.ClientId == targetId)
+                                                    .Select(connectionItem => connectionItem.ID).FirstOrDefault();
 
             if (targetConnectionId != null)
             {
-                connection?.SendTo(container, targetConnectionId);
+                connection.SendTo(container, targetConnectionId);
             }
         }
 
         public void SendBroadcast(MessageContainer container)
         {
-            _connections.Values.FirstOrDefault(connection => connection.IsConnected)?.Broadcast(container);
+            foreach (WsConnection connection in _connections.Values)
+            {
+                connection.Send(container);
+            }
         }
 
         internal void AddConnection(WsConnection connection)
@@ -163,7 +170,6 @@
                         senderConnection,
                         new MessageRequestReceivedEventArgs(messageRequest.Body, messageRequest.SourceId, messageRequest.ChatId));
                     break;
-
                 case MessageTypes.EventLogsRequest:
                     EventLogsRequestReceived?.Invoke(senderConnection, EventArgs.Empty);
                     break;
@@ -191,15 +197,6 @@
                             groupCreationRequest.GroupTitle,
                             groupCreationRequest.ClientIds,
                             groupCreationRequest.CreatorId));
-                    break;
-
-                case MessageTypes.GroupListRequest:
-                    if (!(((JObject)container.Payload).ToObject(typeof(GroupListRequest)) is GroupListRequest groupListRequest))
-                    {
-                        return;
-                    }
-
-                    GroupListRequestReceived?.Invoke(senderConnection, new GroupListRequestReceivedEventArgs(groupListRequest.ClientId));
                     break;
 
                 case MessageTypes.ChatListRequest:

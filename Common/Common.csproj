@@ -87,8 +87,6 @@
     <Compile Include="Messages\EventLogsRequest.cs" />
     <Compile Include="Messages\EventLogsResponse.cs" />
     <Compile Include="Messages\GroupCreationRequest.cs" />
-    <Compile Include="Messages\GroupListRequest.cs" />
-    <Compile Include="Messages\GroupListResponse.cs" />
     <Compile Include="Messages\MessageBroadcast.cs" />
     <Compile Include="Messages\MessageContainer.cs" />
     <Compile Include="Messages\MessageRequest.cs" />
@@ -98,7 +96,6 @@
     <Compile Include="[Enums]\ResultCodes.cs" />
     <Compile Include="[EventArgs]\ChatCreatedBroadcastReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatHistoryReceivedEventArgs.cs" />
-    <Compile Include="[EventArgs]\ChatHistoryRequestHandledEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatHistoryRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatListRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatListResponseReceivedEventArgs.cs" />

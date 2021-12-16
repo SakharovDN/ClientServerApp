@@ -59,7 +59,7 @@
 
         private void HandlePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName == nameof(ConnectedClientsCollectionSelectedItem))
+            if (args.PropertyName == nameof(ConnectedClientsCollectionSelectedItem) && ConnectedClientsCollectionSelectedItem != null)
             {
                 ClientSelected?.Invoke(null, EventArgs.Empty);
             }

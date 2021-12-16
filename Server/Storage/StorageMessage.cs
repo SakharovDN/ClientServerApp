@@ -11,7 +11,7 @@
         public Guid Id { get; set; }
 
         public string SourceId { get; set; }
-        
+
         #endregion
     }
 }

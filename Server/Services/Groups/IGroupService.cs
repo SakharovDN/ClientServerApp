@@ -11,17 +11,13 @@
 
         event EventHandler<ChatNotExistsEventArgs> ChatNotExists;
 
-        event EventHandler<RequestHandledEventArgs> GroupListRequestHandled;
-
         #endregion
 
         #region Methods
 
-        List<string> GetClientIds(string groupId);
+        List<Guid> GetClientIds(string groupId);
 
         void HandleGroupCreationRequest(object sender, GroupCreationRequestReceivedEventArgs args);
-
-        void HandleGroupListRequest(object sender, GroupListRequestReceivedEventArgs args);
 
         #endregion
     }

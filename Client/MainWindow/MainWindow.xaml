@@ -38,9 +38,9 @@
                 <MenuItem Header="Light" IsCheckable="True" />
                 <MenuItem Header="Dark" IsCheckable="True" />
             </MenuItem>
-            <MenuItem Header="Connected clients" Command="{Binding Messenger.ShowConnectedClientsCommand}"
+            <MenuItem Header="Connected clients" Command="{Binding MessengerViewModel.ShowConnectedClientsCommand}"
                       IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
-            <MenuItem Header="Create new group" Command="{Binding Messenger.CreateNewGroupCommand}"
+            <MenuItem Header="Create new group" Command="{Binding MessengerViewModel.CreateNewGroupCommand}"
                       IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
             <MenuItem Header="Event Log" Command="{Binding GetEventLogsCommand}"
                       IsEnabled="{Binding ControlsEnabledViewModel.MessengerControlIsEnabled}" />
@@ -51,10 +51,10 @@
                      IsEnabled="{Binding ControlsEnabledViewModel.ConnectionControlIsEnabled}" />
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="4" Grid.Column="1">
-            <Label Content="{Binding Messenger.ChatsCollectionSelectedItem.TargetName}" DockPanel.Dock="Top"
+            <Label Content="{Binding MessengerViewModel.ChatsCollectionSelectedItem.TargetName}" DockPanel.Dock="Top"
                    BorderThickness="0,0,0,1" BorderBrush="LightGray" MinHeight="27" />
             <ScrollViewer Name="MessagePanelScrollViewer" VerticalScrollBarVisibility="Auto">
-                <ItemsControl Name="MessagesPanel" ItemsSource="{Binding Messenger.MessagesCollection}">
+                <ItemsControl Name="MessagesPanel" ItemsSource="{Binding MessengerViewModel.MessagesCollection}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource MessageBorder}" HorizontalAlignment="{Binding Position}">
@@ -75,8 +75,8 @@
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="6" Grid.Column="2">
             <ListBox Style="{StaticResource ClientsCollection}"
-                     ItemsSource="{Binding Messenger.ChatsCollection}"
-                     SelectedItem="{Binding Messenger.ChatsCollectionSelectedItem, Mode=TwoWay}"
+                     ItemsSource="{Binding MessengerViewModel.ChatsCollection}"
+                     SelectedItem="{Binding MessengerViewModel.ChatsCollectionSelectedItem, Mode=TwoWay}"
                      BorderThickness="1,0,0,1"
                      BorderBrush="LightGray"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -138,13 +138,13 @@
         </DockPanel>
         <DockPanel Grid.Row="5" Grid.RowSpan="2" Grid.Column="1">
             <TextBox Style="{StaticResource MessageTextBox}"
-                     Text="{Binding Messenger.Message, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding MessengerViewModel.Message, UpdateSourceTrigger=PropertyChanged}"
                      TextWrapping="Wrap"
-                     Visibility="{Binding Messenger.MessageVisibility}"
+                     Visibility="{Binding MessengerViewModel.MessageVisibility}"
                      HorizontalContentAlignment="Left"
                      VerticalContentAlignment="Center" FontSize="14">
                 <TextBox.InputBindings>
-                    <KeyBinding Command="{Binding Messenger.SendCommand}" Key="Enter" />
+                    <KeyBinding Command="{Binding MessengerViewModel.SendCommand}" Key="Enter" />
                 </TextBox.InputBindings>
             </TextBox>
         </DockPanel>

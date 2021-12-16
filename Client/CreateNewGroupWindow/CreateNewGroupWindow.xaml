@@ -31,10 +31,11 @@
             </ListBox>
         </DockPanel>
         <DockPanel Grid.Row="1">
-            <TextBox Text="{Binding GroupTitle}" />
+            <TextBox Text="{Binding GroupTitle}" FontSize="25" HorizontalContentAlignment="Center"
+                     VerticalContentAlignment="Center" />
         </DockPanel>
         <DockPanel Grid.Row="2">
-            <Button Content="Create group" Command="{Binding CreateNewGroupCommand}" IsDefault="True" />
+            <Button Content="Create group" Command="{Binding CreateNewGroupCommand}" FontSize="25" />
         </DockPanel>
     </Grid>
 </Window>

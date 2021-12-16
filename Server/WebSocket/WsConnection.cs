@@ -79,17 +79,6 @@
             Sessions.SendToAsync(serializedMessages, targetId, SendCompleted);
         }
 
-        public void Broadcast(MessageContainer container)
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            string serializedMessages = JsonConvert.SerializeObject(container, _settings);
-            Sessions.BroadcastAsync(serializedMessages, null);
-        }
-
         public void SetInactivityTimeout(int inactivityTimeoutInterval)
         {
             _inactivityTimeoutInterval = inactivityTimeoutInterval;

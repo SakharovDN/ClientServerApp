@@ -13,8 +13,6 @@
         ChatHistoryResponse,
         ChatCreatedBroadcast,
         GroupCreationRequest,
-        GroupListRequest,
-        GroupListResponse,
         ChatListRequest,
         ChatListResponse,
     }

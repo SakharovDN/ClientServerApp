@@ -10,6 +10,8 @@
 
     using EventLog;
 
+    using Messenger;
+
     public class MainViewModel : ViewModelBase
     {
         #region Fields
@@ -27,7 +29,7 @@
 
         #region Properties
 
-        public Messenger.Messenger Messenger { get; set; }
+        public MessengerViewModel MessengerViewModel { get; set; }
 
         public ControlsEnabledViewModel ControlsEnabledViewModel { get; set; }
 
@@ -89,7 +91,7 @@
             _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponse;
             _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
-            Messenger = new Messenger.Messenger(_client);
+            MessengerViewModel = new MessengerViewModel(_client);
             EventsCollection = new ObservableCollection<string>();
             Address = "127.0.0.1";
             Port = "65000";
@@ -107,7 +109,7 @@
             }
         }
 
-        private void StartConnection(object commandParameter)
+        private void StartConnection(object obj)
         {
             try
             {
@@ -125,13 +127,13 @@
             }
         }
 
-        private void StopConnection(object commandParameter)
+        private void StopConnection(object obj)
         {
             _client.Disconnect();
             ControlsEnabledViewModel.SetDefaultControlsState();
         }
 
-        private void GetEventLogs(object commandParameter)
+        private void GetEventLogs(object obj)
         {
             _client.RequestEventLogs();
         }
@@ -147,7 +149,7 @@
                     }
                     else
                     {
-                        Messenger.Dispose();
+                        MessengerViewModel.Dispose();
                         ControlsEnabledViewModel.SetDefaultControlsState();
                         EventsCollection.Add($"Connection lost {DateTime.Now:HH:mm}");
                     }

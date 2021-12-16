@@ -8,7 +8,7 @@
 
     using Common;
 
-    public partial class Messenger : ViewModelBase
+    public partial class MessengerViewModel : ViewModelBase
     {
         #region Constants
 
@@ -23,7 +23,6 @@
         private readonly WsClient _client;
         private string _message;
         private ObservableCollection<ClientMessage> _messagesCollection;
-
         private CommandHandler _sendCommand;
         private Visibility _messageVisibility;
 
@@ -67,7 +66,7 @@
 
         #region Constructors
 
-        public Messenger(WsClient client)
+        public MessengerViewModel(WsClient client)
         {
             _client = client;
             _client.MessageHandler.MessageReceived += HandleReceivedMessage;
@@ -97,7 +96,7 @@
             MessageVisibility = Visibility.Hidden;
         }
 
-        private void PerformSendButton(object commandParameter)
+        private void PerformSendButton(object obj)
         {
             if (string.IsNullOrEmpty(Message))
             {
@@ -105,13 +104,11 @@
             }
 
             Message = _messageRegex.Replace(Message, REPLACEMENT).Trim();
-
             _client.SendMessage(
                 ChatsCollectionSelectedItem != null
                     ? ChatsCollectionSelectedItem.Id.ToString()
                     : _selectedClient.Id.ToString(),
                 Message);
-
             Message = string.Empty;
         }
 
@@ -128,7 +125,6 @@
                         }
 
                         chat.LastMessage = args.Message;
-
                         break;
                     }
 
