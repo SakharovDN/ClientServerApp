@@ -1,11 +1,6 @@
 ﻿namespace Client
 {
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-
-    using Annotations;
-
-    public class ControlsEnabledViewModel : INotifyPropertyChanged
+    public class ControlsEnabledViewModel : ViewModelBase
     {
         #region Fields
 
@@ -38,12 +33,6 @@
 
         #endregion
 
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
         #region Constructors
 
         public ControlsEnabledViewModel()
@@ -65,12 +54,6 @@
         {
             MessengerControlIsEnabled = true;
             ConnectionControlIsEnabled = false;
-        }
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

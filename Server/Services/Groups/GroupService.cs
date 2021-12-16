@@ -4,7 +4,6 @@
     using System.Collections.Generic;
 
     using Common;
-    using Common.Messages;
 
     using Newtonsoft.Json;
 
@@ -21,8 +20,6 @@
         #region Events
 
         public event EventHandler<ChatNotExistsEventArgs> ChatNotExists;
-
-        public event EventHandler<RequestHandledEventArgs> GroupListRequestHandled;
 
         #endregion
 
@@ -42,9 +39,9 @@
             return _storage.Groups.Find(Guid.Parse(groupId));
         }
 
-        public List<string> GetClientIds(string groupId)
+        public List<Guid> GetClientIds(string groupId)
         {
-            return JsonConvert.DeserializeObject<List<string>>(GetGroupById(groupId).ClientIds);
+            return JsonConvert.DeserializeObject<List<Guid>>(GetGroupById(groupId).ClientIds);
         }
 
         public void CreateNewGroup(Group group)
@@ -54,7 +51,6 @@
 
         public void HandleGroupCreationRequest(object sender, GroupCreationRequestReceivedEventArgs args)
         {
-            DateTime timestamp = DateTime.Now;
             string clientIds = JsonConvert.SerializeObject(args.ClientIds);
             var group = new Group
             {
@@ -74,23 +70,6 @@
                 MessageAmount = 0
             };
             ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
-        }
-
-        public void HandleGroupListRequest(object sender, GroupListRequestReceivedEventArgs args)
-        {
-            var groups = new List<Group>();
-
-            foreach (Group group in _storage.Groups)
-            {
-                List<string> clientIds = GetClientIds(group.Id.ToString());
-
-                if (clientIds.Contains(args.ClientId))
-                {
-                    groups.Add(group);
-                }
-            }
-
-            GroupListRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new GroupListResponse(groups).GetContainer()));
         }
 
         #endregion

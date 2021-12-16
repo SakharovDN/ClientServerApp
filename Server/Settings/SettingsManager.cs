@@ -39,6 +39,12 @@
             return _configSettings;
         }
 
+        public string GetDbConnectionString()
+        {
+            return
+                $"Data Source={_configSettings.DbServerName};Initial Catalog=ClientServerApp;Integrated Security=True;MultipleActiveResultSets=True";
+        }
+
         private ConfigSettings ReadConfigFile()
         {
             if (File.Exists(CONFIG_FILE_PATH))

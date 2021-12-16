@@ -13,7 +13,7 @@
 
         event EventHandler<RequestHandledEventArgs> ChatListRequestHandled;
 
-        event EventHandler<ChatHistoryRequestHandledEventArgs> ChatHistoryRequestHandled;
+        event EventHandler<RequestHandledEventArgs> ChatHistoryRequestHandled;
 
         #endregion
 

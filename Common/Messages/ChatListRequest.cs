@@ -22,10 +22,10 @@
         public MessageContainer GetContainer()
         {
             return new MessageContainer
-                   {
-                       Type = MessageTypes.ChatListRequest,
-                       Payload = this
-                   };
+            {
+                Type = MessageTypes.ChatListRequest,
+                Payload = this
+            };
         }
 
         #endregion

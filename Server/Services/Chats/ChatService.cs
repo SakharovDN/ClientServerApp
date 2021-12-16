@@ -37,7 +37,7 @@
 
         public event EventHandler<RequestHandledEventArgs> ChatListRequestHandled;
 
-        public event EventHandler<ChatHistoryRequestHandledEventArgs> ChatHistoryRequestHandled;
+        public event EventHandler<RequestHandledEventArgs> ChatHistoryRequestHandled;
 
         #endregion
 
@@ -54,15 +54,15 @@
             }
 
             CommonChat = new Chat
-                         {
-                             Id = Guid.NewGuid(),
-                             Type = ChatTypes.Common,
-                             SourceId = null,
-                             SourceName = null,
-                             TargetId = null,
-                             TargetName = COMMON_CHAT_NAME,
-                             MessageAmount = 0
-                         };
+            {
+                Id = Guid.NewGuid(),
+                Type = ChatTypes.Common,
+                SourceId = null,
+                SourceName = null,
+                TargetId = null,
+                TargetName = COMMON_CHAT_NAME,
+                MessageAmount = 0
+            };
             CreateNewChat(null, new ChatNotExistsEventArgs(CommonChat));
         }
 
@@ -92,74 +92,66 @@
         {
             Chat chat = _storage.Chats.Find(Guid.Parse(args.ChatId));
             List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chat.Id.ToString()).ToList().Cast<Message>().ToList();
-            ChatHistoryRequestHandled?.Invoke(sender, new ChatHistoryRequestHandledEventArgs(new ChatHistoryResponse(chatHistory).GetContainer()));
+            ChatHistoryRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new ChatHistoryResponse(chatHistory).GetContainer()));
         }
 
         private List<Chat> GetClientsChats(string clientId)
         {
             var chats = new List<Chat>();
-            CommonChat.LastMessage = _storage.Messages.Find(Guid.Parse(CommonChat.LastMessageId));
-            chats.Add(CommonChat);
 
             foreach (Chat chat in _storage.Chats)
             {
-                switch (chat.Type)
+                if (chat.Type == ChatTypes.Common)
                 {
-                    case ChatTypes.Private when chat.SourceId == clientId || chat.TargetId == clientId:
+                    if (chat.LastMessageId != null)
                     {
-                        foreach (StorageMessage message in _storage.Messages)
-                        {
-                            if (chat.LastMessageId != message.Id.ToString())
-                            {
-                                continue;
-                            }
-
-                            chat.LastMessage = message;
-
-                            break;
-                        }
-
-                        chats.Add(chat);
-
-                        break;
+                        chat.LastMessage = _storage.Messages.Find(Guid.Parse(chat.LastMessageId));
                     }
 
-                    case ChatTypes.Group:
+                    chats.Add(chat);
+                }
+
+                if (chat.Type != ChatTypes.Private || chat.SourceId != clientId && chat.TargetId != clientId)
+                {
+                    continue;
+                }
+
+                foreach (StorageMessage message in _storage.Messages)
+                {
+                    if (chat.LastMessageId != message.Id.ToString())
                     {
-                        foreach (Group group in _storage.Groups)
-                        {
-                            if (chat.TargetId != group.Id.ToString())
-                            {
-                                continue;
-                            }
-
-                            var groupClientIds = JsonConvert.DeserializeObject<List<string>>(group.ClientIds);
-
-                            if (groupClientIds == null)
-                            {
-                                continue;
-                            }
-
-                            foreach (string unused in groupClientIds.Where(groupClientId => clientId == groupClientId))
-                            {
-                                foreach (StorageMessage message in _storage.Messages)
-                                {
-                                    if (chat.LastMessageId != message.Id.ToString())
-                                    {
-                                        continue;
-                                    }
-
-                                    chat.LastMessage = message;
-
-                                    break;
-                                }
-
-                                chats.Add(chat);
-                            }
-                        }
-
-                        break;
+                        continue;
                     }
+
+                    chat.LastMessage = message;
+                    break;
+                }
+
+                chats.Add(chat);
+            }
+
+            foreach (Group group in _storage.Groups)
+            {
+                var groupClientIds = JsonConvert.DeserializeObject<List<string>>(group.ClientIds);
+
+                if (groupClientIds != null && !groupClientIds.Contains(clientId))
+                {
+                    continue;
+                }
+
+                foreach (Chat chat in _storage.Chats)
+                {
+                    if (chat.TargetId != group.Id.ToString())
+                    {
+                        continue;
+                    }
+
+                    if (chat.LastMessageId != null)
+                    {
+                        chat.LastMessage = _storage.Messages.Find(Guid.Parse(chat.LastMessageId));
+                    }
+
+                    chats.Add(chat);
                 }
             }
 

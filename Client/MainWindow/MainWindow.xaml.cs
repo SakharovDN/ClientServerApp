@@ -21,7 +21,7 @@
 
         #region Methods
 
-        private void MessagesCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void MessagesCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (VisualTreeHelper.GetChildrenCount(MessagesPanel) <= 0)
             {

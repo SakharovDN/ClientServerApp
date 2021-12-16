@@ -13,7 +13,7 @@
 
     using NewGroupWindow;
 
-    public partial class Messenger
+    public partial class MessengerViewModel
     {
         #region Fields
 
@@ -87,7 +87,6 @@
 
                 ChatsCollectionSelectedItem = chat;
                 _selectedClient = null;
-
                 break;
             }
 
@@ -214,14 +213,13 @@
                 case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem != null:
                     MessageVisibility = Visibility.Visible;
                     _client.RequestChatHistory(ChatsCollectionSelectedItem.Id.ToString());
-
                     break;
             }
         }
 
         private void RefreshChatsCollection()
         {
-            ChatsCollection = new ObservableCollection<Chat>(ChatsCollection.OrderByDescending(chat => chat.LastMessage.Timestamp));
+            ChatsCollection = new ObservableCollection<Chat>(ChatsCollection.OrderByDescending(chat => chat.LastMessage?.Timestamp));
             CollectionViewSource.GetDefaultView(ChatsCollection).Refresh();
         }
 

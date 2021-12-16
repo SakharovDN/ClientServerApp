@@ -73,7 +73,10 @@
 
         private void CreateNewGroup(object obj)
         {
-            GroupCreated?.Invoke(null, EventArgs.Empty);
+            if (!string.IsNullOrEmpty(GroupTitle) && SelectedClients.Count != 0)
+            {
+                GroupCreated?.Invoke(null, EventArgs.Empty);
+            }
         }
 
         #endregion

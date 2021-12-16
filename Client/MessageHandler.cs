@@ -24,17 +24,15 @@
 
         public event EventHandler<ChatCreatedBroadcastReceivedEventArgs> ChatCreatedBroadcastReceived;
 
-        public event EventHandler<GroupListResponseReceivedEventArgs> GroupListResponseReceived;
-
         public event EventHandler<ChatListResponseReceivedEventArgs> ChatListResponseReceived;
 
         #endregion
 
         #region Methods
 
-        public void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs e)
+        public void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs args)
         {
-            var container = JsonConvert.DeserializeObject<MessageContainer>(e.MessageContainer);
+            var container = JsonConvert.DeserializeObject<MessageContainer>(args.MessageContainer);
 
             if (container == null)
             {
@@ -46,31 +44,21 @@
                 case MessageTypes.ConnectionResponse:
                     HandleConnectionResponse(container);
                     break;
-
                 case MessageTypes.MessageBroadcast:
                     HandleMessageBroadcast(container);
                     break;
-
                 case MessageTypes.EventLogsResponse:
                     HandleEventLogsResponse(container);
                     break;
-
                 case MessageTypes.ConnectionStateChangedBroadcast:
                     HandleConnectionStateChangedBroadcast(container);
                     break;
-
                 case MessageTypes.ChatHistoryResponse:
                     HandleChatHistoryResponse(container);
                     break;
-
                 case MessageTypes.ChatCreatedBroadcast:
                     HandleChatCreatedBroadcast(container);
                     break;
-
-                case MessageTypes.GroupListResponse:
-                    HandleGroupListResponse(container);
-                    break;
-
                 case MessageTypes.ChatListResponse:
                     HandleChatListResponse(container);
                     break;
@@ -82,14 +70,6 @@
             if (((JObject)container.Payload).ToObject(typeof(ChatListResponse)) is ChatListResponse chatListResponse)
             {
                 ChatListResponseReceived?.Invoke(null, new ChatListResponseReceivedEventArgs(chatListResponse.Chats));
-            }
-        }
-
-        private void HandleGroupListResponse(MessageContainer container)
-        {
-            if (((JObject)container.Payload).ToObject(typeof(GroupListResponse)) is GroupListResponse groupListResponse)
-            {
-                GroupListResponseReceived?.Invoke(null, new GroupListResponseReceivedEventArgs(groupListResponse.Groups));
             }
         }
 

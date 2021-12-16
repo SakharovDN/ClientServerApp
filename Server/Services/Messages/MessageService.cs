@@ -51,12 +51,11 @@
                     SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
                     TargetId = args.ChatId,
                     TargetName = _storage.Clients.Find(Guid.Parse(args.ChatId))?.Name,
-                    LastMessage = new Message() 
-                                  { 
-                                      Timestamp = DateTime.Now
-                                  },
+                    LastMessage = new Message
+                    {
+                        Timestamp = DateTime.Now
+                    },
                     MessageAmount = 0
-
                 };
                 ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
             }

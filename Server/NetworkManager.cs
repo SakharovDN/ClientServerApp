@@ -1,7 +1,6 @@
 ﻿namespace Server
 {
     using System;
-    using System.Collections.Generic;
 
     using Common;
     using Common.Messages;
@@ -40,7 +39,7 @@
             _settingsManager = new SettingsManager();
             _configSetting = _settingsManager.GetConfigSettings();
             _wsServer = new WsServer(_configSetting);
-            _storage = new InternalStorage(GetDbConnectionString(_configSetting.DbServerName));
+            _storage = new InternalStorage(_settingsManager.GetDbConnectionString());
             _chatService = new ChatService(_storage);
             _groupService = new GroupService(_storage);
             _clientService = new ClientService(_storage);
@@ -54,14 +53,12 @@
             _messageService.MessageRequestHandled += SendBroadcast;
             _chatService.NewChatCreated += SendBroadcast;
             _wsServer.ChatHistoryRequestReceived += _chatService.HandleChatHistoryRequest;
-            _chatService.ChatHistoryRequestHandled += SendChatHistoryResponse;
+            _chatService.ChatHistoryRequestHandled += Send;
             _wsServer.GroupCreationRequestReceived += _groupService.HandleGroupCreationRequest;
             _wsServer.EventLogsRequestReceived += SendEventLogsResponse;
             _messageService.ChatNotExists += _chatService.CreateNewChat;
             _groupService.ChatNotExists += _chatService.CreateNewChat;
             _messageService.MessageAddedToDb += _chatService.UpdateChatRecord;
-            _wsServer.GroupListRequestReceived += _groupService.HandleGroupListRequest;
-            _groupService.GroupListRequestHandled += Send;
             _wsServer.ChatListRequestReceived += _chatService.HandleChatListRequest;
             _chatService.ChatListRequestHandled += Send;
         }
@@ -94,11 +91,6 @@
             {
                 _logger.Error(ex.Message, ex.Source);
             }
-        }
-
-        private string GetDbConnectionString(string dbServerName)
-        {
-            return $"Data Source={dbServerName};Initial Catalog=ClientServerApp;Integrated Security=True;MultipleActiveResultSets=True";
         }
 
         private void HandleConnectionClosed(object sender, EventArgs args)
@@ -136,11 +128,6 @@
             _wsServer.Send(sender, args.ConnectionResponse.GetContainer());
         }
 
-        private void SendChatHistoryResponse(object sender, ChatHistoryRequestHandledEventArgs args)
-        {
-            _wsServer.Send(sender, args.ChatHistoryResponse);
-        }
-
         private void Send(object sender, RequestHandledEventArgs args)
         {
             _wsServer.Send(sender, args.Response);
@@ -158,16 +145,11 @@
                     _wsServer.SendTo(sender, args.Response, args.Chat.SourceId);
                     break;
                 case ChatTypes.Group:
-                    List<string> clientIds = _groupService.GetClientIds(args.Chat.TargetId);
-
-                    if (clientIds != null)
-                    {
-                        foreach (string clientId in clientIds)
+                    _groupService.GetClientIds(args.Chat.TargetId).ForEach(
+                        clientId =>
                         {
-                            _wsServer.SendTo(sender, args.Response, clientId);
-                        }
-                    }
-
+                            _wsServer.SendTo(sender, args.Response, clientId.ToString());
+                        });
                     break;
             }
         }

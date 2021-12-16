@@ -14,8 +14,6 @@
 
     using WebSocketSharp;
 
-    using Group = Common.Group;
-
     public class WsClient
     {
         #region Constants
@@ -89,8 +87,6 @@
 
         public string Id { get; set; }
 
-        public List<Group> Groups { get; set; }
-
         public bool IsConnected => _socket?.ReadyState == WebSocketState.Open;
 
         #endregion
@@ -110,7 +106,6 @@
             MessageHandler = new MessageHandler();
             MessageContainerReceived += MessageHandler.HandleMessageContainer;
             MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
-            MessageHandler.GroupListResponseReceived += HandleGroupListResponseReceived;
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -207,12 +202,6 @@
             _socket.Send(serializedMessages);
         }
 
-        private void HandleGroupListResponseReceived(object sender, GroupListResponseReceivedEventArgs args)
-        {
-            Groups = args.Groups;
-            RequestChatList();
-        }
-
         private void HandleConnectionResponseReceived(object sender, ConnectionResponseReceivedEventArgs args)
         {
             if (args.Result == ResultCodes.Failure)
@@ -222,7 +211,7 @@
             }
 
             Id = args.ClientId;
-            RequestGroupList();
+            RequestChatList();
             _keepAlive = new KeepAlive(this, args.KeepAliveInterval);
             _keepAlive.Start();
         }
@@ -230,11 +219,6 @@
         private void RequestChatList()
         {
             Send(new ChatListRequest(Id).GetContainer());
-        }
-
-        private void RequestGroupList()
-        {
-            Send(new GroupListRequest(Id).GetContainer());
         }
 
         private static void OnError(object sender, ErrorEventArgs args)
