@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Client.ConnectedClients"
         d:DataContext="{d:DesignInstance Type=local:ConnectedClientsViewModel}"
         mc:Ignorable="d"
-        Title="Connected Clients" Height="450" Width="300" ResizeMode="CanMinimize">
+        Title="Connected Clients" Height="450" Width="300" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner">
     <Grid>
         <DockPanel>
             <ListBox Style="{StaticResource ClientsCollection}"

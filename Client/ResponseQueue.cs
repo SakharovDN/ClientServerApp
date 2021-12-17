@@ -1,6 +1,9 @@
 ﻿namespace Client
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
+    using System.Timers;
 
     using Common;
     using Common.Messages;
@@ -8,8 +11,18 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public class MessageHandler
+    using Timer = System.Timers.Timer;
+
+    public class ResponseQueue
     {
+        #region Fields
+
+        private readonly ConcurrentQueue<MessageContainer> _responses;
+        private readonly Timer _timer;
+        private int _handling;
+
+        #endregion
+
         #region Events
 
         public event EventHandler<EventLogsReceivedEventArgs> EventLogsReceived;
@@ -28,9 +41,31 @@
 
         #endregion
 
+        #region Constructors
+
+        public ResponseQueue()
+        {
+            _responses = new ConcurrentQueue<MessageContainer>();
+            _handling = 0;
+            _timer = new Timer(100);
+            _timer.Elapsed += DequeueResponse;
+        }
+
+        #endregion
+
         #region Methods
 
-        public void HandleMessageContainer(object sender, MessageContainerReceivedEventArgs args)
+        public void Start()
+        {
+            _timer.Start();
+        }
+
+        public void Stop()
+        {
+            _timer.Stop();
+        }
+
+        public void EnqueueResponse(object sender, MessageContainerReceivedEventArgs args)
         {
             var container = JsonConvert.DeserializeObject<MessageContainer>(args.MessageContainer);
 
@@ -39,29 +74,39 @@
                 return;
             }
 
-            switch (container.Type)
+            _responses.Enqueue(container);
+        }
+
+        private void DequeueResponse(object sender, ElapsedEventArgs args)
+        {
+            if (_responses.TryDequeue(out MessageContainer container) && Interlocked.CompareExchange(ref _handling, 1, 0) == 0)
             {
-                case MessageTypes.ConnectionResponse:
-                    HandleConnectionResponse(container);
-                    break;
-                case MessageTypes.MessageBroadcast:
-                    HandleMessageBroadcast(container);
-                    break;
-                case MessageTypes.EventLogsResponse:
-                    HandleEventLogsResponse(container);
-                    break;
-                case MessageTypes.ConnectionStateChangedBroadcast:
-                    HandleConnectionStateChangedBroadcast(container);
-                    break;
-                case MessageTypes.ChatHistoryResponse:
-                    HandleChatHistoryResponse(container);
-                    break;
-                case MessageTypes.ChatCreatedBroadcast:
-                    HandleChatCreatedBroadcast(container);
-                    break;
-                case MessageTypes.ChatListResponse:
-                    HandleChatListResponse(container);
-                    break;
+                switch (container.Type)
+                {
+                    case MessageTypes.ConnectionResponse:
+                        HandleConnectionResponse(container);
+                        break;
+                    case MessageTypes.MessageBroadcast:
+                        HandleMessageBroadcast(container);
+                        break;
+                    case MessageTypes.EventLogsResponse:
+                        HandleEventLogsResponse(container);
+                        break;
+                    case MessageTypes.ConnectionStateChangedBroadcast:
+                        HandleConnectionStateChangedBroadcast(container);
+                        break;
+                    case MessageTypes.ChatHistoryResponse:
+                        HandleChatHistoryResponse(container);
+                        break;
+                    case MessageTypes.ChatCreatedBroadcast:
+                        HandleChatCreatedBroadcast(container);
+                        break;
+                    case MessageTypes.ChatListResponse:
+                        HandleChatListResponse(container);
+                        break;
+                }
+
+                _handling = 0;
             }
         }
 

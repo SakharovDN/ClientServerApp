@@ -69,12 +69,12 @@
         public MessengerViewModel(WsClient client)
         {
             _client = client;
-            _client.MessageHandler.MessageReceived += HandleReceivedMessage;
-            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponse;
-            _client.MessageHandler.ChatListResponseReceived += HandledChatListResponse;
-            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
-            _client.MessageHandler.ChatHistoryReceived += ShowChatHistory;
-            _client.MessageHandler.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcast;
+            _client.ResponseQueue.MessageReceived += HandleReceivedMessage;
+            _client.ResponseQueue.ConnectionResponseReceived += HandleConnectionResponse;
+            _client.ResponseQueue.ChatListResponseReceived += HandledChatListResponse;
+            _client.ResponseQueue.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
+            _client.ResponseQueue.ChatHistoryReceived += ShowChatHistory;
+            _client.ResponseQueue.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcast;
             ConnectedClientsCollection = new ObservableCollection<Client>();
             MessagesCollection = new ObservableCollection<ClientMessage>();
             ChatsCollection = new ObservableCollection<Chat>();

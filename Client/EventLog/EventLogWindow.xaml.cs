@@ -11,6 +11,7 @@
         {
             InitializeComponent();
             DataContext = new EventLogViewModel(eventLogs);
+            Owner = Application.Current.MainWindow;
         }
 
         #endregion

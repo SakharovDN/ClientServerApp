@@ -87,9 +87,9 @@
         {
             _client = new WsClient();
             _client.ConnectionStateChanged += HandleConnectionStateChanged;
-            _client.MessageHandler.EventLogsReceived += ShowEventLogs;
-            _client.MessageHandler.ConnectionResponseReceived += HandleConnectionResponse;
-            _client.MessageHandler.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
+            _client.ResponseQueue.EventLogsReceived += ShowEventLogs;
+            _client.ResponseQueue.ConnectionResponseReceived += HandleConnectionResponse;
+            _client.ResponseQueue.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             MessengerViewModel = new MessengerViewModel(_client);
             EventsCollection = new ObservableCollection<string>();

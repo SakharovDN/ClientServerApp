@@ -58,6 +58,16 @@
             }
         }
 
+        public Client SelectedClient
+        {
+            get => _selectedClient;
+            set
+            {
+                _selectedClient = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
         public ICommand ShowConnectedClientsCommand =>
@@ -86,14 +96,12 @@
                 }
 
                 ChatsCollectionSelectedItem = chat;
-                _selectedClient = null;
                 break;
             }
 
             if (ChatsCollectionSelectedItem == null)
             {
-                MessagesCollection.Clear();
-                _selectedClient = connectedClientWindow.SelectedClient;
+                SelectedClient = connectedClientWindow.SelectedClient;
             }
         }
 
@@ -198,10 +206,9 @@
                     ChatsCollection.Add(args.Chat);
                     RefreshChatsCollection();
 
-                    if (args.Chat.TargetName == _selectedClient.Name)
+                    if (args.Chat.TargetName == SelectedClient?.Name)
                     {
                         ChatsCollectionSelectedItem = args.Chat;
-                        _selectedClient = null;
                     }
                 });
         }
@@ -211,8 +218,19 @@
             switch (args.PropertyName)
             {
                 case nameof(ChatsCollectionSelectedItem) when ChatsCollectionSelectedItem != null:
+                    SelectedClient = null;
                     MessageVisibility = Visibility.Visible;
                     _client.RequestChatHistory(ChatsCollectionSelectedItem.Id.ToString());
+                    break;
+                case nameof(SelectedClient) when SelectedClient != null:
+                    ChatsCollectionSelectedItem = null;
+                    MessagesCollection.Clear();
+                    MessageVisibility = Visibility.Visible;
+                    break;
+                case nameof(ChatsCollectionSelectedItem):
+                case nameof(SelectedClient) when SelectedClient == null && ChatsCollectionSelectedItem == null:
+                    MessagesCollection.Clear();
+                    MessageVisibility = Visibility.Hidden;
                     break;
             }
         }
