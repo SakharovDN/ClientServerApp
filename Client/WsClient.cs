@@ -12,7 +12,11 @@
 
     using Newtonsoft.Json;
 
+    using NLog;
+
     using WebSocketSharp;
+
+    using Logger = NLog.Logger;
 
     public class WsClient
     {
@@ -25,13 +29,14 @@
 
         #region Fields
 
-        public MessageHandler MessageHandler;
+        public ResponseQueue ResponseQueue;
         private KeepAlive _keepAlive;
         private readonly JsonSerializerSettings _settings;
         private WebSocket _socket;
         private string _name;
         private string _ipAddress;
         private string _port;
+        private readonly Logger _logger;
 
         #endregion
 
@@ -103,13 +108,14 @@
 
         public WsClient()
         {
-            MessageHandler = new MessageHandler();
-            MessageContainerReceived += MessageHandler.HandleMessageContainer;
-            MessageHandler.ConnectionResponseReceived += HandleConnectionResponseReceived;
+            ResponseQueue = new ResponseQueue();
+            MessageContainerReceived += ResponseQueue.EnqueueResponse;
+            ResponseQueue.ConnectionResponseReceived += HandleConnectionResponseReceived;
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         #endregion
@@ -130,6 +136,7 @@
             _socket.OnError += OnError;
             _socket.EmitOnPing = true;
             _socket.Connect();
+            ResponseQueue.Start();
         }
 
         public void Disconnect()
@@ -144,6 +151,7 @@
                 return;
             }
 
+            ResponseQueue.Stop();
             _socket.Close();
             _socket.OnOpen -= OnOpen;
             _socket.OnClose -= OnClose;
@@ -221,8 +229,9 @@
             Send(new ChatListRequest(Id).GetContainer());
         }
 
-        private static void OnError(object sender, ErrorEventArgs args)
+        private void OnError(object sender, ErrorEventArgs args)
         {
+            _logger.Error(args.Exception);
             throw args.Exception;
         }
 

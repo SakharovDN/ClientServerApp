@@ -31,6 +31,7 @@
             _connectedClientsViewModel = new ConnectedClientsViewModel(connectedClientsCollection);
             DataContext = _connectedClientsViewModel;
             _connectedClientsViewModel.ClientSelected += ShowChatWithSelectedClient;
+            Owner = Application.Current.MainWindow;
         }
 
         #endregion

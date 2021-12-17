@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Client"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
-        Title="ClientServerApp" Height="600" Width="1000" MinWidth="750" MinHeight="450">
+        Title="ClientServerApp" Height="600" Width="1000" MinWidth="750" MinHeight="450" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.Resources>
             <Style x:Key="ChatsItemTextBlock" TargetType="TextBlock">

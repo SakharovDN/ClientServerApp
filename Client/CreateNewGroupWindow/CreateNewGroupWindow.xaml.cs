@@ -33,6 +33,7 @@
             _createNewGroupViewModel = new CreateNewGroupViewModel(connectedClients);
             DataContext = _createNewGroupViewModel;
             _createNewGroupViewModel.GroupCreated += HandleGroupCreated;
+            Owner = Application.Current.MainWindow;
         }
 
         #endregion
