@@ -38,9 +38,9 @@
         public InternalStorage(string dbConnection)
             : base(dbConnection)
         {
-            _workQueue = new ConcurrentQueue<QueueItem>();
+            Database.SetInitializer(new CreateDatabaseIfNotExists<InternalStorage>());
             _logger = LogManager.GetCurrentClassLogger();
-            //todo: check connection
+            _workQueue = new ConcurrentQueue<QueueItem>();
         }
 
         #endregion
