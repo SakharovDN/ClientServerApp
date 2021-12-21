@@ -1,6 +1,7 @@
 ﻿namespace Common
 {
     using System;
+    using System.Collections.Generic;
 
     using Messages;
 
@@ -12,14 +13,17 @@
 
         public MessageContainer Response { get; }
 
+        public List<string> ClientIds { get; }
+
         #endregion
 
         #region Constructors
 
-        public RequestHandledEventArgs(MessageContainer response, Chat chat = null)
+        public RequestHandledEventArgs(MessageContainer response, Chat chat = null, List<string> clientIds = null)
         {
-            Chat = chat;
             Response = response;
+            Chat = chat;
+            ClientIds = clientIds;
         }
 
         #endregion

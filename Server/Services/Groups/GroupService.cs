@@ -69,7 +69,7 @@
                 TargetName = args.GroupTitle,
                 MessageAmount = 0
             };
-            ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
+            ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat, args.ClientIds));
         }
 
         #endregion

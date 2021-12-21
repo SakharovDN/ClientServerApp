@@ -25,12 +25,6 @@
 
         #endregion
 
-        #region Properties
-
-        public Chat CommonChat { get; }
-
-        #endregion
-
         #region Events
 
         public event EventHandler<RequestHandledEventArgs> NewChatCreated;
@@ -46,14 +40,14 @@
         public ChatService(InternalStorage storage)
         {
             _storage = storage;
-            CommonChat = _storage.Chats.FirstOrDefault(chat => chat.Type == ChatTypes.Common);
+            Chat commonChat = _storage.Chats.FirstOrDefault(chat => chat.Type == ChatTypes.Common);
 
-            if (CommonChat != null)
+            if (commonChat != null)
             {
                 return;
             }
 
-            CommonChat = new Chat
+            commonChat = new Chat
             {
                 Id = Guid.NewGuid(),
                 Type = ChatTypes.Common,
@@ -63,7 +57,7 @@
                 TargetName = COMMON_CHAT_NAME,
                 MessageAmount = 0
             };
-            CreateNewChat(null, new ChatNotExistsEventArgs(CommonChat));
+            CreateNewChat(null, new ChatNotExistsEventArgs(commonChat));
         }
 
         #endregion
@@ -74,7 +68,7 @@
         {
             _storage.AddQueueItem(new CreateNewChatItem(args.Chat));
             MessageContainer chatCreatedBroadcast = new ChatCreatedBroadcast(args.Chat).GetContainer();
-            NewChatCreated?.Invoke(sender, new RequestHandledEventArgs(chatCreatedBroadcast, args.Chat));
+            NewChatCreated?.Invoke(sender, new RequestHandledEventArgs(chatCreatedBroadcast, args.Chat, args.ClientIds));
         }
 
         public void UpdateChatRecord(object sender, MessageAddedToDbEventArgs args)

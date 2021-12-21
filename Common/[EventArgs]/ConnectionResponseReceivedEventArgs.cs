@@ -11,7 +11,7 @@
 
         public string Reason { get; }
 
-        public List<Client> ConnectedClients { get; }
+        public HashSet<Client> ConnectedClients { get; }
 
         public string ClientId { get; }
 
@@ -24,7 +24,7 @@
         public ConnectionResponseReceivedEventArgs(
             ResultCodes result,
             string reason,
-            List<Client> connectedClients,
+            HashSet<Client> connectedClients,
             string clientId,
             int keepAliveInterval)
         {

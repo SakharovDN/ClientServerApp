@@ -11,7 +11,7 @@
 
     using ConnectedClients;
 
-    using NewGroupWindow;
+    using Groups;
 
     public partial class MessengerViewModel
     {
@@ -107,11 +107,11 @@
 
         private void CreateNewGroup(object obj)
         {
-            var newGroupWindow = new CreateNewGroupWindow(ConnectedClientsCollection);
+            var groupsWindow = new GroupsWindow(ConnectedClientsCollection);
 
-            if (newGroupWindow.ShowDialog() == true)
+            if (groupsWindow.ShowDialog() == true)
             {
-                _client.RequestGroupCreation(newGroupWindow.GroupTitle, newGroupWindow.SelectedClients);
+                _client.RequestGroupCreation(groupsWindow.GroupTitle, groupsWindow.SelectedClients);
             }
         }
 

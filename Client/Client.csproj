@@ -76,10 +76,11 @@
     <Compile Include="ConnectedClients\ConnectedClientsWindow.xaml.cs">
       <DependentUpon>ConnectedClientsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\NullVisibilityConverter.cs" />
     <Compile Include="KeepAlive.cs" />
     <Compile Include="ResponseQueue.cs" />
     <Compile Include="CommandHandler.cs" />
-    <Compile Include="MainWindow\ControlsEnabledViewModel.cs" />
+    <Compile Include="Main\ControlsEnabledViewModel.cs" />
     <Compile Include="EventLog\EventLogViewModel.cs" />
     <Compile Include="EventLog\EventLogWindow.xaml.cs">
       <DependentUpon>EventLogWindow.xaml</DependentUpon>
@@ -87,15 +88,15 @@
     <Compile Include="Messenger\ChatsClientsViewModel.cs" />
     <Compile Include="Messenger\ClientMessage.cs" />
     <Compile Include="Messenger\MessagesViewModel.cs" />
-    <Compile Include="CreateNewGroupWindow\CreateNewGroupWindow.xaml.cs">
-      <DependentUpon>CreateNewGroupWindow.xaml</DependentUpon>
+    <Compile Include="Groups\GroupsWindow.xaml.cs">
+      <DependentUpon>GroupsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MultiSelector\IListItemConverter.cs" />
     <Compile Include="MultiSelector\MultiSelectorBehavior.cs" />
-    <Compile Include="CreateNewGroupWindow\CreateNewGroupViewModel.cs" />
+    <Compile Include="Groups\GroupsViewModel.cs" />
     <Compile Include="MultiSelector\TwoListSynchronizer.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="MainWindow\MainViewModel.cs" />
+    <Compile Include="Main\MainViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="WsClient.cs" />
     <Page Include="ConnectedClients\ConnectedClientsWindow.xaml">
@@ -106,7 +107,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow\MainWindow.xaml">
+    <Page Include="Main\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -114,11 +115,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow\MainWindow.xaml.cs">
+    <Compile Include="Main\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="CreateNewGroupWindow\CreateNewGroupWindow.xaml">
+    <Page Include="Groups\GroupsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -141,6 +142,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

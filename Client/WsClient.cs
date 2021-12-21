@@ -22,6 +22,8 @@
     {
         #region Constants
 
+        private const int MIN_PORT = 8000;
+        private const int MAX_PORT = 65535;
         private const string PATTERN = @"[ ]{2,}";
         private const string REPLACEMENT = @" ";
 
@@ -81,7 +83,7 @@
             get => _port;
             set
             {
-                if (!int.TryParse(value, out int portNumber) || portNumber < 49152 || portNumber > 65535)
+                if (!int.TryParse(value, out int portNumber) || portNumber < MIN_PORT || portNumber > MAX_PORT)
                 {
                     throw new Exception("Port entered incorrectly.");
                 }

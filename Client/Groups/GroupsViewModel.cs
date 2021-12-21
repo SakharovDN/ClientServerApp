@@ -1,4 +1,4 @@
-﻿namespace Client.NewGroupWindow
+﻿namespace Client.Groups
 {
     using System;
     using System.Collections.ObjectModel;
@@ -6,7 +6,7 @@
 
     using Common;
 
-    public class CreateNewGroupViewModel : ViewModelBase
+    public class GroupsViewModel : ViewModelBase
     {
         #region Fields
 
@@ -61,7 +61,7 @@
 
         #region Constructors
 
-        public CreateNewGroupViewModel(ObservableCollection<Client> connectedClients)
+        public GroupsViewModel(ObservableCollection<Client> connectedClients)
         {
             ConnectedClients = connectedClients;
             SelectedClients = new ObservableCollection<Client>();
