@@ -1,7 +1,6 @@
 ﻿namespace Server.Services
 {
     using System;
-    using System.Collections.Generic;
 
     using Common;
 
@@ -33,16 +32,6 @@
         #endregion
 
         #region Methods
-
-        public Group GetGroupById(string groupId)
-        {
-            return _storage.Groups.Find(Guid.Parse(groupId));
-        }
-
-        public List<Guid> GetClientIds(string groupId)
-        {
-            return JsonConvert.DeserializeObject<List<Guid>>(GetGroupById(groupId).ClientIds);
-        }
 
         public void CreateNewGroup(Group group)
         {
