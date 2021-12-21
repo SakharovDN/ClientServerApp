@@ -39,17 +39,21 @@
             : base(dbConnection)
         {
             _logger = LogManager.GetCurrentClassLogger();
-            Database.SetInitializer(new CreateDatabaseIfNotExists<InternalStorage>());
 
-            if (Database.Exists())
+            if (!Database.Exists())
             {
-                _workQueue = new ConcurrentQueue<QueueItem>();
+                try
+                {
+                    Database.CreateIfNotExists();
+                }
+                catch
+                {
+                    _logger.Error("Failed to create database. The server name may be incorrect.");
+                    Environment.Exit(0);
+                }
             }
-            else
-            {
-                _logger.Error("Failed to create database. The server name may be incorrect.");
-                Environment.Exit(0);
-            }
+
+            _workQueue = new ConcurrentQueue<QueueItem>();
         }
 
         #endregion
