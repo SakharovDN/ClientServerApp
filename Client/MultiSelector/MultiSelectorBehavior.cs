@@ -26,21 +26,11 @@
 
         #region Methods
 
-        /// <summary>
-        /// Gets the synchronized selected items.
-        /// </summary>
-        /// <param name = "dependencyObject">The dependency object.</param>
-        /// <returns>The list that is acting as the sync list.</returns>
         public static IList GetSynchronizedSelectedItems(DependencyObject dependencyObject)
         {
             return (IList)dependencyObject.GetValue(SynchronizedSelectedItems);
         }
 
-        /// <summary>
-        /// Sets the synchronized selected items.
-        /// </summary>
-        /// <param name = "dependencyObject">The dependency object.</param>
-        /// <param name = "value">The value to be set as synchronized items.</param>
         public static void SetSynchronizedSelectedItems(DependencyObject dependencyObject, IList value)
         {
             dependencyObject.SetValue(SynchronizedSelectedItems, value);
@@ -65,7 +55,6 @@
                 Set_synchronizationManager(dependencyObject, null);
             }
 
-            // check that this property is an IList, and that it is being set on a ListBox
             if (!(e.NewValue is IList) || !(dependencyObject is Selector selector))
             {
                 return;
@@ -88,9 +77,6 @@
 
         #region Classes
 
-        /// <summary>
-        /// A synchronization manager.
-        /// </summary>
         private class SynchronizationManager
         {
             #region Fields
@@ -102,10 +88,6 @@
 
             #region Constructors
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref = "SynchronizationManager"/> class.
-            /// </summary>
-            /// <param name = "selector">The selector.</param>
             internal SynchronizationManager(Selector selector)
             {
                 _multiSelector = selector;
@@ -115,9 +97,6 @@
 
             #region Methods
 
-            /// <summary>
-            /// Starts synchronizing the list.
-            /// </summary>
             public void StartSynchronizingList()
             {
                 IList list = GetSynchronizedSelectedItems(_multiSelector);
@@ -131,9 +110,6 @@
                 _synchronizer.StartSynchronizing();
             }
 
-            /// <summary>
-            /// Stops synchronizing the list.
-            /// </summary>
             public void StopSynchronizing()
             {
                 _synchronizer.StopSynchronizing();

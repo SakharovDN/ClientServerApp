@@ -1,7 +1,6 @@
 ﻿namespace Server.Services
 {
     using System;
-    using System.Collections.Generic;
 
     using Common;
 
@@ -14,8 +13,6 @@
         #endregion
 
         #region Methods
-
-        List<Guid> GetClientIds(string groupId);
 
         void HandleGroupCreationRequest(object sender, GroupCreationRequestReceivedEventArgs args);
 

@@ -14,12 +14,7 @@
         #region Fields
 
         private readonly InternalStorage _storage;
-
-        #endregion
-
-        #region Properties
-
-        public HashSet<Client> ConnectedClients { get; set; }
+        private readonly HashSet<Client> _connectedClients;
 
         #endregion
 
@@ -34,7 +29,7 @@
         public ClientService(InternalStorage storage)
         {
             _storage = storage;
-            ConnectedClients = new HashSet<Client>();
+            _connectedClients = new HashSet<Client>();
         }
 
         #endregion
@@ -43,7 +38,7 @@
 
         public bool ClientIsConnected(string clientId)
         {
-            return ConnectedClients.Any(client => clientId == client.Id.ToString());
+            return _connectedClients.Any(client => clientId == client.Id.ToString());
         }
 
         public Client GetClientById(string clientId)
@@ -53,7 +48,7 @@
 
         public void SetClientDisconnected(Client client)
         {
-            ConnectedClients.Remove(client);
+            _connectedClients.Remove(client);
             _storage.AddQueueItem(new AddEventLogItem(client.Name, false));
         }
 
@@ -71,7 +66,7 @@
             {
                 connectionResponse.Result = ResultCodes.Ok;
                 connectionResponse.ClientId = client.Id.ToString();
-                connectionResponse.ConnectedClients = ConnectedClients;
+                connectionResponse.ConnectedClients = _connectedClients;
                 SetClientConnected(client);
             }
 
@@ -85,7 +80,7 @@
 
         private void SetClientConnected(Client client)
         {
-            ConnectedClients.Add(client);
+            _connectedClients.Add(client);
             _storage.AddQueueItem(new AddEventLogItem(client.Name, true));
         }
 
