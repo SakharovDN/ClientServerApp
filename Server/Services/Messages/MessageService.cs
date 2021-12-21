@@ -1,9 +1,12 @@
 ﻿namespace Server.Services
 {
     using System;
+    using System.Collections.Generic;
 
     using Common;
     using Common.Messages;
+
+    using Newtonsoft.Json;
 
     using Storage;
 
@@ -51,10 +54,6 @@
                     SourceName = _storage.Clients.Find(Guid.Parse(args.SourceId))?.Name,
                     TargetId = args.ChatId,
                     TargetName = _storage.Clients.Find(Guid.Parse(args.ChatId))?.Name,
-                    LastMessage = new Message
-                    {
-                        Timestamp = DateTime.Now
-                    },
                     MessageAmount = 0
                 };
                 ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat));
@@ -72,7 +71,23 @@
             chat.LastMessage = message;
             _storage.AddQueueItem(new AddNewMessageItem(message));
             MessageAddedToDb?.Invoke(sender, new MessageAddedToDbEventArgs(chat.Id.ToString(), message.Id.ToString()));
-            MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), chat));
+
+            if (chat.Type == ChatTypes.Group)
+            {
+                string serializedClientIds = _storage.Groups.Find(Guid.Parse(chat.TargetId))?.ClientIds;
+
+                if (serializedClientIds == null)
+                {
+                    return;
+                }
+
+                var clientIds = JsonConvert.DeserializeObject<List<string>>(serializedClientIds);
+                MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), chat, clientIds));
+            }
+            else
+            {
+                MessageRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new MessageBroadcast(message).GetContainer(), chat));
+            }
         }
 
         #endregion

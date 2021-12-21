@@ -38,9 +38,18 @@
         public InternalStorage(string dbConnection)
             : base(dbConnection)
         {
-            Database.SetInitializer(new CreateDatabaseIfNotExists<InternalStorage>());
             _logger = LogManager.GetCurrentClassLogger();
-            _workQueue = new ConcurrentQueue<QueueItem>();
+            Database.SetInitializer(new CreateDatabaseIfNotExists<InternalStorage>());
+
+            if (Database.Exists())
+            {
+                _workQueue = new ConcurrentQueue<QueueItem>();
+            }
+            else
+            {
+                _logger.Error("Failed to create database. The server name may be incorrect.");
+                Environment.Exit(0);
+            }
         }
 
         #endregion

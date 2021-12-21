@@ -1,8 +1,10 @@
 ﻿<Application x:Class="Client.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow/MainWindow.xaml">
+             xmlns:converters="clr-namespace:Client.Converters"
+             StartupUri="Main/MainWindow.xaml">
     <Application.Resources>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter" />
         <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
             <Setter Property="BorderBrush" Value="LightGray" />
@@ -18,6 +20,24 @@
                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                     <VisualBrush.Visual>
                         <Label Content="Address..." Foreground="Gray" FontSize="25" />
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="GroupTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox}"
+               xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Style.Resources>
+                <VisualBrush x:Key="CueBannerBrush" AlignmentX="Center" AlignmentY="Center" Stretch="None">
+                    <VisualBrush.Visual>
+                        <Label Content="Group title..." Foreground="Gray" FontSize="25" />
                     </VisualBrush.Visual>
                 </VisualBrush>
             </Style.Resources>

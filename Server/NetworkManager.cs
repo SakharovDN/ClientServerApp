@@ -146,11 +146,11 @@
                     _wsServer.SendTo(sender, args.Response, args.Chat.SourceId);
                     break;
                 case ChatTypes.Group:
-                    _groupService.GetClientIds(args.Chat.TargetId).ForEach(
-                        clientId =>
-                        {
-                            _wsServer.SendTo(sender, args.Response, clientId.ToString());
-                        });
+                    foreach (string clientId in args.ClientIds)
+                    {
+                        _wsServer.SendTo(sender, args.Response, clientId);
+                    }
+
                     break;
             }
         }

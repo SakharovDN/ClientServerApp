@@ -6,8 +6,6 @@
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
 
-    using NewGroupWindow;
-
     public class MultiSelectorBehavior
     {
         #region Fields
@@ -147,10 +145,8 @@
                 {
                     case MultiSelector multiSelector:
                         return multiSelector.SelectedItems;
-
                     case ListBox box:
                         return box.SelectedItems;
-
                     default:
                         throw new InvalidOperationException("Target object has no SelectedItems property to bind.");
                 }

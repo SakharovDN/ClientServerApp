@@ -19,7 +19,7 @@
 
         #region Properties
 
-        public List<Client> ConnectedClients { get; set; }
+        public HashSet<Client> ConnectedClients { get; set; }
 
         #endregion
 
@@ -34,7 +34,7 @@
         public ClientService(InternalStorage storage)
         {
             _storage = storage;
-            ConnectedClients = new List<Client>();
+            ConnectedClients = new HashSet<Client>();
         }
 
         #endregion

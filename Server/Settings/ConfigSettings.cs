@@ -20,14 +20,17 @@
 
         #endregion
 
-        #region Constructors
+        #region Methods
 
-        public ConfigSettings()
+        public ConfigSettings GetDefaultConfigSettings()
         {
-            NetworkInterface = "WebSocket";
-            Port = 65000;
-            InactivityTimeoutInterval = 60000;
-            DbServerName = @"localhost\SQLExpress";
+            return new ConfigSettings
+            {
+                NetworkInterface = "WebSocket",
+                Port = 65000,
+                InactivityTimeoutInterval = 60000,
+                DbServerName = @"localhost\SQLExpress"
+            };
         }
 
         #endregion
