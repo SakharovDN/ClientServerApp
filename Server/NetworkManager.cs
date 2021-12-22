@@ -74,6 +74,7 @@
             {
                 _wsServer.Start();
                 _logger.Info("Server started successfully");
+                Console.WriteLine("Server started successfully");
             }
             catch (Exception ex)
             {
@@ -87,6 +88,7 @@
             {
                 _wsServer.Stop();
                 _logger.Info("Server stopped successfully");
+                Console.WriteLine("Server started successfully");
             }
             catch (Exception ex)
             {
@@ -96,7 +98,16 @@
 
         private void HandleConnectionClosed(object sender, EventArgs args)
         {
-            var connection = sender as WsConnection;
+            if (!(sender is WsConnection connection))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(connection.ClientId))
+            {
+                return;
+            }
+
             Client client = _clientService.GetClientById(connection?.ClientId);
 
             if (client == null)
