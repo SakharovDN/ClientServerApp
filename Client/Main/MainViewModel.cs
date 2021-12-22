@@ -179,7 +179,7 @@
                     else
                     {
                         _client.Disconnect();
-                        EventsCollection.Add(args.Reason);
+                        EventsCollection.Add($"{DateTime.Now:HH:mm:ss} {args.Reason}");
                         ControlsEnabledViewModel.SetDefaultControlsState();
                     }
                 });

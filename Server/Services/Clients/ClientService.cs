@@ -11,6 +11,12 @@
 
     public class ClientService : IClientService
     {
+        #region Constants
+
+        private const string COMMON_CHAT_NAME = "Common";
+
+        #endregion
+
         #region Fields
 
         private readonly InternalStorage _storage;
@@ -54,8 +60,17 @@
 
         public void HandleConnectionRequest(object sender, ConnectionRequestReceivedEventArgs args)
         {
-            Client client = GetOrCreateClient(args.ClientName);
             var connectionResponse = new ConnectionResponse();
+
+            if (string.Equals(args.ClientName, COMMON_CHAT_NAME, StringComparison.CurrentCultureIgnoreCase))
+            {
+                connectionResponse.Result = ResultCodes.Failure;
+                connectionResponse.Reason = "The name \"Common\" is not available. Please choose another name.";
+                ConnectionRequestHandled?.Invoke(sender, new ConnectionRequestHandledEventArgs(null, connectionResponse));
+                return;
+            }
+
+            Client client = GetOrCreateClient(args.ClientName);
 
             if (ClientIsConnected(client.Id.ToString()))
             {

@@ -13,7 +13,7 @@
         {
             InitializeComponent();
             serviceInstaller1.StartType = ServiceStartMode.Manual;
-            serviceInstaller1.ServiceName = "AppClientServerService";
+            serviceInstaller1.ServiceName = "ClientServerAppService";
             serviceProcessInstaller1.Account = ServiceAccount.LocalSystem;
         }
 
