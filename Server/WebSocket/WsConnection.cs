@@ -18,7 +18,7 @@
         private WsServer _server;
         private readonly JsonSerializerSettings _settings;
         private DateTime _lastActivity;
-        private Timer _checkConnectionTimer;
+        private Timer _checkActivityTimer;
         private int _inactivityTimeoutInterval;
 
         #endregion
@@ -41,7 +41,6 @@
 
         public WsConnection()
         {
-            EmitOnPing = true;
             _settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -92,28 +91,21 @@
         protected override void OnMessage(MessageEventArgs args)
         {
             _lastActivity = DateTime.Now;
-
-            if (args.IsPing)
-            {
-                Sessions.PingTo(ID);
-                return;
-            }
-
             RequestReceived?.Invoke(this, new RequestReceivedEventArgs(ID, args.Data));
         }
 
         protected override void OnOpen()
         {
             _server.AddConnection(this);
-            _checkConnectionTimer = new Timer(_inactivityTimeoutInterval);
-            _checkConnectionTimer.Elapsed += CheckConnection;
-            _checkConnectionTimer.Start();
+            _checkActivityTimer = new Timer(_inactivityTimeoutInterval);
+            _checkActivityTimer.Elapsed += CheckConnection;
+            _checkActivityTimer.Start();
         }
 
         protected override void OnClose(CloseEventArgs args)
         {
-            _checkConnectionTimer.Stop();
-            _server.CloseConnection(ID);
+            _checkActivityTimer.Stop();
+            _server.ReleaseConnection(ID);
         }
 
         private void SendCompleted(bool completed)
@@ -123,13 +115,12 @@
                 return;
             }
 
-            _server.CloseConnection(ID);
             Close();
         }
 
         private void CheckConnection(object sender, ElapsedEventArgs args)
         {
-            if (DateTime.Now > _lastActivity + TimeSpan.FromMilliseconds(3 * _inactivityTimeoutInterval))
+            if (DateTime.Now > _lastActivity + TimeSpan.FromMilliseconds(5 * _inactivityTimeoutInterval))
             {
                 Close();
             }

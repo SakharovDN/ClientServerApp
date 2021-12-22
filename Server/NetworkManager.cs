@@ -47,21 +47,23 @@
             _eventLogService = new EventLogService(_storage);
             _logger = LogManager.GetCurrentClassLogger();
             _wsServer.ConnectionRequestReceived += _clientService.HandleConnectionRequest;
-            _clientService.ConnectionRequestHandled += SendConnectionResponse;
-            _wsServer.ConnectionClosed += HandleConnectionClosed;
             _wsServer.MessageRequestReceived += _messageService.HandleMessageRequest;
-            _messageService.MessageRequestHandled += SendBroadcast;
-            _chatService.NewChatCreated += SendBroadcast;
             _wsServer.ChatHistoryRequestReceived += _chatService.HandleChatHistoryRequest;
-            _chatService.ChatHistoryRequestHandled += Send;
             _wsServer.GroupCreationRequestReceived += _groupService.HandleGroupCreationRequest;
             _wsServer.EventLogsRequestReceived += _eventLogService.HandleEventLogsRequest;
-            _eventLogService.EventLogRequestHandled += Send;
+            _wsServer.ChatListRequestReceived += _chatService.HandleChatListRequest;
             _messageService.ChatNotExists += _chatService.CreateNewChat;
             _groupService.ChatNotExists += _chatService.CreateNewChat;
             _messageService.MessageAddedToDb += _chatService.UpdateChatRecord;
-            _wsServer.ChatListRequestReceived += _chatService.HandleChatListRequest;
+            _clientService.ConnectionRequestHandled += Send;
+            _chatService.ChatHistoryRequestHandled += Send;
+            _eventLogService.EventLogRequestHandled += Send;
             _chatService.ChatListRequestHandled += Send;
+            _messageService.MessageRequestHandled += SendBroadcast;
+            _chatService.NewChatCreated += SendBroadcast;
+            _clientService.ClientConnected += SendConnectionStateChangedBroadcast;
+            _wsServer.ConnectionClosed += SendConnectionStateChangedBroadcast;
+            _wsServer.ConnectionClosed += _clientService.SetClientDisconnected;
         }
 
         #endregion
@@ -96,7 +98,7 @@
             }
         }
 
-        private void HandleConnectionClosed(object sender, EventArgs args)
+        private void SendConnectionStateChangedBroadcast(object sender, ConnectionStateChangedEventArgs args)
         {
             if (!(sender is WsConnection connection))
             {
@@ -108,36 +110,14 @@
                 return;
             }
 
-            Client client = _clientService.GetClientById(connection?.ClientId);
+            Client client = _clientService.GetClientById(connection.ClientId);
 
             if (client == null)
             {
                 return;
             }
 
-            if (!_clientService.ClientIsConnected(client.Id.ToString()))
-            {
-                return;
-            }
-
-            _clientService.SetClientDisconnected(client);
-            _wsServer.SendBroadcast(new ConnectionStateChangedBroadcast(client, false).GetContainer());
-        }
-
-        private void SendConnectionResponse(object sender, ConnectionRequestHandledEventArgs args)
-        {
-            if (args.ConnectionResponse.Result == ResultCodes.Ok)
-            {
-                if (sender is WsConnection connection)
-                {
-                    connection.ClientId = args.Client.Id.ToString();
-                }
-
-                args.ConnectionResponse.KeepAliveInterval = _configSetting.InactivityTimeoutInterval / 2;
-                _wsServer.SendBroadcast(new ConnectionStateChangedBroadcast(args.Client, true).GetContainer());
-            }
-
-            _wsServer.Send(sender, args.ConnectionResponse.GetContainer());
+            _wsServer.SendBroadcast(new ConnectionStateChangedBroadcast(client, args.IsConnected).GetContainer());
         }
 
         private void Send(object sender, RequestHandledEventArgs args)

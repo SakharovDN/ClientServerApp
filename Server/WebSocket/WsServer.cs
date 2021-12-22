@@ -33,7 +33,7 @@
 
         public event EventHandler<ConnectionRequestReceivedEventArgs> ConnectionRequestReceived;
 
-        public event EventHandler ConnectionClosed;
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionClosed;
 
         public event EventHandler<MessageRequestReceivedEventArgs> MessageRequestReceived;
 
@@ -127,11 +127,11 @@
             _connections.TryAdd(connection.ID, connection);
         }
 
-        internal void CloseConnection(string connectionId)
+        internal void ReleaseConnection(string connectionId)
         {
             if (_connections.TryRemove(connectionId, out WsConnection connection))
             {
-                ConnectionClosed?.Invoke(connection, EventArgs.Empty);
+                ConnectionClosed?.Invoke(connection, new ConnectionStateChangedEventArgs(connection.ClientId, false));
             }
         }
 

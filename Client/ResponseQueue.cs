@@ -157,8 +157,7 @@
                         connectionResponse.Result,
                         connectionResponse.Reason,
                         connectionResponse.ConnectedClients,
-                        connectionResponse.ClientId,
-                        connectionResponse.KeepAliveInterval));
+                        connectionResponse.ClientId));
             }
         }
 

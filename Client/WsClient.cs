@@ -32,7 +32,6 @@
         #region Fields
 
         public ResponseQueue ResponseQueue;
-        private KeepAlive _keepAlive;
         private readonly JsonSerializerSettings _settings;
         private WebSocket _socket;
         private string _name;
@@ -136,7 +135,6 @@
             _socket.OnClose += OnClose;
             _socket.OnMessage += OnMessage;
             _socket.OnError += OnError;
-            _socket.EmitOnPing = true;
             _socket.Connect();
             ResponseQueue.Start();
         }
@@ -222,8 +220,6 @@
 
             Id = args.ClientId;
             RequestChatList();
-            _keepAlive = new KeepAlive(this, args.KeepAliveInterval);
-            _keepAlive.Start();
         }
 
         private void RequestChatList()
@@ -239,12 +235,6 @@
 
         private void OnMessage(object sender, MessageEventArgs args)
         {
-            if (args.IsPing)
-            {
-                _keepAlive.ResetPingResponseCounter();
-                return;
-            }
-
             MessageContainerReceived?.Invoke(this, new MessageContainerReceivedEventArgs(args.Data));
         }
 
@@ -255,7 +245,6 @@
 
         private void OnClose(object sender, CloseEventArgs args)
         {
-            _keepAlive?.Stop();
             ConnectionStateChanged?.Invoke(this, new ConnectionStateChangedEventArgs(false));
         }
 

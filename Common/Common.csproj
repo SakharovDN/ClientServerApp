@@ -100,7 +100,6 @@
     <Compile Include="[EventArgs]\ChatListRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatListResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ChatNotExistsEventArgs.cs" />
-    <Compile Include="[EventArgs]\ConnectionRequestHandledEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionRequestReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\ConnectionStateChangedBroadcastReceivedEventArgs.cs" />
