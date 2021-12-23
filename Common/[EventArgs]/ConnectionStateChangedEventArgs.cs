@@ -6,6 +6,8 @@
     {
         #region Properties
 
+        public string ClientId { get; }
+
         public bool IsConnected { get; }
 
         #endregion
@@ -14,6 +16,12 @@
 
         public ConnectionStateChangedEventArgs(bool isConnected)
         {
+            IsConnected = isConnected;
+        }
+
+        public ConnectionStateChangedEventArgs(string clientId, bool isConnected)
+        {
+            ClientId = clientId;
             IsConnected = isConnected;
         }
 

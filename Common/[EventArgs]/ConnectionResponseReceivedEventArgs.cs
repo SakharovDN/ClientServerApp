@@ -15,8 +15,6 @@
 
         public string ClientId { get; }
 
-        public int KeepAliveInterval { get; }
-
         #endregion
 
         #region Constructors
@@ -25,14 +23,12 @@
             ResultCodes result,
             string reason,
             HashSet<Client> connectedClients,
-            string clientId,
-            int keepAliveInterval)
+            string clientId)
         {
             Result = result;
             Reason = reason;
             ConnectedClients = connectedClients;
             ClientId = clientId;
-            KeepAliveInterval = keepAliveInterval;
         }
 
         #endregion

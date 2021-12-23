@@ -77,7 +77,6 @@
       <DependentUpon>ConnectedClientsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullVisibilityConverter.cs" />
-    <Compile Include="KeepAlive.cs" />
     <Compile Include="ResponseQueue.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Main\ControlsEnabledViewModel.cs" />

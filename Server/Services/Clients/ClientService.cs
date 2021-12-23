@@ -9,6 +9,8 @@
 
     using Storage;
 
+    using WebSocket;
+
     public class ClientService : IClientService
     {
         #region Constants
@@ -26,7 +28,9 @@
 
         #region Events
 
-        public event EventHandler<ConnectionRequestHandledEventArgs> ConnectionRequestHandled;
+        public event EventHandler<RequestHandledEventArgs> ConnectionRequestHandled;
+
+        public event EventHandler<ConnectionStateChangedEventArgs> ClientConnected;
 
         #endregion
 
@@ -42,20 +46,21 @@
 
         #region Methods
 
-        public bool ClientIsConnected(string clientId)
+        public void SetClientDisconnected(object sender, ConnectionStateChangedEventArgs args)
         {
-            return _connectedClients.Any(client => clientId == client.Id.ToString());
+            if (args.IsConnected)
+            {
+                return;
+            }
+
+            Client client = GetClientById(args.ClientId);
+            _connectedClients.Remove(client);
+            _storage.AddQueueItem(new AddEventLogItem(client.Name, args.IsConnected));
         }
 
         public Client GetClientById(string clientId)
         {
             return _storage.Clients.Find(Guid.Parse(clientId));
-        }
-
-        public void SetClientDisconnected(Client client)
-        {
-            _connectedClients.Remove(client);
-            _storage.AddQueueItem(new AddEventLogItem(client.Name, false));
         }
 
         public void HandleConnectionRequest(object sender, ConnectionRequestReceivedEventArgs args)
@@ -66,7 +71,7 @@
             {
                 connectionResponse.Result = ResultCodes.Failure;
                 connectionResponse.Reason = "The name \"Common\" is not available. Please choose another name.";
-                ConnectionRequestHandled?.Invoke(sender, new ConnectionRequestHandledEventArgs(null, connectionResponse));
+                ConnectionRequestHandled?.Invoke(sender, new RequestHandledEventArgs(connectionResponse.GetContainer()));
                 return;
             }
 
@@ -79,13 +84,24 @@
             }
             else
             {
+                if (sender is WsConnection connection)
+                {
+                    connection.ClientId = client.Id.ToString();
+                }
+
                 connectionResponse.Result = ResultCodes.Ok;
                 connectionResponse.ClientId = client.Id.ToString();
                 connectionResponse.ConnectedClients = _connectedClients;
                 SetClientConnected(client);
+                ClientConnected?.Invoke(sender, new ConnectionStateChangedEventArgs(client.Id.ToString(), true));
             }
 
-            ConnectionRequestHandled?.Invoke(sender, new ConnectionRequestHandledEventArgs(client, connectionResponse));
+            ConnectionRequestHandled?.Invoke(sender, new RequestHandledEventArgs(connectionResponse.GetContainer()));
+        }
+
+        private bool ClientIsConnected(string clientId)
+        {
+            return _connectedClients.Any(client => clientId == client.Id.ToString());
         }
 
         private Client GetClientByName(string clientName)

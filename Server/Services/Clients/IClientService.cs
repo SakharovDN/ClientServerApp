@@ -8,7 +8,9 @@
     {
         #region Events
 
-        event EventHandler<ConnectionRequestHandledEventArgs> ConnectionRequestHandled;
+        event EventHandler<RequestHandledEventArgs> ConnectionRequestHandled;
+
+        event EventHandler<ConnectionStateChangedEventArgs> ClientConnected;
 
         #endregion
 
@@ -17,10 +19,7 @@
         Client GetClientById(string clientId);
 
         void HandleConnectionRequest(object sender, ConnectionRequestReceivedEventArgs args);
-
-        bool ClientIsConnected(string clientId);
-
-        void SetClientDisconnected(Client client);
+        void SetClientDisconnected(object sender, ConnectionStateChangedEventArgs args);
 
         #endregion
     }
