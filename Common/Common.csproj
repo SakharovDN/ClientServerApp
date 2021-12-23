@@ -88,6 +88,7 @@
     <Compile Include="Messages\EventLogsRequest.cs" />
     <Compile Include="Messages\EventLogsResponse.cs" />
     <Compile Include="Messages\GroupCreationRequest.cs" />
+    <Compile Include="Messages\GroupCreationResponse.cs" />
     <Compile Include="Messages\MessageBroadcast.cs" />
     <Compile Include="Messages\MessageContainer.cs" />
     <Compile Include="Messages\MessageRequest.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="[EventArgs]\ConnectionStateChangedEventArgs.cs" />
     <Compile Include="[EventArgs]\EventLogsReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\GroupCreationRequestReceivedEventArgs.cs" />
+    <Compile Include="[EventArgs]\GroupCreationResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\GroupListRequesttReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\GroupListResponseReceivedEventArgs.cs" />
     <Compile Include="[EventArgs]\MessageAddedToDbEventArgs.cs" />

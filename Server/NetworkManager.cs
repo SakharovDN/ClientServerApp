@@ -59,6 +59,7 @@
             _chatService.ChatHistoryRequestHandled += Send;
             _eventLogService.EventLogRequestHandled += Send;
             _chatService.ChatListRequestHandled += Send;
+            _groupService.GroupCreationRequestHandled += Send;
             _messageService.MessageRequestHandled += SendBroadcast;
             _chatService.NewChatCreated += SendBroadcast;
             _clientService.ClientConnected += SendConnectionStateChangedBroadcast;

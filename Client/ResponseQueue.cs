@@ -39,6 +39,8 @@
 
         public event EventHandler<ChatListResponseReceivedEventArgs> ChatListResponseReceived;
 
+        public event EventHandler<GroupCreationResponseReceivedEventArgs> GroupCreationResponseReceived;
+
         #endregion
 
         #region Constructors
@@ -103,6 +105,9 @@
                         break;
                     case MessageTypes.ChatListResponse:
                         HandleChatListResponse(container);
+                        break;
+                    case MessageTypes.GroupCreationResponse:
+                        HandleGroupCreationResponse(container);
                         break;
                 }
 
@@ -174,6 +179,16 @@
             if (((JObject)container.Payload).ToObject(typeof(ChatCreatedBroadcast)) is ChatCreatedBroadcast chatCreatedBroadcast)
             {
                 ChatCreatedBroadcastReceived?.Invoke(null, new ChatCreatedBroadcastReceivedEventArgs(chatCreatedBroadcast.Chat));
+            }
+        }
+
+        private void HandleGroupCreationResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(GroupCreationResponse)) is GroupCreationResponse groupCreationResponse)
+            {
+                GroupCreationResponseReceived?.Invoke(
+                    null,
+                    new GroupCreationResponseReceivedEventArgs(groupCreationResponse.Result, groupCreationResponse.Reason));
             }
         }
 

@@ -10,6 +10,8 @@
 
         event EventHandler<ChatNotExistsEventArgs> ChatNotExists;
 
+        event EventHandler<RequestHandledEventArgs> GroupCreationRequestHandled;
+
         #endregion
 
         #region Methods
