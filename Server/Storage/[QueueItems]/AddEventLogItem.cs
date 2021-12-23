@@ -2,6 +2,8 @@
 {
     using System;
 
+    using Common;
+
     public class AddEventLogItem : QueueItem
     {
         #region Fields

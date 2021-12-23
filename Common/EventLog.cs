@@ -1,4 +1,4 @@
-﻿namespace Server.Storage
+﻿namespace Common
 {
     using System;
 

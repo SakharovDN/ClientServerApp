@@ -1,13 +1,15 @@
 ﻿namespace Client.EventLog
 {
-    using System.Data;
+    using System.Collections.Generic;
     using System.Windows;
+
+    using Common;
 
     public partial class EventLogWindow : Window
     {
         #region Constructors
 
-        public EventLogWindow(DataTable eventLogs)
+        public EventLogWindow(IEnumerable<EventLog> eventLogs)
         {
             InitializeComponent();
             DataContext = new EventLogViewModel(eventLogs);

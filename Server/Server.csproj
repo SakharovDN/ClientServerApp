@@ -85,7 +85,6 @@
     <Compile Include="Services\Messages\MessageService.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Storage\[QueueItems]\AddNewClientItem.cs" />
-    <Compile Include="Storage\EventLog.cs" />
     <Compile Include="Storage\[QueueItems]\AddEventLogItem.cs" />
     <Compile Include="Storage\InternalStorage.cs" />
     <Compile Include="Storage\[QueueItems]\AddNewMessageItem.cs" />

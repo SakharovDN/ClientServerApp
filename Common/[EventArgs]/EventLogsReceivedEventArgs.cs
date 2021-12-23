@@ -1,19 +1,19 @@
 ﻿namespace Common
 {
     using System;
-    using System.Data;
+    using System.Collections.Generic;
 
     public class EventLogsReceivedEventArgs : EventArgs
     {
         #region Properties
 
-        public DataTable EventLogs { get; }
+        public List<EventLog> EventLogs { get; }
 
         #endregion
 
         #region Constructors
 
-        public EventLogsReceivedEventArgs(DataTable eventLogs)
+        public EventLogsReceivedEventArgs(List<EventLog> eventLogs)
         {
             EventLogs = eventLogs;
         }
