@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Chat.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="EventLog.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Messages\ChatCreatedBroadcast.cs" />

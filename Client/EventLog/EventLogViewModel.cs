@@ -1,8 +1,11 @@
 ﻿namespace Client.EventLog
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Data;
+    using System.Linq;
+
+    using Common;
 
     public class EventLogViewModel : ViewModelBase
     {
@@ -10,8 +13,8 @@
 
         private DateTime _selectedDateFrom;
         private DateTime _selectedDateTo;
-        private DataTable _eventLogs;
-        private readonly DataTable _eventLogsGlobal;
+        private List<EventLog> _eventLogs;
+        private readonly List<EventLog> _eventLogsGlobal;
 
         #endregion
 
@@ -45,7 +48,7 @@
             }
         }
 
-        public DataTable EventLogs
+        public List<EventLog> EventLogs
         {
             get => _eventLogs;
             set
@@ -59,12 +62,12 @@
 
         #region Constructors
 
-        public EventLogViewModel(DataTable eventLogs)
+        public EventLogViewModel(IEnumerable<EventLog> eventLogs)
         {
-            _eventLogsGlobal = eventLogs.Copy();
-            EventLogs = eventLogs.Copy();
-            SelectedDateTo = _eventLogsGlobal.Rows[0].Field<DateTime>("Timestamp").Date;
-            SelectedDateFrom = _eventLogsGlobal.Rows[_eventLogsGlobal.Rows.Count - 1].Field<DateTime>("Timestamp").Date;
+            _eventLogsGlobal = new List<EventLog>(eventLogs.OrderByDescending(eventLog => eventLog.Timestamp));
+            EventLogs = new List<EventLog>(_eventLogsGlobal);
+            SelectedDateTo = DateTime.Now;
+            SelectedDateFrom = DateTime.Now - TimeSpan.FromDays(7);
             PropertyChanged += HandlePropertyChanged;
         }
 
@@ -82,17 +85,10 @@
 
         private void FilterEventLogs()
         {
-            string filter = $"Timestamp >= '{SelectedDateFrom}' AND Timestamp < '{SelectedDateTo + TimeSpan.FromDays(1)}'";
-            string sort = "Timestamp desc";
-
-            try
-            {
-                EventLogs = _eventLogsGlobal.Select(filter, sort).CopyToDataTable();
-            }
-            catch
-            {
-                EventLogs = null;
-            }
+            List<EventLog> eventLogs = _eventLogsGlobal
+                                      .Where(eventLog => eventLog.Timestamp > SelectedDateFrom
+                                                         && eventLog.Timestamp < SelectedDateTo + TimeSpan.FromDays(1)).ToList();
+            EventLogs = new List<EventLog>(eventLogs);
         }
 
         #endregion

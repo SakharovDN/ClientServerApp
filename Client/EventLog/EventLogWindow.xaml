@@ -9,21 +9,39 @@
         Title="Event log" Height="450" Width="800" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
             <Label>From:</Label>
-            <DatePicker SelectedDate="{Binding SelectedDateFrom}"></DatePicker>
+            <DatePicker SelectedDate="{Binding SelectedDateFrom}" />
         </StackPanel>
-        <StackPanel  Grid.Row="0" Grid.Column="1">
+        <StackPanel Grid.Row="0" Grid.Column="1">
             <Label>To:</Label>
-            <DatePicker SelectedDate="{Binding SelectedDateTo}"></DatePicker>
+            <DatePicker SelectedDate="{Binding SelectedDateTo}" />
         </StackPanel>
-        <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0" ColumnWidth="*" ItemsSource="{Binding EventLogs}" AutoGenerateColumns="True"/>
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding EventLogs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Timestamp, StringFormat=d.M.yyyy HH:mm:ss}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Message}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
     </Grid>
 </Window>

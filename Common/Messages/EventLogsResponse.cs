@@ -1,18 +1,18 @@
 ﻿namespace Common.Messages
 {
-    using System.Data;
+    using System.Collections.Generic;
 
     public class EventLogsResponse
     {
         #region Properties
 
-        public DataTable EventLogs { get; set; }
+        public List<EventLog> EventLogs { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public EventLogsResponse(DataTable eventLogs)
+        public EventLogsResponse(List<EventLog> eventLogs)
         {
             EventLogs = eventLogs;
         }
