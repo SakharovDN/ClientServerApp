@@ -89,6 +89,7 @@
             _client.ConnectionStateChanged += HandleConnectionStateChanged;
             _client.ResponseQueue.EventLogsReceived += ShowEventLogs;
             _client.ResponseQueue.ConnectionResponseReceived += HandleConnectionResponse;
+            _client.ResponseQueue.GroupCreationResponseReceived += HandleGroupCreationResponse;
             _client.ResponseQueue.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
             ControlsEnabledViewModel = new ControlsEnabledViewModel();
             MessengerViewModel = new MessengerViewModel(_client);
@@ -181,6 +182,18 @@
                         _client.Disconnect();
                         EventsCollection.Add($"{DateTime.Now:HH:mm:ss} {args.Reason}");
                         ControlsEnabledViewModel.SetDefaultControlsState();
+                    }
+                });
+        }
+
+        private void HandleGroupCreationResponse(object sender, GroupCreationResponseReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    if (args.Result == ResultCodes.Failure)
+                    {
+                        EventsCollection.Add($"{DateTime.Now:HH:mm:ss} {args.Reason}");
                     }
                 });
         }

@@ -31,6 +31,7 @@
             string message = $"Client '{_clientName}' {clientState}.";
             var eventLog = new EventLog
             {
+                Id = 1,
                 Message = message,
                 Timestamp = DateTime.Now
             };

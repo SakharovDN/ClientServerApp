@@ -48,7 +48,7 @@
 
         public void SetClientDisconnected(object sender, ConnectionStateChangedEventArgs args)
         {
-            if (args.IsConnected)
+            if (args.IsConnected || string.IsNullOrEmpty(args.ClientId))
             {
                 return;
             }
