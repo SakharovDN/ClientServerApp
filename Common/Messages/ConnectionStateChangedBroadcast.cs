@@ -27,7 +27,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ConnectionStateChangedBroadcast,
-                Payload = this
+                Payload = this,
             };
         }
 

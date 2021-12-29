@@ -1,18 +1,18 @@
 ﻿namespace Common.Messages
 {
-    public class ChatHistoryRequest
+    public class ChatInfoResponse
     {
         #region Properties
 
-        public string ChatId { get; set; }
+        public Group Group { get; set; }
 
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequest(string chatId)
+        public ChatInfoResponse(Group group)
         {
-            ChatId = chatId;
+            Group = group;
         }
 
         #endregion
@@ -23,7 +23,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ChatHistoryRequest,
+                Type = MessageTypes.ChatInfoResponse,
                 Payload = this,
             };
         }

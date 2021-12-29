@@ -24,7 +24,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ChatCreatedBroadcast,
-                Payload = this
+                Payload = this,
             };
         }
 

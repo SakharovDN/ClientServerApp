@@ -5,6 +5,7 @@
              StartupUri="Main/MainWindow.xaml">
     <Application.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter" />
+        <converters:IconConverter x:Key="IconConverter"></converters:IconConverter>
         <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
             <Setter Property="BorderBrush" Value="LightGray" />
@@ -130,7 +131,6 @@
                                                 Value="{StaticResource Item.MouseOver.Background}" />
                                         <Setter Property="BorderBrush" TargetName="Bd"
                                                 Value="{StaticResource Item.MouseOver.Border}" />
-
                                     </MultiTrigger>
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>

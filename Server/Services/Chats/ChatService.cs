@@ -33,6 +33,8 @@
 
         public event EventHandler<RequestHandledEventArgs> ChatHistoryRequestHandled;
 
+        public event EventHandler<RequestHandledEventArgs> ChatInfoRequestHandled;
+
         #endregion
 
         #region Constructors
@@ -84,9 +86,68 @@
 
         public void HandleChatHistoryRequest(object sender, ChatHistoryRequestReceivedEventArgs args)
         {
-            Chat chat = _storage.Chats.Find(Guid.Parse(args.ChatId));
+            if (!Guid.TryParse(args.ChatId, out Guid chatId))
+            {
+                return;
+            }
+
+            Chat chat = _storage.Chats.Find(chatId);
             List<Message> chatHistory = _storage.Messages.Where(message => message.ChatId == chat.Id.ToString()).ToList().Cast<Message>().ToList();
             ChatHistoryRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new ChatHistoryResponse(chatHistory).GetContainer()));
+        }
+
+        public void HandleChatInfoRequest(object sender, ChatInfoRequestReceivedEventArgs args)
+        {
+            if (!Guid.TryParse(args.ChatId, out Guid chatId))
+            {
+                return;
+            }
+
+            Chat chat = _storage.Chats.Find(chatId);
+            Group group = null;
+
+            if (chat == null || chat.Type != ChatTypes.Group)
+            {
+                return;
+            }
+
+            if (!Guid.TryParse(chat.TargetId, out Guid groupId))
+            {
+                return;
+            }
+
+            group = _storage.Groups.Find(groupId);
+
+            if (group == null)
+            {
+                return;
+            }
+
+            if (!Guid.TryParse(group.CreatorId, out Guid creatorId))
+            {
+                return;
+            }
+
+            group.Creator = _storage.Clients.Find(creatorId);
+            var clientIds = JsonConvert.DeserializeObject<List<string>>(group.ClientIds);
+            group.Clients = new List<Client>();
+
+            if (clientIds == null)
+            {
+                return;
+            }
+
+            foreach (string clientId in clientIds)
+            {
+                if (!Guid.TryParse(clientId, out Guid id))
+                {
+                    continue;
+                }
+
+                group.Clients.Add(_storage.Clients.Find(id));
+            }
+
+            ChatInfoRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new ChatInfoResponse(group).GetContainer()));
         }
 
         private List<Chat> GetClientsChats(string clientId)
@@ -97,9 +158,9 @@
             {
                 if (chat.Type == ChatTypes.Common)
                 {
-                    if (chat.LastMessageId != null)
+                    if (chat.LastMessageId != null && Guid.TryParse(chat.LastMessageId, out Guid messageId))
                     {
-                        chat.LastMessage = _storage.Messages.Find(Guid.Parse(chat.LastMessageId));
+                        chat.LastMessage = _storage.Messages.Find(messageId);
                     }
 
                     chats.Add(chat);
@@ -140,9 +201,9 @@
                         continue;
                     }
 
-                    if (chat.LastMessageId != null)
+                    if (chat.LastMessageId != null && Guid.TryParse(chat.LastMessageId, out Guid lastMessageId))
                     {
-                        chat.LastMessage = _storage.Messages.Find(Guid.Parse(chat.LastMessageId));
+                        chat.LastMessage = _storage.Messages.Find(lastMessageId);
                     }
 
                     chats.Add(chat);

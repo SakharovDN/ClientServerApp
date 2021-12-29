@@ -24,7 +24,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ConnectionRequest,
-                Payload = this
+                Payload = this,
             };
         }
 

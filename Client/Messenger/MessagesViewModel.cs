@@ -75,6 +75,8 @@
             _client.ResponseQueue.ConnectionStateChangedBroadcastReceived += HandleConnectionStateChangedBroadcast;
             _client.ResponseQueue.ChatHistoryReceived += ShowChatHistory;
             _client.ResponseQueue.ChatCreatedBroadcastReceived += HandleChatCreatedBroadcast;
+            _client.ResponseQueue.ChatInfoResponseReceived += HandleChatInfo;
+            _client.ResponseQueue.GroupLeavingResponseReceived += RemoveGroup;
             ConnectedClientsCollection = new ObservableCollection<Client>();
             MessagesCollection = new ObservableCollection<ClientMessage>();
             ChatsCollection = new ObservableCollection<Chat>();

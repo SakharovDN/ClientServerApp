@@ -1,18 +1,21 @@
 ﻿namespace Common.Messages
 {
-    public class ChatHistoryRequest
+    public class GroupLeavingRequest
     {
         #region Properties
 
         public string ChatId { get; set; }
 
+        public string ClientId { get; set; }
+
         #endregion
 
         #region Constructors
 
-        public ChatHistoryRequest(string chatId)
+        public GroupLeavingRequest(string chatId, string clientId)
         {
             ChatId = chatId;
+            ClientId = clientId;
         }
 
         #endregion
@@ -23,7 +26,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ChatHistoryRequest,
+                Type = MessageTypes.GroupLeavingRequest,
                 Payload = this,
             };
         }

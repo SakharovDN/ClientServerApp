@@ -92,6 +92,7 @@
     <Compile Include="Storage\[QueueItems]\CreateNewGroupItem.cs" />
     <Compile Include="Storage\[QueueItems]\QueueItem.cs" />
     <Compile Include="Storage\[QueueItems]\UpdateChatRecordItem.cs" />
+    <Compile Include="Storage\[QueueItems]\UpdateGroupClientsItem.cs" />
     <Compile Include="WebSocket\WsConnection.cs" />
     <Compile Include="WebSocket\WsServer.cs" />
   </ItemGroup>

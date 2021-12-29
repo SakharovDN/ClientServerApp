@@ -32,7 +32,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.GroupCreationRequest,
-                Payload = this
+                Payload = this,
             };
         }
 

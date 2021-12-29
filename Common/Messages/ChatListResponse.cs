@@ -26,7 +26,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ChatListResponse,
-                Payload = this
+                Payload = this,
             };
         }
 

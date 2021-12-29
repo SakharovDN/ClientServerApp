@@ -20,12 +20,11 @@
 
         public MessageContainer GetContainer()
         {
-            var container = new MessageContainer
+            return new MessageContainer
             {
                 Type = MessageTypes.ConnectionResponse,
-                Payload = this
+                Payload = this,
             };
-            return container;
         }
 
         #endregion

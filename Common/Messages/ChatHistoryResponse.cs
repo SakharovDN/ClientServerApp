@@ -26,7 +26,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ChatHistoryResponse,
-                Payload = this
+                Payload = this,
             };
         }
 

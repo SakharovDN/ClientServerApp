@@ -26,7 +26,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.EventLogsResponse,
-                Payload = this
+                Payload = this,
             };
         }
 

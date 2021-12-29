@@ -7,6 +7,8 @@
     using System.Windows.Data;
     using System.Windows.Input;
 
+    using ChatInfo;
+
     using Common;
 
     using ConnectedClients;
@@ -23,6 +25,7 @@
         private CommandHandler _createNewGroupCommand;
         private CommandHandler _showConnectedClientsCommand;
         private Client _selectedClient;
+        private CommandHandler _getChatInfoCommand;
 
         #endregion
 
@@ -70,6 +73,8 @@
 
         public ICommand CreateNewGroupCommand => _createNewGroupCommand ?? (_createNewGroupCommand = new CommandHandler(CreateNewGroup));
 
+        public ICommand GetChatInfoCommand => _getChatInfoCommand ?? (_getChatInfoCommand = new CommandHandler(GetChatInfo));
+
         public ICommand ShowConnectedClientsCommand =>
             _showConnectedClientsCommand ?? (_showConnectedClientsCommand = new CommandHandler(ShowConnectedClients));
 
@@ -112,6 +117,14 @@
             if (groupsWindow.ShowDialog() == true)
             {
                 _client.RequestGroupCreation(groupsWindow.GroupTitle, groupsWindow.SelectedClients);
+            }
+        }
+
+        private void GetChatInfo(object obj)
+        {
+            if (ChatsCollectionSelectedItem != null)
+            {
+                _client.RequestChatInfo(ChatsCollectionSelectedItem.Id.ToString());
             }
         }
 
@@ -239,6 +252,43 @@
         {
             ChatsCollection = new ObservableCollection<Chat>(ChatsCollection.OrderByDescending(chat => chat.LastMessage?.Timestamp));
             CollectionViewSource.GetDefaultView(ChatsCollection).Refresh();
+        }
+
+        private void HandleChatInfo(object sender, ChatInfoResponseReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    var chatInfoWindow = new ChatInfoWindow(ChatsCollectionSelectedItem, args.Group);
+
+                    if (chatInfoWindow.ShowDialog() == true)
+                    {
+                        _client.RequestGroupLeaving(ChatsCollectionSelectedItem.Id.ToString());
+                    }
+                });
+        }
+
+        private void RemoveGroup(object sender, GroupLeavingResponseReceivedEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(
+                delegate
+                {
+                    foreach (Chat chat in ChatsCollection)
+                    {
+                        if (chat.Id.ToString() != args.ChatId)
+                        {
+                            continue;
+                        }
+
+                        if (ChatsCollectionSelectedItem != null && ChatsCollectionSelectedItem.Id.ToString() == args.ChatId)
+                        {
+                            ChatsCollectionSelectedItem = null;
+                        }
+
+                        ChatsCollection.Remove(chat);
+                        return;
+                    }
+                });
         }
 
         #endregion

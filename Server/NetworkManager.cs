@@ -50,8 +50,10 @@
             _wsServer.MessageRequestReceived += _messageService.HandleMessageRequest;
             _wsServer.ChatHistoryRequestReceived += _chatService.HandleChatHistoryRequest;
             _wsServer.GroupCreationRequestReceived += _groupService.HandleGroupCreationRequest;
+            _wsServer.GroupLeavingRequestReceived += _groupService.HandleGroupLeavingRequest;
             _wsServer.EventLogsRequestReceived += _eventLogService.HandleEventLogsRequest;
             _wsServer.ChatListRequestReceived += _chatService.HandleChatListRequest;
+            _wsServer.ChatInfoRequestReceived += _chatService.HandleChatInfoRequest;
             _messageService.ChatNotExists += _chatService.CreateNewChat;
             _groupService.ChatNotExists += _chatService.CreateNewChat;
             _messageService.MessageAddedToDb += _chatService.UpdateChatRecord;
@@ -60,6 +62,8 @@
             _eventLogService.EventLogRequestHandled += Send;
             _chatService.ChatListRequestHandled += Send;
             _groupService.GroupCreationRequestHandled += Send;
+            _chatService.ChatInfoRequestHandled += Send;
+            _groupService.GroupLeavingRequestHandled += Send;
             _messageService.MessageRequestHandled += SendBroadcast;
             _chatService.NewChatCreated += SendBroadcast;
             _clientService.ClientConnected += SendConnectionStateChangedBroadcast;
@@ -137,7 +141,7 @@
                     _wsServer.SendTo(sender, args.Response, args.Chat.TargetId);
                     _wsServer.SendTo(sender, args.Response, args.Chat.SourceId);
                     break;
-                case ChatTypes.Group:
+                    case ChatTypes.Group:
                     foreach (string clientId in args.ClientIds)
                     {
                         _wsServer.SendTo(sender, args.Response, clientId);

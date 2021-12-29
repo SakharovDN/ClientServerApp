@@ -187,16 +187,14 @@
             Send(new GroupCreationRequest(groupTitle, clientIds, Id).GetContainer());
         }
 
-        public void Ping()
+        public void RequestChatInfo(string chatId)
         {
-            try
-            {
-                _socket.Ping();
-            }
-            catch
-            {
-                Disconnect();
-            }
+            Send(new ChatInfoRequest(chatId).GetContainer());
+        }
+
+        public void RequestGroupLeaving(string chatId)
+        {
+            Send(new GroupLeavingRequest(chatId, Id).GetContainer());
         }
 
         private void Send(MessageContainer container)
