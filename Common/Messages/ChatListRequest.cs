@@ -24,7 +24,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.ChatListRequest,
-                Payload = this
+                Payload = this,
             };
         }
 

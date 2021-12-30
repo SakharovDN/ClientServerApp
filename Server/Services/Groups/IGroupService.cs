@@ -12,11 +12,15 @@
 
         event EventHandler<RequestHandledEventArgs> GroupCreationRequestHandled;
 
+        event EventHandler<RequestHandledEventArgs> GroupLeavingRequestHandled;
+
         #endregion
 
         #region Methods
 
         void HandleGroupCreationRequest(object sender, GroupCreationRequestReceivedEventArgs args);
+
+        void HandleGroupLeavingRequest(object sender, GroupLeavingRequestReceivedEventArgs args);
 
         #endregion
     }

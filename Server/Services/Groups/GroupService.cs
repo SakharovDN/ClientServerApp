@@ -1,6 +1,7 @@
 ﻿namespace Server.Services
 {
     using System;
+    using System.Collections.Generic;
 
     using Common;
     using Common.Messages;
@@ -28,6 +29,8 @@
         public event EventHandler<ChatNotExistsEventArgs> ChatNotExists;
 
         public event EventHandler<RequestHandledEventArgs> GroupCreationRequestHandled;
+
+        public event EventHandler<RequestHandledEventArgs> GroupLeavingRequestHandled;
 
         #endregion
 
@@ -77,6 +80,44 @@
                 MessageAmount = 0
             };
             ChatNotExists?.Invoke(sender, new ChatNotExistsEventArgs(chat, args.ClientIds));
+        }
+
+        public void HandleGroupLeavingRequest(object sender, GroupLeavingRequestReceivedEventArgs args)
+        {
+            if (!Guid.TryParse(args.ChatId, out Guid chatId))
+            {
+                return;
+            }
+
+            Chat chat = _storage.Chats.Find(chatId);
+
+            if (chat == null)
+            {
+                return;
+            }
+
+            if (!Guid.TryParse(chat.TargetId, out Guid groupId))
+            {
+                return;
+            }
+
+            Group group = _storage.Groups.Find(groupId);
+
+            if (group == null)
+            {
+                return;
+            }
+
+            var clientIds = JsonConvert.DeserializeObject<List<string>>(group.ClientIds);
+
+            if (clientIds == null)
+            {
+                return;
+            }
+
+            clientIds.Remove(args.ClientId);
+            _storage.AddQueueItem(new UpdateGroupClientsItem(chat.TargetId, clientIds));
+            GroupLeavingRequestHandled?.Invoke(sender, new RequestHandledEventArgs(new GroupLeavingResponse(args.ChatId).GetContainer()));
         }
 
         #endregion

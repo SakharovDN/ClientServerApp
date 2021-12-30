@@ -60,7 +60,7 @@
 
         public Client GetClientById(string clientId)
         {
-            return _storage.Clients.Find(Guid.Parse(clientId));
+            return Guid.TryParse(clientId, out Guid id) ? _storage.Clients.Find(id) : null;
         }
 
         public void HandleConnectionRequest(object sender, ConnectionRequestReceivedEventArgs args)

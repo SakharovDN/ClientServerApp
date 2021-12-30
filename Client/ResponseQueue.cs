@@ -41,6 +41,10 @@
 
         public event EventHandler<GroupCreationResponseReceivedEventArgs> GroupCreationResponseReceived;
 
+        public event EventHandler<ChatInfoResponseReceivedEventArgs> ChatInfoResponseReceived;
+
+        public event EventHandler<GroupLeavingResponseReceivedEventArgs> GroupLeavingResponseReceived;
+
         #endregion
 
         #region Constructors
@@ -108,6 +112,12 @@
                         break;
                     case MessageTypes.GroupCreationResponse:
                         HandleGroupCreationResponse(container);
+                        break;
+                    case MessageTypes.ChatInfoResponse:
+                        HandleChatInfoResponse(container);
+                        break;
+                    case MessageTypes.GroupLeavingResponse:
+                        HandleGroupLeavingResponse(container);
                         break;
                 }
 
@@ -189,6 +199,22 @@
                 GroupCreationResponseReceived?.Invoke(
                     null,
                     new GroupCreationResponseReceivedEventArgs(groupCreationResponse.Result, groupCreationResponse.Reason));
+            }
+        }
+
+        private void HandleChatInfoResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(ChatInfoResponse)) is ChatInfoResponse chatInfoResponse)
+            {
+                ChatInfoResponseReceived?.Invoke(null, new ChatInfoResponseReceivedEventArgs(chatInfoResponse.Group));
+            }
+        }
+
+        private void HandleGroupLeavingResponse(MessageContainer container)
+        {
+            if (((JObject)container.Payload).ToObject(typeof(GroupLeavingResponse)) is GroupLeavingResponse groupLeavingResponse)
+            {
+                GroupLeavingResponseReceived?.Invoke(null, new GroupLeavingResponseReceivedEventArgs(groupLeavingResponse.ChatId));
             }
         }
 

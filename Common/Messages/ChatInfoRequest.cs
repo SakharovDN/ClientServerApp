@@ -1,6 +1,6 @@
 ﻿namespace Common.Messages
 {
-    public class ChatHistoryRequest
+    public class ChatInfoRequest
     {
         #region Properties
 
@@ -10,7 +10,7 @@
 
         #region Constructors
 
-        public ChatHistoryRequest(string chatId)
+        public ChatInfoRequest(string chatId)
         {
             ChatId = chatId;
         }
@@ -23,7 +23,7 @@
         {
             return new MessageContainer
             {
-                Type = MessageTypes.ChatHistoryRequest,
+                Type = MessageTypes.ChatInfoRequest,
                 Payload = this,
             };
         }

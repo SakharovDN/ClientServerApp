@@ -72,10 +72,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChatInfo\ChatInfoViewModel.cs" />
+    <Compile Include="ChatInfo\ChatInfoWindow.xaml.cs">
+      <DependentUpon>ChatInfoWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConnectedClients\ConnectedClientsViewModel.cs" />
     <Compile Include="ConnectedClients\ConnectedClientsWindow.xaml.cs">
       <DependentUpon>ConnectedClientsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\IconConverter.cs" />
     <Compile Include="Converters\NullVisibilityConverter.cs" />
     <Compile Include="ResponseQueue.cs" />
     <Compile Include="CommandHandler.cs" />
@@ -98,6 +103,10 @@
     <Compile Include="Main\MainViewModel.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="WsClient.cs" />
+    <Page Include="ChatInfo\ChatInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ConnectedClients\ConnectedClientsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -141,6 +150,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Images\info.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

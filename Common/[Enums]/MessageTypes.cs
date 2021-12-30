@@ -16,5 +16,9 @@
         ChatListRequest,
         ChatListResponse,
         GroupCreationResponse,
+        ChatInfoRequest,
+        ChatInfoResponse,
+        GroupLeavingRequest,
+        GroupLeavingResponse,
     }
 }

@@ -27,7 +27,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.GroupCreationResponse,
-                Payload = this
+                Payload = this,
             };
         }
 

@@ -15,6 +15,8 @@
 
         event EventHandler<RequestHandledEventArgs> ChatHistoryRequestHandled;
 
+        event EventHandler<RequestHandledEventArgs> ChatInfoRequestHandled;
+
         #endregion
 
         #region Methods
@@ -26,6 +28,8 @@
         void HandleChatListRequest(object sender, ChatListRequestReceivedEventArgs args);
 
         void HandleChatHistoryRequest(object sender, ChatHistoryRequestReceivedEventArgs args);
+
+        void HandleChatInfoRequest(object sender, ChatInfoRequestReceivedEventArgs args);
 
         #endregion
     }

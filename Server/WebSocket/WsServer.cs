@@ -45,6 +45,10 @@
 
         public event EventHandler<ChatListRequestReceivedEventArgs> ChatListRequestReceived;
 
+        public event EventHandler<ChatInfoRequestReceivedEventArgs> ChatInfoRequestReceived;
+
+        public event EventHandler<GroupLeavingRequestReceivedEventArgs> GroupLeavingRequestReceived;
+
         #endregion
 
         #region Constructors
@@ -159,7 +163,6 @@
 
                     ConnectionRequestReceived?.Invoke(senderConnection, new ConnectionRequestReceivedEventArgs(connectionRequest.ClientName));
                     break;
-
                 case MessageTypes.MessageRequest:
                     if (!(((JObject)container.Payload).ToObject(typeof(MessageRequest)) is MessageRequest messageRequest))
                     {
@@ -173,7 +176,6 @@
                 case MessageTypes.EventLogsRequest:
                     EventLogsRequestReceived?.Invoke(senderConnection, EventArgs.Empty);
                     break;
-
                 case MessageTypes.ChatHistoryRequest:
                     if (!(((JObject)container.Payload).ToObject(typeof(ChatHistoryRequest)) is ChatHistoryRequest chatHistoryRequest))
                     {
@@ -184,7 +186,6 @@
                         senderConnection,
                         new ChatHistoryRequestReceivedEventArgs(chatHistoryRequest.ChatId));
                     break;
-
                 case MessageTypes.GroupCreationRequest:
                     if (!(((JObject)container.Payload).ToObject(typeof(GroupCreationRequest)) is GroupCreationRequest groupCreationRequest))
                     {
@@ -198,7 +199,6 @@
                             groupCreationRequest.ClientIds,
                             groupCreationRequest.CreatorId));
                     break;
-
                 case MessageTypes.ChatListRequest:
                     if (!(((JObject)container.Payload).ToObject(typeof(ChatListRequest)) is ChatListRequest chatListRequest))
                     {
@@ -208,6 +208,24 @@
                     ChatListRequestReceived?.Invoke(
                         senderConnection,
                         new ChatListRequestReceivedEventArgs(chatListRequest.ClientId));
+                    break;
+                case MessageTypes.ChatInfoRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(ChatInfoRequest)) is ChatInfoRequest chatInfoRequest))
+                    {
+                        return;
+                    }
+
+                    ChatInfoRequestReceived?.Invoke(senderConnection, new ChatInfoRequestReceivedEventArgs(chatInfoRequest.ChatId));
+                    break;
+                case MessageTypes.GroupLeavingRequest:
+                    if (!(((JObject)container.Payload).ToObject(typeof(GroupLeavingRequest)) is GroupLeavingRequest groupLeavingRequest))
+                    {
+                        return;
+                    }
+
+                    GroupLeavingRequestReceived?.Invoke(
+                        senderConnection,
+                        new GroupLeavingRequestReceivedEventArgs(groupLeavingRequest.ChatId, groupLeavingRequest.ClientId));
                     break;
             }
         }

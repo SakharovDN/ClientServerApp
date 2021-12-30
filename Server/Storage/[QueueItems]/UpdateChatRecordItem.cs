@@ -27,15 +27,22 @@
 
         public override void Accept(InternalStorage storage)
         {
-            Chat chat = storage.Chats.Find(Guid.Parse(_chatId));
-
-            if (chat != null)
+            if (Guid.TryParse(_chatId, out Guid id))
             {
-                chat.LastMessageId = _lastMessageId;
-                chat.MessageAmount++;
-            }
+                Chat chat = storage.Chats.Find(id);
 
-            storage.SaveChanges();
+                if (chat != null)
+                {
+                    chat.LastMessageId = _lastMessageId;
+                    chat.MessageAmount++;
+                }
+
+                storage.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("Failed to get chat id");
+            }
         }
 
         #endregion

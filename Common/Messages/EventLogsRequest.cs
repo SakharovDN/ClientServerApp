@@ -9,7 +9,7 @@
             return new MessageContainer
             {
                 Type = MessageTypes.EventLogsRequest,
-                Payload = this
+                Payload = this,
             };
         }
 
