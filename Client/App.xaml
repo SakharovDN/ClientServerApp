@@ -5,7 +5,8 @@
              StartupUri="Main/MainWindow.xaml">
     <Application.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter" />
-        <converters:IconConverter x:Key="IconConverter"></converters:IconConverter>
+        <converters:IconConverter x:Key="IconConverter" />
+        <converters:DateTimeConverter x:Key="DateTimeConverter" />
         <Style x:Key="TextBox" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="25" />
             <Setter Property="BorderBrush" Value="LightGray" />
@@ -161,11 +162,11 @@
             </Style.Resources>
         </Style>
         <Style x:Key="MessageBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="BorderBrush" Value="#FFE6E6E6" />
             <Setter Property="BorderThickness" Value="2" />
             <Setter Property="CornerRadius" Value="2" />
             <Setter Property="Margin" Value="10,5" />
-            <Setter Property="Background" Value="LightGray" />
+            <Setter Property="Background" Value="#FFE6E6E6" />
             <Setter Property="MinWidth" Value="100" />
             <Setter Property="MaxWidth" Value="500" />
             <Setter Property="VerticalAlignment" Value="Top" />
