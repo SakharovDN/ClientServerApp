@@ -191,7 +191,7 @@
                                            FontWeight="Bold"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"  Margin="2,0,0,0"/>
                                 <TextBlock Style="{StaticResource ChatsItemTextBlock}"
-                                           Text="{Binding Path=LastMessage.Timestamp, StringFormat=dd.MM.yy}"
+                                           Text="{Binding Path=LastMessage.Timestamp, Converter={StaticResource DateTimeConverter}}"
                                            VerticalAlignment="Center" HorizontalAlignment="Right" />
                             </DockPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,5">

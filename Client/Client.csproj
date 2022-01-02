@@ -80,6 +80,7 @@
     <Compile Include="ConnectedClients\ConnectedClientsWindow.xaml.cs">
       <DependentUpon>ConnectedClientsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DateTimeConverter.cs" />
     <Compile Include="Converters\IconConverter.cs" />
     <Compile Include="Converters\NullVisibilityConverter.cs" />
     <Compile Include="ResponseQueue.cs" />
