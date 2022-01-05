@@ -95,7 +95,7 @@
             {
                 _wsServer.Stop();
                 _logger.Info("Server stopped successfully");
-                Console.WriteLine("Server started successfully");
+                Console.WriteLine("Server stopped successfully");
             }
             catch (Exception ex)
             {
